@@ -1,12 +1,13 @@
-Quick Start with JetBrains CLion
-================================
+# Quick Start with JetBrains CLion
 
 The following *should* work but has not been tested on a completely clean system with CLion. It may
 work with other "batteries-included" IDEs as well.
 
-* Install `external-libs` from [prebuilt static external libraries from the qpdf/external-libs
+* **Recommended (vcpkg):** Install dependencies using vcpkg (see [vcpkg Setup](#vcpkg-setup-recommended) below).
+* **Legacy (external-libs):** Install `external-libs` from [prebuilt static external libraries from the qpdf/external-libs
   github repository](https://github.com/qpdf/external-libs/releases) by unzipping the binary
-  distribution into an otherwise clean source tree.
+  distribution into an otherwise clean source tree. Note: The external-libs repository is deprecated
+  and will be removed in a future release.
 * Using the default toolchain, you can create a cmake build of type *other than Debug*. A `Debug`
   build will not work with the external libraries since debug versions are not redistributable. If
   you want a Debug build, you'll have to build the external libraries yourself. The external-libs
@@ -30,7 +31,7 @@ Common Setup
 
 You may need to disable antivirus software to run qpdf's test suite. Running Windows Defender on Windows 10 does not interfere with building or running qpdf or its test suite.
 
-Starting with qpdf version 11, qpdf is built with cmake. You can build qpdf with Visual C++ in Release mode with the pre-built external-libraries distribution (described below) without having any additional tools installed. You can also build with Visual C++ using JetBrains CLion with the external libraries distribution as long as you pass `-DBUILD_SHARED_LIBS=OFF`. It also works to use the build type `RelWithDebInfo`, in which case you can run qpdf in the debugger. To run the test suite, you need MSYS2.
+Starting with qpdf version 11, qpdf is built with cmake. You can build qpdf with Visual C++ in Release mode using vcpkg (recommended) or with the pre-built external-libraries distribution (deprecated) without having any additional tools installed. You can also build with Visual C++ using JetBrains CLion with vcpkg as long as you pass `-DBUILD_SHARED_LIBS=OFF`. It also works to use the build type `RelWithDebInfo`, in which case you can run qpdf in the debugger. To run the test suite, you need MSYS2.
 
 Here's what I did on my system:
 
@@ -60,7 +61,51 @@ Image comparison tests are disabled by default, but it is possible to run them o
 * [LibTiff](http://gnuwin32.sourceforge.net/packages/tiff.htm): This archive provides some needed binaries and DLLs if you want to use the image comparison tests. It depends on some DLLs from LibJpeg.
 * [GhostScript](http://www.ghostscript.com/download/gsdnld.html): GhostScript is needed for image comparison tests. It's important that the binary is available as `gs`, while its default name is `gswin32[c].exe`. You can either copy one of the original files, use `mklink` to create a hard/softlink, or provide a custom `gs.cmd` wrapper that forwards all arguments to one of the original binaries. Using `mklink` with `gswin32c.exe` is probably the best choice.
 
-# External Libraries
+# vcpkg Setup (Recommended)
+
+Starting with qpdf 12.4.0, the recommended way to manage dependencies on Windows is using [vcpkg](https://vcpkg.io/). vcpkg is a cross-platform package manager from Microsoft that simplifies dependency management.
+
+## Installing vcpkg
+
+```bash
+# Clone vcpkg
+git clone https://github.com/microsoft/vcpkg.git C:\vcpkg
+cd C:\vcpkg
+
+# Bootstrap vcpkg
+.\bootstrap-vcpkg.bat
+
+# Add vcpkg to your PATH (optional but recommended)
+setx PATH "%PATH%;C:\vcpkg"
+```
+
+## Using vcpkg with qpdf
+
+Once vcpkg is installed, qpdf will automatically use it to resolve dependencies when you build:
+
+```bash
+# Set VCPKG_ROOT environment variable
+set VCPKG_ROOT=C:\vcpkg
+
+# Configure and build (dependencies will be installed automatically via vcpkg.json)
+mkdir build
+cd build
+cmake -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake ..
+cmake --build . --config Release
+```
+
+The required dependencies (zlib, libjpeg-turbo, openssl) are specified in `vcpkg.json` at the root of the qpdf repository and will be installed automatically by vcpkg during the CMake configure step.
+
+## Opting out of vcpkg
+
+If you prefer not to use vcpkg, you can:
+
+1. **Use external-libs (deprecated):** Set `-DUSE_VCPKG=OFF` and extract the external-libs distribution into the source tree.
+2. **Use system libraries:** Set `-DUSE_VCPKG=OFF` and ensure zlib, libjpeg, and openssl are available to CMake via other means.
+
+# External Libraries (Deprecated)
+
+**Note:** The external-libs repository approach is deprecated and will be removed in a future version of qpdf. Please migrate to vcpkg.
 
 In order to build qpdf, you must have a copy of `zlib` and the `jpeg` library. You can download [prebuilt static external libraries from the qpdf/external-libs github repository](https://github.com/qpdf/external-libs/releases). These include `zlib`, `jpeg`, and `openssl` libraries. For MSVC, you must use a non-debugging build configuration. There are files called `external-libs-bin.zip` and `external-libs-src.zip`. If you are building with a recent MSVC or MINGW with MSYS2, you can just extract the `qpdf-external-libs-bin.zip` zip file into the top-level qpdf source tree. The qpdf build detects the presence of the `external-libs` directory automatically. You don't need to set any cmake options.
 

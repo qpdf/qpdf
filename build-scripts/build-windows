@@ -8,7 +8,7 @@ declare -a cmake_xargs
 declare -a ctest_xargs
 config=Release
 if [[ $tool == mingw ]]; then
-    pacman -Sy --noconfirm make base-devel tar zip unzip
+    pacman -Sy --noconfirm make base-devel tar zip unzip git
     if [ ! -x /c/msys64/mingw$wordsize/bin/g++.exe ]; then
         if [[ $wordsize == 64 ]]; then
             pacman -Sy --noconfirm mingw-w64-x86_64-toolchain
@@ -27,7 +27,16 @@ fi
 
 mkdir build distribution
 unzip doc.zip
-unzip qpdf-external-libs-bin.zip
+
+# Use vcpkg by default, fall back to external-libs if USE_VCPKG=0
+if [[ "${USE_VCPKG:-1}" == "1" ]]; then
+    echo "Setting up vcpkg for dependency resolution..."
+    source build-scripts/setup-vcpkg
+    export VCPKG_ROOT
+else
+    echo "Using external-libs for dependency resolution (deprecated)..."
+    unzip qpdf-external-libs-bin.zip
+fi
 
 cd build
 ../cmake-win $tool ci $config

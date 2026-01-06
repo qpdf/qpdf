@@ -96,6 +96,12 @@ option(DEFAULT_CRYPTO
 
 option(ZOPFLI, "Use zopfli for zlib-compatible compression")
 
+# USE_VCPKG enables vcpkg for dependency resolution on Windows. When OFF,
+# falls back to external-libs or system-provided libraries.
+CMAKE_DEPENDENT_OPTION(
+  USE_VCPKG "Use vcpkg for dependency resolution on Windows" ON
+  "WIN32" OFF)
+
 # INSTALL_MANUAL is not dependent on building docs. When creating some
 # distributions, we build the doc in one run, copy doc-dist in, and
 # install it elsewhere.

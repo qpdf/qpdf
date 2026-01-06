@@ -67,16 +67,21 @@ jobs:
         shell: bash
         run: git config --global core.autocrlf input
       - uses: actions/checkout@v4
+      - name: 'Setup vcpkg'
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgGitCommitId: 'a42af01b72c28a8e1d7b48107b33e4f286a55ef6'
       - name: 'Download documentation'
         uses: actions/download-artifact@v4
         with:
           name: doc
           path: .
-      - name: 'Download external libs'
+      - name: 'Download external libs (fallback)'
         uses: actions/download-artifact@v4
         with:
           name: external-libs
           path: .
+        continue-on-error: true
       - name: 'Build, test, generate binary distributions'
         shell: cmd
         run: build-scripts/build-windows.bat ${{ matrix.wordsize }} ${{ matrix.tool }}
