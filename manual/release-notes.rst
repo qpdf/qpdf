@@ -98,6 +98,11 @@ more detail.
       into the environment during completion and to correctly handle
       ``bashcompinit`` for zsh users.
 
+    - Add new :qpdf:ref:`--remove-acroform` option to exclude the AcroForm
+      dictionary from the output PDF. This option can be useful particularly
+      when the :qpdf:ref:`--flatten-annotations` option is used on damaged
+      PDF files.
+
   - Other enhancements
 
     - Add new ``inspection mode`` to help with the inspection and manual repair

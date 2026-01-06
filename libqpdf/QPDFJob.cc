@@ -438,6 +438,9 @@ QPDFJob::createQPDF()
     m->warnings |= m->inputs.clear();
 
     auto root = pdf.getRoot();
+    if (m->remove_acroform) {
+        root.erase("/AcroForm");
+    }
     if (m->remove_info) {
         auto trailer = pdf.getTrailer();
         auto mod_date = trailer["/Info"]["/ModDate"];
