@@ -158,6 +158,8 @@ if(USE_VCPKG_DEPS)
   
   find_package(JPEG REQUIRED)
   list(APPEND dep_link_libraries JPEG::JPEG)
+  # Extract JPEG include directory for use by other parts of the build
+  # (e.g., tests that need to know the jpeg include path)
   get_target_property(JPEG_INCLUDE_DIRS JPEG::JPEG INTERFACE_INCLUDE_DIRECTORIES)
   if(JPEG_INCLUDE_DIRS)
     list(GET JPEG_INCLUDE_DIRS 0 JPEG_INCLUDE)

@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-cd $(dirname $0)/..
+cd "$(dirname "$0")"/..
 
 # Setup vcpkg for Windows builds
 # This script clones vcpkg if not present and bootstraps it
@@ -9,7 +9,10 @@ VCPKG_DIR="${VCPKG_ROOT:-$HOME/vcpkg}"
 
 if [ ! -d "$VCPKG_DIR" ]; then
     echo "Cloning vcpkg to $VCPKG_DIR"
-    git clone https://github.com/microsoft/vcpkg.git "$VCPKG_DIR"
+    if ! git clone https://github.com/microsoft/vcpkg.git "$VCPKG_DIR"; then
+        echo "ERROR: Failed to clone vcpkg repository" >&2
+        exit 1
+    fi
 fi
 
 cd "$VCPKG_DIR"
@@ -18,9 +21,15 @@ cd "$VCPKG_DIR"
 if [ ! -f "vcpkg" ] && [ ! -f "vcpkg.exe" ]; then
     echo "Bootstrapping vcpkg..."
     if [[ "$OSTYPE" == "msys" ]] || [[ "$OSTYPE" == "win32" ]]; then
-        ./bootstrap-vcpkg.bat
+        if ! ./bootstrap-vcpkg.bat; then
+            echo "ERROR: Failed to bootstrap vcpkg" >&2
+            exit 1
+        fi
     else
-        ./bootstrap-vcpkg.sh
+        if ! ./bootstrap-vcpkg.sh; then
+            echo "ERROR: Failed to bootstrap vcpkg" >&2
+            exit 1
+        fi
     fi
 fi
 
