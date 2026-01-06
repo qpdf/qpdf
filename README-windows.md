@@ -63,7 +63,7 @@ Image comparison tests are disabled by default, but it is possible to run them o
 
 # vcpkg Setup (Recommended)
 
-Starting with qpdf 12.4.0, the recommended way to manage dependencies on Windows is using [vcpkg](https://vcpkg.io/). vcpkg is a cross-platform package manager from Microsoft that simplifies dependency management.
+Starting with qpdf 12.3.0, the recommended way to manage dependencies on Windows is using [vcpkg](https://vcpkg.io/). vcpkg is a cross-platform package manager from Microsoft that simplifies dependency management.
 
 ## Installing vcpkg
 

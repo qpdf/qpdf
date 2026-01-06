@@ -205,7 +205,7 @@ Fuzz Errors
 External Libraries
 ==================
 
-**Status as of qpdf 12.4.0:** The external-libs repository approach is **deprecated** in favor of vcpkg.
+**Status as of qpdf 12.3.0:** The external-libs repository approach is **deprecated** in favor of vcpkg.
 
 vcpkg is now the recommended method for managing Windows dependencies:
 
@@ -220,7 +220,7 @@ For users still using external-libs:
 * Consider migrating to vcpkg for better dependency management and updates
 * See `README-windows.md` for vcpkg setup instructions
 
-Previous state (before 12.4.0):
+Previous state (before 12.3.0):
 
 Current state (10.0.2):
 

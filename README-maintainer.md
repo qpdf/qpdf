@@ -518,7 +518,7 @@ When done, the following should happen:
   Copyright last updated: 2026.
 
 * Take a look at "External Libraries" in TODO to see if we need to
-  make any changes. Starting with qpdf 12.4.0, vcpkg is the recommended
+  make any changes. Starting with qpdf 12.3.0, vcpkg is the recommended
   dependency management approach for Windows. The external-libs repository
   is deprecated but still maintained for legacy support. See
   README-maintainer in external-libs if updates are needed.

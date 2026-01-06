@@ -48,7 +48,7 @@ Ubuntu. However, there are some downloads available for Linux as well.
 
 Windows Build Support
 
-**Note:** Starting with qpdf 12.4.0, vcpkg is the recommended method for obtaining build dependencies on Windows.
+**Note:** Starting with qpdf 12.3.0, vcpkg is the recommended method for obtaining build dependencies on Windows.
 
 If you are building on Windows with vcpkg (recommended), the dependencies will be automatically managed based on the
 `vcpkg.json` manifest file in the source distribution. See README-windows.md for setup instructions.
