@@ -116,16 +116,24 @@ set(dep_link_libraries)
 set(ANYTHING_MISSING 0)
 
 # Determine dependency resolution method:
-# 1. If USE_VCPKG is ON (Windows default), use vcpkg
+# 1. If USE_VCPKG is ON (Windows default) and vcpkg toolchain is used, use vcpkg
 # 2. If external-libs directory exists, use it (legacy support)
 # 3. Otherwise, use system libraries via pkg-config or find_package
 set(USE_VCPKG_DEPS OFF)
 set(EXTERNAL_LIBS 0)
 
-if(WIN32 AND USE_VCPKG AND DEFINED ENV{VCPKG_ROOT})
-  set(USE_VCPKG_DEPS ON)
-  message(STATUS "Using vcpkg for dependency resolution")
-elseif(WIN32 AND (EXISTS ${qpdf_SOURCE_DIR}/external-libs))
+# Check if vcpkg is being used via toolchain file or environment variable
+if(WIN32 AND USE_VCPKG)
+  if(DEFINED CMAKE_TOOLCHAIN_FILE AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
+    set(USE_VCPKG_DEPS ON)
+    message(STATUS "Using vcpkg for dependency resolution (toolchain file detected)")
+  elseif(DEFINED ENV{VCPKG_ROOT})
+    set(USE_VCPKG_DEPS ON)
+    message(STATUS "Using vcpkg for dependency resolution (VCPKG_ROOT set)")
+  endif()
+endif()
+
+if(WIN32 AND NOT USE_VCPKG_DEPS AND (EXISTS ${qpdf_SOURCE_DIR}/external-libs))
   set(EXTERNAL_LIBS 1)
   message(STATUS "Using external-libs for dependency resolution (deprecated)")
 endif()

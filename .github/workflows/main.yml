@@ -32,11 +32,13 @@ jobs:
         with:
           name: doc
           path: doc.zip
-      - name: 'Upload external libs'
+      - name: 'Upload external libs (legacy fallback)'
         uses: actions/upload-artifact@v4
         with:
           name: external-libs
           path: external-libs-dist
+        # Note: This step is kept for compatibility but Windows builds
+        # now use vcpkg by default. This may be removed in the future.
       - name: 'Upload doc distribution'
         uses: actions/upload-artifact@v4
         with:

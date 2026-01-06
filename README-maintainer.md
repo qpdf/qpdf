@@ -518,9 +518,10 @@ When done, the following should happen:
   Copyright last updated: 2026.
 
 * Take a look at "External Libraries" in TODO to see if we need to
-  make any changes. There is still some automation work left to do, so
-  handling external-libs releases is still manual. See also
-  README-maintainer in external-libs.
+  make any changes. Starting with qpdf 12.4.0, vcpkg is the recommended
+  dependency management approach for Windows. The external-libs repository
+  is deprecated but still maintained for legacy support. See
+  README-maintainer in external-libs if updates are needed.
 
 * Check for open fuzz crashes at https://oss-fuzz.com
 
@@ -843,8 +844,10 @@ To declare something as deprecated:
 
 This is what I do for routine testing on Windows.
 
-* From Windows, git clone from my Linux clone, and unzip
-  `external-libs`.
+* From Windows, git clone from my Linux clone.
+
+* **Recommended:** Set up vcpkg as described in README-windows.md, or
+  unzip `external-libs` for legacy testing.
 
 * Start a command-line shell for x86_64 and x86 tools from Visual
   studio. From there, start C:\msys64\mingw64 twice and
@@ -905,7 +908,8 @@ manual tests were done:
 
 We are using RelWithDebInfo for mingw and other non-Windows builds but
 Release for MSVC. There are linker warnings if MSVC is built with
-RelWithDebInfo when using external-libs.
+RelWithDebInfo when using external-libs. With vcpkg, RelWithDebInfo
+should work without issues.
 
 ## ABI checks
 

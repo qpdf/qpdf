@@ -48,10 +48,16 @@ Ubuntu. However, there are some downloads available for Linux as well.
 
 Windows Build Support
 
-If you are building on Windows and want to use pre-built external static libraries, you should obtain current versions
-from https://github.com/qpdf/external-libs/releases. The `external-libs` directory contains older versions that will not
-work with qpdf versions >= 10.0.2. Please see README-windows.md in the qpdf source distribution. The libraries from this
-distribution will not work with a Debug build with MSVC.
+**Note:** Starting with qpdf 12.4.0, vcpkg is the recommended method for obtaining build dependencies on Windows.
+
+If you are building on Windows with vcpkg (recommended), the dependencies will be automatically managed based on the
+`vcpkg.json` manifest file in the source distribution. See README-windows.md for setup instructions.
+
+Alternatively, for legacy support, if you want to use pre-built external static libraries, you can obtain current
+versions from https://github.com/qpdf/external-libs/releases. However, this approach is deprecated and will be
+removed in a future version. The `external-libs` directory contains older versions that will not work with qpdf
+versions >= 10.0.2. Please see README-windows.md in the qpdf source distribution. The libraries from this distribution
+will not work with a Debug build with MSVC.
 
 Documentation
 
