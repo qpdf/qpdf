@@ -767,7 +767,14 @@ namespace qpdf::impl
             return {qpdf() ? qpdf()->getRoot()["/AcroForm"][name] : null_oh};
         }
 
-        void setRadioButtonValue(QPDFObjectHandle name);
+        /// @brief Sets the value of a radio button field.
+        ///
+        /// This method updates the value of a radio button field to the specified name.
+        /// It ensures that the radio button's state is consistent with the provided value.
+        ///
+        /// @param name The name of the radio button value to set. This corresponds to the
+        ///             appearance state name of the selected radio button.
+        void setRadioButtonValue(Name const& name);
         void setCheckBoxValue(bool value);
         void generateTextAppearance(QPDFAnnotationObjectHelper&);
 

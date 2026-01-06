@@ -446,8 +446,8 @@ QPDFFormFieldObjectHelper::setV(QPDFObjectHandle value, bool need_appearances)
 void
 FormNode::setV(QPDFObjectHandle value, bool need_appearances)
 {
-    Name name = value;
     if (FT() == "/Btn") {
+        Name name = value;
         if (isCheckbox()) {
             if (!name) {
                 warn("ignoring attempt to set a checkbox field to a value whose type is not name");
@@ -498,31 +498,30 @@ FormNode::setV(std::string const& utf8_value, bool need_appearances)
 }
 
 void
-FormNode::setRadioButtonValue(QPDFObjectHandle name)
+FormNode::setRadioButtonValue(Name const& name)
 {
+    qpdf_expect(name);
     // Set the value of a radio button field. This has the following specific behavior:
-    // * If this is a radio button field that has a parent that is also a radio button field and has
-    //   no explicit /V, call itself on the parent
+    // * If this is a node without /Kids, assume this is a individual radio button widget and call
+    // itself on the parent
     // * If this is a radio button field with children, set /V to the given value. Then, for each
     //   child, if the child has the specified value as one of its keys in the /N subdictionary of
     //   its /AP (i.e. its normal appearance stream dictionary), set /AS to name; otherwise, if /Off
     //   is a member, set /AS to /Off.
-    // Note that we never turn on /NeedAppearances when setting a radio button field.
-    QPDFObjectHandle parent = oh().getKey("/Parent");
-    if (parent.isDictionary() && parent.getKey("/Parent").null()) {
-        FormNode ph(parent);
-        if (ph.isRadioButton()) {
-            // This is most likely one of the individual buttons. Try calling on the parent.
-            ph.setRadioButtonValue(name);
+    auto kids = Kids();
+    if (!kids) {
+        // This is most likely one of the individual buttons. Try calling on the parent.
+        auto parent = Parent();
+        if (parent.Kids()) {
+            parent.setRadioButtonValue(name);
             return;
         }
     }
-    auto kids = Kids();
-    if (!(isRadioButton() && parent.null() && kids)) {
+    if (!isRadioButton() || !kids) {
         warn("don't know how to set the value of this field as a radio button");
         return;
     }
-    setFieldAttribute("/V", name);
+    replace("/V", name);
     for (FormNode kid: kids) {
         auto ap = kid.AP();
         QPDFObjectHandle annot;
@@ -542,7 +541,7 @@ FormNode::setRadioButtonValue(QPDFObjectHandle name)
             warn("unable to set the value of this radio button");
             continue;
         }
-        if (ap["/N"].contains(name.getName())) {
+        if (ap["/N"].contains(name.value())) {
             annot.replace("/AS", name);
         } else {
             annot.replace("/AS", Name("/Off"));
