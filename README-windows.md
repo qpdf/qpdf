@@ -67,15 +67,15 @@ Starting with qpdf 12.3.0, the recommended way to manage dependencies on Windows
 
 ## Installing vcpkg
 
-```bash
-# Clone vcpkg
+```cmd
+REM Clone vcpkg
 git clone https://github.com/microsoft/vcpkg.git C:\vcpkg
 cd C:\vcpkg
 
-# Bootstrap vcpkg
+REM Bootstrap vcpkg
 .\bootstrap-vcpkg.bat
 
-# Add vcpkg to your PATH (optional but recommended)
+REM Add vcpkg to your PATH (optional but recommended)
 setx PATH "%PATH%;C:\vcpkg"
 ```
 
@@ -83,11 +83,11 @@ setx PATH "%PATH%;C:\vcpkg"
 
 Once vcpkg is installed, qpdf will automatically use it to resolve dependencies when you build:
 
-```bash
-# Set VCPKG_ROOT environment variable
+```cmd
+REM Set VCPKG_ROOT environment variable
 set VCPKG_ROOT=C:\vcpkg
 
-# Configure and build (dependencies will be installed automatically via vcpkg.json)
+REM Configure and build (dependencies will be installed automatically via vcpkg.json)
 mkdir build
 cd build
 cmake -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake ..
