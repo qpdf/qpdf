@@ -607,6 +607,12 @@ When done, the following should happen:
 
 ## CREATING A RELEASE
 
+* Until qpdf 13: see also README-maintainer.md from v12.2.0 for
+  additional gpg signing steps. This includes signing the releases
+  with gpg. Do this before running cosign. Also use `git tag -s`
+  instead of `git tag -a`. When we deprecate gpg signing, this can be
+  removed.
+
 * Releases are signed using
   [cosign](https://docs.sigstore.dev/quickstart/quickstart-cosign/)
   using your GitHub identity. If you are creating a release, please
@@ -649,7 +655,7 @@ chmod 555 *.AppImage
 
 ```sh
 git rev-parse qpdf/main @
-git tag -s v$version @ -m"qpdf $version"
+git tag -a v$version @ -m"qpdf $version"
 git push qpdf v$version
 ```
 
@@ -673,7 +679,7 @@ git push qpdf @:stable
 GITHUB_TOKEN=$(qdata-show cred github-token)
 function gcurl() { curl -H "Authorization: token $GITHUB_TOKEN" ${1+"$@"}; }
 
-url=$(gcurl -s -XPOST https://api.github.com/repos/qpdf/qpdf/releases -d'{"tag_name": "v'$version'", "name": "qpdf '$ver
+url=$(gcurl -s -XPOST https://api.github.com/repos/qpdf/qpdf/releases -d'{"tag_name": "v'$version'", "name": "qpdf '$version'", "draft": true}' | jq -r '.url')
 
 # Get upload url
 upload_url=$(gcurl -s $url | jq -r '.upload_url' | sed -E -e 's/\{.*\}//')
