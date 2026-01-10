@@ -13,7 +13,7 @@ more detail.
 
 .. x.y.z: not yet released
 
-12.3.0: not yet released
+12.3.0: January 10, 2026
   - Release changes
 
     - Starting with version 12.3.0, we use
