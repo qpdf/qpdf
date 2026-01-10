@@ -51,7 +51,8 @@ information. The Artistic License appears in the file [Artistic-2.0](Artistic-2.
 
 # Prerequisites
 
-qpdf requires a C++ compiler that supports C++-17.
+To build and test qpdf, a C++ compiler that supports C++20 is required. To link with qpdf, a C++17-compatible compiler
+is sufficient.
 
 To compile and link something with qpdf, you can use `pkg-config` with package name `libqpdf` or `cmake` with package
 name `qpdf`. Here's an example of a `CMakeLists.txt` file that builds a program with the qpdf library:
