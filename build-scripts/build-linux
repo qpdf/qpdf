@@ -20,6 +20,9 @@ done
 cd ..
 # Perform additional tests on header files.
 ./build-scripts/check-headers
+# Perform additional tests on private header files.
+./build-scripts/check-private-headers
+# Create distribution
 export TMPDIR=$PWD/dist-tmp
 rm -rf $TMPDIR
 ./make_dist --ci
