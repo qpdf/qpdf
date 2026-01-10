@@ -1,0 +1,38 @@
+#!/bin/bash
+set -e
+
+# Setup vcpkg for Windows builds
+# This script clones vcpkg if not present and bootstraps it
+# It is meant to be sourced, so it preserves the current directory
+
+VCPKG_DIR="${VCPKG_ROOT:-$HOME/vcpkg}"
+
+if [ ! -d "$VCPKG_DIR" ]; then
+    echo "Cloning vcpkg to $VCPKG_DIR"
+    if ! git clone https://github.com/microsoft/vcpkg.git "$VCPKG_DIR"; then
+        echo "ERROR: Failed to clone vcpkg repository" >&2
+        return 1
+    fi
+fi
+
+# Bootstrap vcpkg if not already done (in a subshell to preserve directory)
+if [ ! -f "$VCPKG_DIR/vcpkg" ] && [ ! -f "$VCPKG_DIR/vcpkg.exe" ]; then
+    echo "Bootstrapping vcpkg..."
+    (
+        cd "$VCPKG_DIR"
+        if [[ "$OSTYPE" == "msys" ]] || [[ "$OSTYPE" == "win32" ]]; then
+            if ! ./bootstrap-vcpkg.bat; then
+                echo "ERROR: Failed to bootstrap vcpkg" >&2
+                exit 1
+            fi
+        else
+            if ! ./bootstrap-vcpkg.sh; then
+                echo "ERROR: Failed to bootstrap vcpkg" >&2
+                exit 1
+            fi
+        fi
+    ) || return 1
+fi
+
+echo "vcpkg is ready at $VCPKG_DIR"
+echo "VCPKG_ROOT=$VCPKG_DIR"

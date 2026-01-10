@@ -33,6 +33,14 @@ elif [ "$mode" = "ci" ]; then
 fi
 args=("${args[@]}" -DCPACK_NSIS_MODIFY_PATH=ON)
 
+# Add vcpkg toolchain file if VCPKG_ROOT is set
+if [ -n "$VCPKG_ROOT" ]; then
+    if [ -f "$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" ]; then
+        args=("${args[@]}" -DCMAKE_TOOLCHAIN_FILE="$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake")
+        echo "Using vcpkg toolchain file from $VCPKG_ROOT"
+    fi
+fi
+
 set -x
 cmake "${args[@]}" $dir
 set +x

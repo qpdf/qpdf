@@ -9,9 +9,11 @@ if %2 == msvc (
     )
     choco install zip
     choco install nsis
+    set VCPKG_ROOT=%VCPKG_ROOT%
     bash ./build-scripts/build-windows %1 %2
 ) else (
     choco install nsis
     set MSYS=C:\msys64
-    !MSYS!\usr\bin\env.exe MSYSTEM=MINGW64 MSYS2_PATH_TYPE=inherit /bin/bash -l %CD%/build-scripts/build-windows %1 %2
+    set VCPKG_ROOT=%VCPKG_ROOT%
+    !MSYS!\usr\bin\env.exe MSYSTEM=MINGW64 MSYS2_PATH_TYPE=inherit VCPKG_ROOT=!VCPKG_ROOT! /bin/bash -l %CD%/build-scripts/build-windows %1 %2
 )

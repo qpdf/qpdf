@@ -8,7 +8,7 @@ declare -a cmake_xargs
 declare -a ctest_xargs
 config=Release
 if [[ $tool == mingw ]]; then
-    pacman -Sy --noconfirm make base-devel tar zip unzip
+    pacman -Sy --noconfirm make base-devel tar zip unzip git
     if [ ! -x /c/msys64/mingw$wordsize/bin/g++.exe ]; then
         if [[ $wordsize == 64 ]]; then
             pacman -Sy --noconfirm mingw-w64-x86_64-toolchain
@@ -27,7 +27,33 @@ fi
 
 mkdir build distribution
 unzip doc.zip
-unzip qpdf-external-libs-bin.zip
+
+# Use vcpkg by default, fall back to external-libs if USE_VCPKG=0
+if [[ "${USE_VCPKG:-1}" == "1" ]]; then
+    echo "Setting up vcpkg for dependency resolution..."
+    
+    # Check if vcpkg is already set up (e.g., by GitHub Actions lukka/run-vcpkg)
+    if [ -n "$VCPKG_ROOT" ] && [ -d "$VCPKG_ROOT" ]; then
+        echo "VCPKG_ROOT is already set to: $VCPKG_ROOT"
+        export VCPKG_ROOT
+    else
+        # Set up vcpkg using our script
+        if ! source build-scripts/setup-vcpkg; then
+            echo "ERROR: Failed to setup vcpkg, falling back to external-libs..."
+            if [ -f qpdf-external-libs-bin.zip ]; then
+                unzip qpdf-external-libs-bin.zip
+            else
+                echo "ERROR: Neither vcpkg nor external-libs available" >&2
+                exit 1
+            fi
+        else
+            export VCPKG_ROOT
+        fi
+    fi
+else
+    echo "Using external-libs for dependency resolution (deprecated)..."
+    unzip qpdf-external-libs-bin.zip
+fi
 
 cd build
 ../cmake-win $tool ci $config

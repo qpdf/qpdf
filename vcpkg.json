@@ -1,0 +1,15 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "qpdf",
+  "description": "Content-preserving PDF transformation system",
+  "homepage": "https://qpdf.sourceforge.io/",
+  "license": "Apache-2.0 OR Artistic-2.0",
+  "dependencies": [
+    "zlib",
+    {
+      "name": "libjpeg-turbo",
+      "default-features": false
+    },
+    "openssl"
+  ]
+}

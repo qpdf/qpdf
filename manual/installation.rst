@@ -441,6 +441,17 @@ AVOID_WINDOWS_HANDLE
   functionality won't work, but you can still process PDF files from
   memory in this configuration.
 
+USE_VCPKG
+  On Windows, this option (enabled by default) enables vcpkg for
+  dependency resolution. vcpkg is a cross-platform package manager that
+  simplifies obtaining and building dependencies like zlib, libjpeg, and
+  openssl. When enabled, qpdf expects the ``VCPKG_ROOT`` environment
+  variable to be set or the ``CMAKE_TOOLCHAIN_FILE`` to point to vcpkg's
+  toolchain file. When disabled, qpdf falls back to using the
+  ``external-libs`` directory if present (deprecated) or system-provided
+  libraries. See :file:`README-windows.md` for detailed vcpkg setup
+  instructions.
+
 BUILD_DOC_DIST, INSTALL_MANUAL
   By default, installing qpdf does not include a pre-built copy of the
   manual. Instead, it installs a README file that tells people where

@@ -205,6 +205,23 @@ Fuzz Errors
 External Libraries
 ==================
 
+**Status as of qpdf 12.3.0:** The external-libs repository approach is **deprecated** in favor of vcpkg.
+
+vcpkg is now the recommended method for managing Windows dependencies:
+
+* vcpkg is integrated via `vcpkg.json` manifest in the qpdf repository
+* The `USE_VCPKG` CMake option (ON by default on Windows) enables vcpkg integration
+* GitHub Actions CI uses vcpkg for Windows builds
+* The external-libs repository will be maintained for legacy support but may be removed in a future major release
+
+For users still using external-libs:
+
+* You can continue to use external-libs by setting `-DUSE_VCPKG=OFF` or by having an `external-libs` directory
+* Consider migrating to vcpkg for better dependency management and updates
+* See `README-windows.md` for vcpkg setup instructions
+
+Previous state (before 12.3.0):
+
 Current state (10.0.2):
 
 * qpdf/external-libs repository builds external-libs on a schedule. It detects and downloads the

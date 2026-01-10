@@ -115,10 +115,27 @@ set(dep_link_directories)
 set(dep_link_libraries)
 set(ANYTHING_MISSING 0)
 
-if(WIN32 AND (EXISTS ${qpdf_SOURCE_DIR}/external-libs))
+# Determine dependency resolution method:
+# 1. If USE_VCPKG is ON (Windows default) and vcpkg toolchain is used, use vcpkg
+# 2. If external-libs directory exists, use it (legacy support)
+# 3. Otherwise, use system libraries via pkg-config or find_package
+set(USE_VCPKG_DEPS OFF)
+set(EXTERNAL_LIBS 0)
+
+# Check if vcpkg is being used via toolchain file or environment variable
+if(WIN32 AND USE_VCPKG)
+  if(DEFINED CMAKE_TOOLCHAIN_FILE AND CMAKE_TOOLCHAIN_FILE MATCHES "vcpkg")
+    set(USE_VCPKG_DEPS ON)
+    message(STATUS "Using vcpkg for dependency resolution (toolchain file detected)")
+  elseif(DEFINED ENV{VCPKG_ROOT})
+    set(USE_VCPKG_DEPS ON)
+    message(STATUS "Using vcpkg for dependency resolution (VCPKG_ROOT set)")
+  endif()
+endif()
+
+if(WIN32 AND NOT USE_VCPKG_DEPS AND (EXISTS ${qpdf_SOURCE_DIR}/external-libs))
   set(EXTERNAL_LIBS 1)
-else()
-  set(EXTERNAL_LIBS 0)
+  message(STATUS "Using external-libs for dependency resolution (deprecated)")
 endif()
 
 if(EXTERNAL_LIBS)
@@ -134,7 +151,30 @@ if(EXTERNAL_LIBS)
   endif()
 endif()
 
-if(NOT EXTERNAL_LIBS)
+# vcpkg dependency resolution using find_package
+if(USE_VCPKG_DEPS)
+  find_package(ZLIB REQUIRED)
+  list(APPEND dep_link_libraries ZLIB::ZLIB)
+  
+  find_package(JPEG REQUIRED)
+  list(APPEND dep_link_libraries JPEG::JPEG)
+  # Extract JPEG include directory for use by other parts of the build
+  # (e.g., tests that need to know the jpeg include path)
+  get_target_property(JPEG_INCLUDE_DIRS JPEG::JPEG INTERFACE_INCLUDE_DIRECTORIES)
+  if(JPEG_INCLUDE_DIRS)
+    list(GET JPEG_INCLUDE_DIRS 0 JPEG_INCLUDE)
+  endif()
+  
+  find_package(OpenSSL REQUIRED)
+  list(APPEND dep_link_libraries OpenSSL::SSL OpenSSL::Crypto)
+  
+  # Windows system libraries still needed for crypto
+  if(WIN32)
+    list(APPEND dep_link_libraries ws2_32 crypt32)
+  endif()
+endif()
+
+if(NOT EXTERNAL_LIBS AND NOT USE_VCPKG_DEPS)
   pkg_check_modules(pc_zlib zlib)
   if(pc_zlib_FOUND)
     list(APPEND dep_include_directories ${pc_zlib_INCLUDEDIR})
@@ -154,7 +194,7 @@ if(NOT EXTERNAL_LIBS)
   endif()
 endif()
 
-if(NOT EXTERNAL_LIBS)
+if(NOT EXTERNAL_LIBS AND NOT USE_VCPKG_DEPS)
   pkg_check_modules(pc_libjpeg libjpeg)
   if(pc_libjpeg_FOUND)
     list(APPEND dep_include_directories ${pc_libjpeg_INCLUDEDIR})
@@ -202,7 +242,7 @@ set(USE_CRYPTO_NATIVE OFF)
 set(FOUND_CRYPTO OFF)
 
 if(USE_IMPLICIT_CRYPTO OR REQUIRE_CRYPTO_OPENSSL)
-  if(EXTERNAL_LIBS)
+  if(EXTERNAL_LIBS OR USE_VCPKG_DEPS)
     set(USE_CRYPTO_OPENSSL ON)
   else()
     pkg_check_modules(pc_openssl openssl>=1.1.0)
@@ -284,7 +324,7 @@ message(STATUS "")
 
 if(USE_CRYPTO_OPENSSL)
   list(APPEND libqpdf_SOURCES ${libqpdf_crypto_openssl})
-  if(NOT EXTERNAL_LIBS)
+  if(NOT EXTERNAL_LIBS AND NOT USE_VCPKG_DEPS)
     list(APPEND dep_include_directories ${pc_openssl_INCLUDEDIR})
     list(APPEND dep_link_directories ${pc_openssl_LIBDIR})
     list(APPEND dep_link_libraries ${pc_openssl_LIBRARIES})
