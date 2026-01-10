@@ -371,6 +371,7 @@ check_analyze(std::string const& str, bool has8bit, bool utf8, bool utf16)
 void
 explicit_utf8_test()
 {
+    // cSpell:ignore xbfnot xbenot
     assert(QUtil::is_explicit_utf8("\xef\xbb\xbfnot empty"));
     assert(QUtil::is_explicit_utf8("\xef\xbb\xbf"));
     assert(!QUtil::is_explicit_utf8("\xef\xbb\xbenot explicit"));

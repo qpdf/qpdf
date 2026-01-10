@@ -658,6 +658,7 @@ std::string
 Encryption::compute_Perms_value_V5_clear() const
 {
     // From algorithm 3.10 from the PDF 1.7 extension level 3
+    // cSpell:ignore Tadb
     std::string k = "    \xff\xff\xff\xffTadb    ";
     int perms = getP();
     for (size_t i = 0; i < 4; ++i) {
