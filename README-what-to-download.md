@@ -10,21 +10,21 @@ crypto provider. There are several options:
   can download the `.zip` file which you can unzip to any location. Note that the `msvc` executables perform slightly
   better than the `mingw` executables.
 
-* `qpdf-<version>-bin-msvc64.exe` - Use this for 64-bit Windows systems. This is the highest performance Windows
+* `qpdf-<version>-msvc64.exe` - Use this for 64-bit Windows systems. This is the highest performance Windows
   release. It is usually the best choice for using qpdf from the command line. It is also the right choice if you are
   building non-Debug code for 64-bit systems using a recent version of Microsoft Visual C++.
 
-* `qpdf-<version>-bin-mingw64.exe` - This is a 64-bit version built with mingw. Use this for 64-bit Windows systems if
+* `qpdf-<version>-mingw64.exe` - This is a 64-bit version built with mingw. Use this for 64-bit Windows systems if
   you want development libraries that work with the 64-bit version of mingw. If you are dynamically loading qpdf from
   the DLL, this version has fewer DLLs than the msvc version and does not require a Visual C++ runtime DLL. Unlike with
   the MSVC releases, it is possible to link a debugging build with mingw against non-debugging libraries built with
   mingw.
 
-* `qpdf-<version>-bin-msvc32.exe` - This is a 32-bit version built with MSVC. Use this if you need to run qpdf on a
+* `qpdf-<version>-msvc32.exe` - This is a 32-bit version built with MSVC. Use this if you need to run qpdf on a
   32-bit system or if you are building 32-bit executables in non-Debug mode with Microsoft Visual C++. The 32-bit
   executables will work on 64-bit systems as well and are capable of working with files larger than 2 GB.
 
-* `qpdf-<version>-bin-mingw32.exe` - This is a 32-bit version built with mingw. It will work on 32-bit or 64-bit systems
+* `qpdf-<version>-mingw32.exe` - This is a 32-bit version built with mingw. It will work on 32-bit or 64-bit systems
   and can handle files larger than 2 GB.
 
 Linux Binaries
