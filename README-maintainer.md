@@ -706,6 +706,8 @@ since there is no relative link target from the news area.
 This is qpdf version x.y.z. (Brief description, summary of highlights)
 
 For a full list of changes from previous releases, please see the [release notes](https://qpdf.readthedocs.io/en/stable/release-notes.html). See also [README-what-to-download](./README-what-to-download.md) for details about the available source and binary distributions.
+
+This release was signed by enter-email@address.here.
 ```
 
 * Publish release. This can be done most easily directly from the
@@ -731,7 +733,7 @@ rsync -vrlcO ./ sourceforge_login,qpdf@frs.sourceforge.net:/home/frs/project/q/q
 
 * Upload the debian package and Ubuntu ppa backports.
 
-* Email the qpdf-announce list.
+* Email the qpdf-announce list. Mention the email address of the release signer.
 
 ## RUNNING pikepdf's TEST SUITE
 
