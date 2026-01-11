@@ -61,11 +61,14 @@ class QPDFTokenizer;
 class QPDFExc;
 class Pl_QPDFTokenizer;
 class QPDFMatrix;
-class QPDFParser;
+namespace qpdf::impl
+{
+    class Parser;
+}
 
 class QPDFObjectHandle: public qpdf::BaseHandle
 {
-    friend class QPDFParser;
+    friend class qpdf::impl::Parser;
 
   public:
     // This class is used by replaceStreamData.  It provides an alternative way of associating
