@@ -11,7 +11,7 @@ require TestDriver;
 
 my $td = new TestDriver('global');
 
-my $n_tests = 3;
+my $n_tests = 4;
 
 $td->runtest("global limits",
              {$td->COMMAND => "global 0 -"},
@@ -26,6 +26,11 @@ $td->runtest("global filter limits/ options",
 $td->runtest("C-API global setters",
              {$td->COMMAND => "global 2 -"},
              {$td->STRING => "test 2 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("global fuzz mode",
+             {$td->COMMAND => "global 3 -"},
+             {$td->STRING => "test 3 done\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 $td->report($n_tests);

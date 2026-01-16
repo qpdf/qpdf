@@ -9,6 +9,20 @@ Limits Limits::l;
 Options Options::o;
 
 void
+Options::fuzz_mode(bool value)
+{
+    if (value) {
+        o.fuzz_mode_ = true;
+        // Limit the memory used to decompress JPEG files during fuzzing. Excessive memory use
+        // during fuzzing is due to corrupt JPEG data which sometimes cannot be detected before
+        // jpeg_start_decompress is called. During normal use of qpdf very large JPEGs can
+        // occasionally occur legitimately and therefore must be allowed during normal operations.
+        Limits::dct_max_memory(10'000'000);
+        Limits::dct_max_progressive_scans(50);
+    }
+}
+
+void
 Limits::parser_max_container_size(bool damaged, uint32_t value)
 {
     if (damaged) {
@@ -40,6 +54,9 @@ qpdf_global_get_uint32(qpdf_param_e param, uint32_t* value)
     switch (param) {
     case qpdf_p_inspection_mode:
         *value = Options::inspection_mode();
+        return qpdf_r_ok;
+    case qpdf_p_fuzz_mode:
+        *value = Options::fuzz_mode();
         return qpdf_r_ok;
     case qpdf_p_default_limits:
         *value = Options::default_limits();
@@ -81,6 +98,9 @@ qpdf_global_set_uint32(qpdf_param_e param, uint32_t value)
     switch (param) {
     case qpdf_p_inspection_mode:
         Options::inspection_mode(value);
+        return qpdf_r_ok;
+    case qpdf_p_fuzz_mode:
+        Options::fuzz_mode(value);
         return qpdf_r_ok;
     case qpdf_p_default_limits:
         Options::default_limits(value);

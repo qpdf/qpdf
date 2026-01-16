@@ -185,11 +185,34 @@ test_1(QPDF&, char const*)
 static void
 test_2(QPDF&, char const*)
 {
+    set_uint32(qpdf_p_fuzz_mode, 1);
+    assert(fuzz_mode());
+
     // DCT-specific limits
     set_uint32(qpdf_p_dct_max_memory, 1234);
     assert(dct_max_memory() == 1234);
     set_uint32(qpdf_p_dct_max_progressive_scans, 6);
     assert(dct_max_progressive_scans() == 6);
+}
+
+// Test fuzz_mode behavior
+static void
+test_3(QPDF&, char const*)
+{
+    // Initially fuzz_mode should be false
+    assert(!fuzz_mode());
+
+    // Enable fuzz mode and check that DCT limits are tightened
+    fuzz_mode(true);
+    assert(fuzz_mode());
+    assert(get_uint32(qpdf_p_fuzz_mode) == 1);
+
+    assert(dct_max_memory() == 10'000'000);
+    assert(dct_max_progressive_scans() == 50);
+
+    // Attempting to disable fuzz mode is a no-op; fuzz_mode should remain true
+    fuzz_mode(false);
+    assert(fuzz_mode());
 }
 
 void
@@ -199,7 +222,7 @@ runtest(int n, char const* filename1, char const* arg2)
     // the test suite to see how the test is invoked to find the file
     // that the test is supposed to operate on.
 
-    std::set<int> ignore_filename = {0, 1, 2};
+    std::set<int> ignore_filename = {0, 1, 2, 3};
 
     QPDF pdf;
     std::shared_ptr<char> file_buf;
@@ -213,7 +236,7 @@ runtest(int n, char const* filename1, char const* arg2)
     }
 
     std::map<int, void (*)(QPDF&, char const*)> test_functions = {
-        {0, test_0}, {1, test_1}, {2, test_2}};
+        {0, test_0}, {1, test_1}, {2, test_2}, {3, test_3}};
 
     auto fn = test_functions.find(n);
     if (fn == test_functions.end()) {

@@ -142,6 +142,14 @@ namespace qpdf::global
         }
 
         static bool
+        fuzz_mode()
+        {
+            return static_cast<bool>(o.fuzz_mode_);
+        }
+
+        static void fuzz_mode(bool value);
+
+        static bool
         default_limits()
         {
             return static_cast<bool>(o.default_limits_);
@@ -160,6 +168,7 @@ namespace qpdf::global
         static Options o;
 
         bool inspection_mode_{false};
+        bool fuzz_mode_{false};
         bool default_limits_{true};
     };
 } // namespace qpdf::global

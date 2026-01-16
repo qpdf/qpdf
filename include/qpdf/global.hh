@@ -95,6 +95,44 @@ namespace qpdf::global
             set_uint32(qpdf_p_inspection_mode, value ? QPDF_TRUE : QPDF_FALSE);
         }
 
+        /// @brief  Retrieves whether fuzz mode is set.
+        ///
+        /// Fuzz mode is intended for use when building fuzzers and sets various global limits with
+        /// the aim of avoiding spurious time-outs and out-of-memory errors as well as limiting the
+        /// time spent fuzzing qpdf's dependencies instead of fuzzing qpdf itself. These limits
+        /// cannot be imposed on qpdf during normal operation since legitimate PDF files can be very
+        /// large and complex and as result may require more memory and longer runtimes than is
+        /// allowed during fuzzing. By default fuzz mode is off.
+        ///
+        /// @return True if fuzz mode is set.
+        ///
+        /// @since 12.4
+        inline bool
+        fuzz_mode()
+        {
+            return get_uint32(qpdf_p_fuzz_mode) != 0;
+        }
+
+        /// @brief  Set fuzz mode if `true` is passed.
+        ///
+        /// This function enables fuzz mode if `true` is passed. Fuzz mode is intended for use when
+        /// building fuzzers and sets various global limits with the aim of avoiding spurious
+        /// time-outs and out-of-memory errors as well as limiting the time spent fuzzing qpdf's
+        /// dependencies instead of fuzzing qpdf itself. These limits cannot be imposed on qpdf
+        /// during normal operation since legitimate PDF files can be very large and complex and as
+        /// result may require more memory and longer runtimes than is allowed during fuzzing. By
+        /// default fuzz mode is off. Calling `fuzz_mode(false)` is not supported and currently is a
+        /// no-op.
+        ///
+        /// @param value A boolean indicating whether to enable (true) fuzz mode.
+        ///
+        /// @since 12.4
+        inline void
+        fuzz_mode(bool value)
+        {
+            set_uint32(qpdf_p_fuzz_mode, value ? QPDF_TRUE : QPDF_FALSE);
+        }
+
         /// @brief  Retrieves whether default limits are enabled.
         ///
         /// @return True if default limits are enabled.
