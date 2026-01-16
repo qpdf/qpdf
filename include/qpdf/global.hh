@@ -61,7 +61,8 @@ namespace qpdf::global
     /// @return The number of limit errors.
     ///
     /// @since 12.3
-    uint32_t inline limit_errors()
+    inline uint32_t
+    limit_errors()
     {
         return get_uint32(qpdf_p_limit_errors);
     }
@@ -73,7 +74,8 @@ namespace qpdf::global
         /// @return True if inspection mode is set.
         ///
         /// @since 12.3
-        bool inline inspection_mode()
+        inline bool
+        inspection_mode()
         {
             return get_uint32(qpdf_p_inspection_mode) != 0;
         }
@@ -87,7 +89,8 @@ namespace qpdf::global
         /// @param value A boolean indicating whether to enable (true) inspection mode.
         ///
         /// @since 12.3
-        void inline inspection_mode(bool value)
+        inline void
+        inspection_mode(bool value)
         {
             set_uint32(qpdf_p_inspection_mode, value ? QPDF_TRUE : QPDF_FALSE);
         }
@@ -97,7 +100,8 @@ namespace qpdf::global
         /// @return True if default limits are enabled.
         ///
         /// @since 12.3
-        bool inline default_limits()
+        inline bool
+        default_limits()
         {
             return get_uint32(qpdf_p_default_limits) != 0;
         }
@@ -112,7 +116,8 @@ namespace qpdf::global
         /// @param value A boolean indicating whether to disable (false) the default limits.
         ///
         /// @since 12.3
-        void inline default_limits(bool value)
+        inline void
+        default_limits(bool value)
         {
             set_uint32(qpdf_p_default_limits, value ? QPDF_TRUE : QPDF_FALSE);
         }
@@ -128,7 +133,8 @@ namespace qpdf::global
         /// @note The maximum nesting level cannot be disabled by calling `default_limit(false)`.
         ///
         /// @since 12.3
-        uint32_t inline parser_max_nesting()
+        inline uint32_t
+        parser_max_nesting()
         {
             return get_uint32(qpdf_p_parser_max_nesting);
         }
@@ -140,7 +146,8 @@ namespace qpdf::global
         /// @note The maximum nesting level cannot be disabled by calling `default_limit(false)`.
         ///
         /// @since 12.3
-        void inline parser_max_nesting(uint32_t value)
+        inline void
+        parser_max_nesting(uint32_t value)
         {
             set_uint32(qpdf_p_parser_max_nesting, value);
         }
@@ -152,7 +159,8 @@ namespace qpdf::global
         /// @return The maximum number of errors allowed while parsing objects.
         ///
         /// @since 12.3
-        uint32_t inline parser_max_errors()
+        inline uint32_t
+        parser_max_errors()
         {
             return get_uint32(qpdf_p_parser_max_errors);
         }
@@ -164,7 +172,8 @@ namespace qpdf::global
         /// @param value The maximum number of errors allowed while parsing objects to set.
         ///
         /// @since 12.3
-        void inline parser_max_errors(uint32_t value)
+        inline void
+        parser_max_errors(uint32_t value)
         {
             set_uint32(qpdf_p_parser_max_errors, value);
         }
@@ -179,7 +188,8 @@ namespace qpdf::global
         ///         objects.
         ///
         /// @since 12.3
-        uint32_t inline parser_max_container_size()
+        inline uint32_t
+        parser_max_container_size()
         {
             return get_uint32(qpdf_p_parser_max_container_size);
         }
@@ -194,7 +204,8 @@ namespace qpdf::global
         ///               parsing objects to set.
         ///
         /// @since 12.3
-        void inline parser_max_container_size(uint32_t value)
+        inline void
+        parser_max_container_size(uint32_t value)
         {
             set_uint32(qpdf_p_parser_max_container_size, value);
         }
@@ -209,7 +220,8 @@ namespace qpdf::global
         ///         objects.
         ///
         /// @since 12.3
-        uint32_t inline parser_max_container_size_damaged()
+        inline uint32_t
+        parser_max_container_size_damaged()
         {
             return get_uint32(qpdf_p_parser_max_container_size_damaged);
         }
@@ -225,7 +237,8 @@ namespace qpdf::global
         ///               parsing objects to set.
         ///
         /// @since 12.3
-        void inline parser_max_container_size_damaged(uint32_t value)
+        inline void
+        parser_max_container_size_damaged(uint32_t value)
         {
             set_uint32(qpdf_p_parser_max_container_size_damaged, value);
         }
@@ -239,7 +252,8 @@ namespace qpdf::global
         /// @return The maximum number of filters allowed when filtering streams.
         ///
         /// @since 12.3
-        uint32_t inline max_stream_filters()
+        inline uint32_t
+        max_stream_filters()
         {
             return get_uint32(qpdf_p_max_stream_filters);
         }
@@ -253,7 +267,8 @@ namespace qpdf::global
         /// @param value  The maximum number of filters allowed when filtering streams to set.
         ///
         /// @since 12.3
-        void inline max_stream_filters(uint32_t value)
+        inline void
+        max_stream_filters(uint32_t value)
         {
             set_uint32(qpdf_p_max_stream_filters, value);
         }
