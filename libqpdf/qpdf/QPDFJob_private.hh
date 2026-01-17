@@ -37,7 +37,7 @@ struct QPDFJob::Selection
 // filename.  This is a documented work-around.
 struct QPDFJob::Input
 {
-    void initialize(Inputs& in, QPDF* qpdf = nullptr);
+    void initialize(QPDFJob& job, Inputs& in, QPDF* qpdf = nullptr);
 
     std::string password;
     std::unique_ptr<QPDF> qpdf_p;
@@ -56,12 +56,8 @@ struct QPDFJob::Inputs
     // These default values are duplicated in help and docs.
     static int constexpr DEFAULT_KEEP_FILES_OPEN_THRESHOLD = 200;
 
-    Inputs(QPDFJob& job) :
-        job(job)
-    {
-    }
-    void process(std::string const& filename, QPDFJob::Input& file_spec);
-    void process_all();
+    void process(QPDFJob& job, std::string const& filename, QPDFJob::Input& file_spec);
+    void process_all(QPDFJob& job);
 
     // Destroy all owned QPDF objects. Return false if any of the QPDF objects recorded warnings.
     bool clear();
@@ -90,9 +86,6 @@ struct QPDFJob::Inputs
     std::vector<Selection> selections;
 
     bool any_page_labels{false};
-
-  private:
-    QPDFJob& job;
 };
 
 struct QPDFJob::RotationSpec
@@ -150,9 +143,8 @@ class QPDFJob::Members
     friend class QPDFJob;
 
   public:
-    Members(QPDFJob& job) :
-        log(d_cfg.log()),
-        inputs(job)
+    Members() :
+        log(d_cfg.log())
     {
     }
     Members(Members const&) = delete;

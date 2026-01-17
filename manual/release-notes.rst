@@ -13,6 +13,13 @@ more detail.
 
 .. x.y.z: not yet released
 
+
+12.3.1: not yet released
+  - Bug fixes
+
+    - Fix a bug causing ``QPDFJob::createQPDF`` to fail if called
+      from pikepdf.
+
 12.3.0: January 10, 2026
   - Release changes
 

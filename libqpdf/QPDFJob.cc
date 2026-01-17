@@ -261,7 +261,7 @@ struct QPDFJob::PageNo
 };
 
 QPDFJob::QPDFJob() :
-    m(std::make_shared<Members>(*this))
+    m(std::make_shared<Members>())
 {
 }
 
@@ -2331,7 +2331,7 @@ added_page(QPDF& pdf, QPDFPageObjectHelper page)
 // Initialize all members that depend on the QPDF object. If both qpdf and  qpdf_p are null do
 // nothing.
 void
-QPDFJob::Input::initialize(Inputs& in, QPDF* a_qpdf)
+QPDFJob::Input::initialize(QPDFJob& job, Inputs& in, QPDF* a_qpdf)
 {
     qpdf = a_qpdf ? a_qpdf : qpdf_p.get();
     if (qpdf) {
@@ -2340,8 +2340,8 @@ QPDFJob::Input::initialize(Inputs& in, QPDF* a_qpdf)
         n_pages = static_cast<int>(orig_pages.size());
         copied_pages = std::vector<bool>(orig_pages.size(), false);
 
-        if (in.job.m->remove_unreferenced_page_resources != QPDFJob::re_no) {
-            remove_unreferenced = in.job.shouldRemoveUnreferencedResources(*qpdf);
+        if (job.m->remove_unreferenced_page_resources != QPDFJob::re_no) {
+            remove_unreferenced = job.shouldRemoveUnreferencedResources(*qpdf);
         }
         if (doc.page_labels().hasPageLabels()) {
             in.any_page_labels = true;
@@ -2372,7 +2372,7 @@ QPDFJob::Inputs::infile_name(std::string const& name)
 }
 
 void
-QPDFJob::Inputs::process(std::string const& filename, QPDFJob::Input& input)
+QPDFJob::Inputs::process(QPDFJob& job, std::string const& filename, QPDFJob::Input& input)
 {
     // Open the PDF file and store the QPDF object. Do not canonicalize the file name. Using two
     // different paths to refer to the same file is a documented workaround for duplicating a page.
@@ -2398,7 +2398,7 @@ QPDFJob::Inputs::process(std::string const& filename, QPDFJob::Input& input)
             password.data(),
             true);
     }
-    input.initialize(*this);
+    input.initialize(job, *this);
 
     if (input.cfis) {
         input.cfis->stayOpen(false);
@@ -2406,7 +2406,7 @@ QPDFJob::Inputs::process(std::string const& filename, QPDFJob::Input& input)
 }
 
 void
-QPDFJob::Inputs::process_all()
+QPDFJob::Inputs::process_all(QPDFJob& job)
 {
     if (!infile_name().empty()) {
         files.erase("");
@@ -2425,7 +2425,7 @@ QPDFJob::Inputs::process_all()
 
     for (auto& [filename, input]: files) {
         if (!input.qpdf) {
-            process(filename, input);
+            process(job, filename, input);
         }
 
         for (auto& selection: selections) {
@@ -2519,10 +2519,10 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
         return;
     }
     auto& main_input = m->inputs.files[m->infile_name()];
-    main_input.initialize(m->inputs, &pdf);
+    main_input.initialize(*this, m->inputs, &pdf);
 
     // Parse all section and translate them into lists of actual pages.
-    m->inputs.process_all();
+    m->inputs.process_all(*this);
 
     // Clear all pages out of the primary QPDF's pages tree but leave the objects in place in the
     // file so they can be re-added without changing their object numbers. This enables other things
