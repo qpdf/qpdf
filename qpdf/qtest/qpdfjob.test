@@ -44,7 +44,7 @@ my @good_json = (
     ["underlay-overlay-password", ""],
     ["misc-options", ""],
     );
-my $n_tests = 11 + scalar(@bad_json) + (2 * scalar(@good_json));
+my $n_tests = 13 + scalar(@bad_json) + (2 * scalar(@good_json));
 
 
 foreach my $i (@bad_json)
@@ -129,6 +129,14 @@ else
                  {$td->COMMAND => "qpdf-test-compare a.pdf qpdfjob-ctest-wide.pdf"},
                  {$td->FILE => "qpdfjob-ctest-wide.pdf", $td->EXIT_STATUS => 0});
 }
+
+$td->runtest("Copied QPDFJob",
+             {$td->COMMAND => "test_driver 102 -"},
+             {$td->STRING => "test 102 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "test102.pdf"});
 
 cleanup();
 $td->report($n_tests);
