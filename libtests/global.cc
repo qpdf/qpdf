@@ -157,28 +157,39 @@ test_0(QPDF&, char const*)
 static void
 test_1(QPDF&, char const*)
 {
-    // Check defaults for DCT limits (0 == no limit)
+    // Check defaults for DCT limits and throw flag (0 == no limit)
     assert(dct_max_memory() == 0);
     assert(dct_max_progressive_scans() == 0);
+    assert(dct_throw_on_corrupt_data());
 
-    // DCT-specific limits
+    // Set DCT limits and throw flag via global limits and verify
     dct_max_memory(123456);
     dct_max_progressive_scans(7);
+    dct_throw_on_corrupt_data(false);
 
     assert(dct_max_memory() == 123456);
     assert(get_uint32(qpdf_p_dct_max_memory) == 123456);
     assert(dct_max_progressive_scans() == 7);
     assert(get_uint32(qpdf_p_dct_max_progressive_scans) == 7);
+    assert(!dct_throw_on_corrupt_data());
+    assert(get_uint32(qpdf_p_dct_throw_on_corrupt_data) == 0);
+
+    // Now set via Pl_DCT helpers and verify they update the same global state
     Pl_DCT::setMemoryLimit(12345);
     assert(dct_max_memory() == 12345);
     Pl_DCT::setScanLimit(8);
-    assert(dct_max_progressive_scans() == 8);
+    Pl_DCT::setThrowOnCorruptData(true);
 
-    // Check disabling default limits does not override filter limits
+    assert(dct_max_memory() == 12345);
+    assert(dct_max_progressive_scans() == 8);
+    assert(dct_throw_on_corrupt_data());
+
+    // Check disabling default limits does not override filter limits or throw flag
     default_limits(false);
 
     assert(dct_max_memory() == 12345);
     assert(dct_max_progressive_scans() == 8);
+    assert(dct_throw_on_corrupt_data());
 }
 
 // Test C-API setters
@@ -193,6 +204,8 @@ test_2(QPDF&, char const*)
     assert(dct_max_memory() == 1234);
     set_uint32(qpdf_p_dct_max_progressive_scans, 6);
     assert(dct_max_progressive_scans() == 6);
+    set_uint32(qpdf_p_dct_throw_on_corrupt_data, 0);
+    assert(!dct_throw_on_corrupt_data());
 }
 
 // Test fuzz_mode behavior

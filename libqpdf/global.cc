@@ -19,6 +19,9 @@ Options::fuzz_mode(bool value)
         // occasionally occur legitimately and therefore must be allowed during normal operations.
         Limits::dct_max_memory(10'000'000);
         Limits::dct_max_progressive_scans(50);
+        // Do not decompress corrupt data. This may cause extended runtime within jpeglib without
+        // exercising additional code paths in qpdf.
+        dct_throw_on_corrupt_data(true);
     }
 }
 
@@ -64,6 +67,9 @@ qpdf_global_get_uint32(qpdf_param_e param, uint32_t* value)
     case qpdf_p_limit_errors:
         *value = Limits::errors();
         return qpdf_r_ok;
+    case qpdf_p_dct_throw_on_corrupt_data:
+        *value = Options::dct_throw_on_corrupt_data();
+        return qpdf_r_ok;
     case qpdf_p_parser_max_nesting:
         *value = Limits::parser_max_nesting();
         return qpdf_r_ok;
@@ -80,7 +86,7 @@ qpdf_global_get_uint32(qpdf_param_e param, uint32_t* value)
         *value = Limits::max_stream_filters();
         return qpdf_r_ok;
     case qpdf_p_dct_max_memory:
-        qpdf_invariant(util::fits<uint32_t>(Limits::dct_max_progressive_scans()));
+        qpdf_invariant(util::fits<uint32_t>(Limits::dct_max_memory()));
         *value = static_cast<uint32_t>(Limits::dct_max_memory());
         return qpdf_r_ok;
     case qpdf_p_dct_max_progressive_scans:
@@ -104,6 +110,9 @@ qpdf_global_set_uint32(qpdf_param_e param, uint32_t value)
         return qpdf_r_ok;
     case qpdf_p_default_limits:
         Options::default_limits(value);
+        return qpdf_r_ok;
+    case qpdf_p_dct_throw_on_corrupt_data:
+        Options::dct_throw_on_corrupt_data(value);
         return qpdf_r_ok;
     case qpdf_p_parser_max_nesting:
         Limits::parser_max_nesting(value);

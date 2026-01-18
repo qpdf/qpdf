@@ -133,6 +133,36 @@ namespace qpdf::global
             set_uint32(qpdf_p_fuzz_mode, value ? QPDF_TRUE : QPDF_FALSE);
         }
 
+        /// @brief  Retrieves whether DCT throw-on-corrupt-data option is set.
+        ///
+        /// When enabled, DCT decompression will treat corrupt data as an error and throw an
+        /// exception. By default this option is enabled.
+        ///
+        /// @return True if DCT throw-on-corrupt-data is set.
+        ///
+        /// @since 12.4
+        inline bool
+        dct_throw_on_corrupt_data()
+        {
+            return get_uint32(qpdf_p_dct_throw_on_corrupt_data) != 0;
+        }
+
+        /// @brief  Set the DCT throw-on-corrupt-data option.
+        ///
+        /// When enabled, DCT decompression will treat corrupt data as an error and throw an
+        /// exception. Passing `false` will cause the decompressor to attempt to continue on
+        /// corrupt JPEG data where possible.
+        ///
+        /// @param value A boolean indicating whether to enable (true) or disable (false) the
+        ///              behavior.
+        ///
+        /// @since 12.4
+        inline void
+        dct_throw_on_corrupt_data(bool value)
+        {
+            set_uint32(qpdf_p_dct_throw_on_corrupt_data, value ? QPDF_TRUE : QPDF_FALSE);
+        }
+
         /// @brief  Retrieves whether default limits are enabled.
         ///
         /// @return True if default limits are enabled.

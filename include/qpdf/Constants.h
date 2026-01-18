@@ -281,6 +281,9 @@ enum qpdf_param_e {
     qpdf_p_fuzz_mode = 0x11010,
     qpdf_p_default_limits = 0x11100,
 
+    /* stream and filter options */
+    qpdf_p_dct_throw_on_corrupt_data = 0x11400,
+
     /* global limits */
 
     /* parser limits */

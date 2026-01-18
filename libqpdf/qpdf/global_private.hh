@@ -164,12 +164,25 @@ namespace qpdf::global
             }
         }
 
+        static bool const&
+        dct_throw_on_corrupt_data()
+        {
+            return o.dct_throw_on_corrupt_data_;
+        }
+
+        static void
+        dct_throw_on_corrupt_data(bool value)
+        {
+            o.dct_throw_on_corrupt_data_ = value;
+        }
+
       private:
         static Options o;
 
         bool inspection_mode_{false};
-        bool fuzz_mode_{false};
         bool default_limits_{true};
+        bool fuzz_mode_{false};
+        bool dct_throw_on_corrupt_data_{true};
     };
 } // namespace qpdf::global
 
