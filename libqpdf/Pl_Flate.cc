@@ -7,6 +7,7 @@
 #include <qpdf/QIntC.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/Util.hh>
+#include <qpdf/global_private.hh>
 #include <qpdf/qpdf-config.h>
 
 #ifdef ZOPFLI
@@ -17,7 +18,7 @@ using namespace qpdf;
 
 namespace
 {
-    unsigned long long memory_limit_{0};
+    static unsigned long long const& memory_limit{global::Limits::flate_max_memory()};
 } // namespace
 
 int Pl_Flate::compression_level = Z_DEFAULT_COMPRESSION;
@@ -81,13 +82,13 @@ Pl_Flate::~Pl_Flate() = default;
 unsigned long long
 Pl_Flate::memory_limit()
 {
-    return memory_limit_;
+    return ::memory_limit;
 }
 
 void
 Pl_Flate::memory_limit(unsigned long long limit)
 {
-    memory_limit_ = limit;
+    global::Limits::flate_max_memory(limit);
 }
 
 void
@@ -198,9 +199,9 @@ Pl_Flate::handleData(unsigned char const* data, size_t len, int flush)
                 }
                 uLong ready = QIntC::to_ulong(m->out_bufsize - zstream.avail_out);
                 if (ready > 0) {
-                    if (memory_limit_ && m->action != a_deflate) {
+                    if (::memory_limit && m->action != a_deflate) {
                         m->written += ready;
-                        if (m->written > memory_limit_) {
+                        if (m->written > ::memory_limit) {
                             throw std::runtime_error("PL_Flate memory limit exceeded");
                         }
                     }
@@ -220,7 +221,7 @@ Pl_Flate::handleData(unsigned char const* data, size_t len, int flush)
 void
 Pl_Flate::finish()
 {
-    if (m->written > memory_limit_) {
+    if (m->written > ::memory_limit) {
         throw std::runtime_error("PL_Flate memory limit exceeded");
     }
     try {

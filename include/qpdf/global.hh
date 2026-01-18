@@ -400,6 +400,36 @@ namespace qpdf::global
             set_uint32(qpdf_p_dct_max_progressive_scans, val);
         }
 
+        /// @brief  Retrieves the maximum amount of memory in bytes allowed for Flate (zlib)
+        ///         decompression/processing.
+        ///
+        /// Streams requiring memory in excess of the limit for Flate processing are treated as
+        /// unfilterable. A value of 0 indicates no limit. The default is 0.
+        ///
+        /// @return The configured maximum memory in bytes for Flate processing.
+        ///
+        /// @since 12.4
+        inline uint32_t
+        flate_max_memory()
+        {
+            return get_uint32(qpdf_p_flate_max_memory);
+        }
+
+        /// @brief  Sets the maximum amount of memory in bytes allowed for Flate (zlib)
+        ///         decompression/processing.
+        ///
+        /// Streams requiring memory in excess of the limit for processing are treated as
+        /// unfilterable. A value of 0 indicates no limit. The default is 0.
+        ///
+        /// @param val The maximum memory in bytes to allow for Flate processing.
+        ///
+        /// @since 12.4
+        inline void
+        flate_max_memory(uint32_t val)
+        {
+            set_uint32(qpdf_p_flate_max_memory, val);
+        }
+
         /// @brief  Retrieves the maximum amount of memory in bytes allowed for PNG filter
         ///         processing.
         ///

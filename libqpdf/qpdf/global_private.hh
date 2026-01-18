@@ -88,6 +88,18 @@ namespace qpdf::global
         }
 
         static unsigned long long const&
+        flate_max_memory()
+        {
+            return l.flate_max_memory_;
+        }
+
+        static void
+        flate_max_memory(unsigned long long value)
+        {
+            l.flate_max_memory_ = util::fits<uint32_t>(value) ? value : 0;
+        }
+
+        static unsigned long long const&
         png_max_memory()
         {
             return l.png_max_memory_;
@@ -132,9 +144,10 @@ namespace qpdf::global
         bool parser_max_container_size_damaged_set_{false};
         uint32_t max_stream_filters_{25};
         bool max_stream_filters_set_{false};
-        long dct_max_memory_{0};               // constraint to uint32_t range in setter
-        int dct_max_progressive_scans_{0};     // constraint to uint32_t range in setter
-        unsigned long long png_max_memory_{0}; // constraint to uint32_t range in setter
+        long dct_max_memory_{0};                 // constraint to uint32_t range in setter
+        int dct_max_progressive_scans_{0};       // constraint to uint32_t range in setter
+        unsigned long long flate_max_memory_{0}; // constraint to uint32_t range in setter
+        unsigned long long png_max_memory_{0};   // constraint to uint32_t range in setter
     };
 
     class Options
