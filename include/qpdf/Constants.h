@@ -305,6 +305,9 @@ enum qpdf_param_e {
     /* stream and filter limits - png limits */
     qpdf_p_png_max_memory = 0x14040,
 
+    /* stream and filter limits - runlength limits */
+    qpdf_p_run_length_max_memory = 0x14050,
+
     /* next section = 0x20000 */
     qpdf_enum_max = 0x7fffffff,
 };

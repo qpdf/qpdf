@@ -459,6 +459,36 @@ namespace qpdf::global
             set_uint32(qpdf_p_png_max_memory, val);
         }
 
+        /// @brief  Retrieves the maximum amount of memory in bytes allowed for RunLength
+        ///         decoding/processing.
+        ///
+        /// Streams requiring memory in excess of the limit for run-length processing are treated
+        /// as unfilterable. A value of 0 indicates no limit. The default is 0.
+        ///
+        /// @return The configured maximum memory in bytes for run-length processing.
+        ///
+        /// @since 12.4
+        inline uint32_t
+        run_length_max_memory()
+        {
+            return get_uint32(qpdf_p_run_length_max_memory);
+        }
+
+        /// @brief  Sets the maximum amount of memory in bytes allowed for RunLength
+        ///         decoding/processing.
+        ///
+        /// Streams requiring memory in excess of the limit for processing are treated as
+        /// unfilterable. A value of 0 indicates no limit. The default is 0.
+        ///
+        /// @param val The maximum memory in bytes to allow for run-length processing.
+        ///
+        /// @since 12.4
+        inline void
+        run_length_max_memory(uint32_t val)
+        {
+            set_uint32(qpdf_p_run_length_max_memory, val);
+        }
+
     } // namespace limits
 
 } // namespace qpdf::global

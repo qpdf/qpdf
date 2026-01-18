@@ -2,12 +2,13 @@
 
 #include <qpdf/QTC.hh>
 #include <qpdf/Util.hh>
+#include <qpdf/global_private.hh>
 
 using namespace qpdf;
 
 namespace
 {
-    unsigned long long memory_limit{0};
+    static unsigned long long const& memory_limit{global::Limits::run_length_max_memory()};
 } // namespace
 
 class Pl_RunLength::Members
@@ -37,7 +38,7 @@ Pl_RunLength::Pl_RunLength(char const* identifier, Pipeline* next, action_e acti
 void
 Pl_RunLength::setMemoryLimit(unsigned long long limit)
 {
-    memory_limit = limit;
+    global::Limits::run_length_max_memory(limit);
 }
 
 Pl_RunLength::~Pl_RunLength() = default;

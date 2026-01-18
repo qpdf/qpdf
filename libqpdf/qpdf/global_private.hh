@@ -111,6 +111,18 @@ namespace qpdf::global
             l.png_max_memory_ = util::fits<uint32_t>(value) ? value : 0;
         }
 
+        static unsigned long long const&
+        run_length_max_memory()
+        {
+            return l.run_length_max_memory_;
+        }
+
+        static void
+        run_length_max_memory(unsigned long long value)
+        {
+            l.run_length_max_memory_ = util::fits<uint32_t>(value) ? value : 0;
+        }
+
         /// Record a limit error.
         static void
         error()
@@ -144,10 +156,11 @@ namespace qpdf::global
         bool parser_max_container_size_damaged_set_{false};
         uint32_t max_stream_filters_{25};
         bool max_stream_filters_set_{false};
-        long dct_max_memory_{0};                 // constraint to uint32_t range in setter
-        int dct_max_progressive_scans_{0};       // constraint to uint32_t range in setter
-        unsigned long long flate_max_memory_{0}; // constraint to uint32_t range in setter
-        unsigned long long png_max_memory_{0};   // constraint to uint32_t range in setter
+        long dct_max_memory_{0};                      // constraint to uint32_t range in setter
+        int dct_max_progressive_scans_{0};            // constraint to uint32_t range in setter
+        unsigned long long flate_max_memory_{0};      // constraint to uint32_t range in setter
+        unsigned long long png_max_memory_{0};        // constraint to uint32_t range in setter
+        unsigned long long run_length_max_memory_{0}; // constraint to uint32_t range in setter
     };
 
     class Options
