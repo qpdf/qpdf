@@ -3,6 +3,7 @@
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/Util.hh>
+#include <qpdf/global_private.hh>
 
 #include <climits>
 #include <cstring>
@@ -12,7 +13,7 @@ using namespace qpdf;
 
 namespace
 {
-    unsigned long long memory_limit{0};
+    unsigned long long const& memory_limit = global::Limits::png_max_memory();
 } // namespace
 
 static int
@@ -59,7 +60,7 @@ Pl_PNGFilter::Pl_PNGFilter(
 void
 Pl_PNGFilter::setMemoryLimit(unsigned long long limit)
 {
-    memory_limit = limit;
+    global::Limits::png_max_memory(limit);
 }
 
 void

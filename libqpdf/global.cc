@@ -22,6 +22,7 @@ Options::fuzz_mode(bool value)
         // Do not decompress corrupt data. This may cause extended runtime within jpeglib without
         // exercising additional code paths in qpdf.
         dct_throw_on_corrupt_data(true);
+        Limits::png_max_memory(1'000'000);
     }
 }
 
@@ -93,6 +94,10 @@ qpdf_global_get_uint32(qpdf_param_e param, uint32_t* value)
         qpdf_invariant(util::fits<uint32_t>(Limits::dct_max_progressive_scans()));
         *value = static_cast<uint32_t>(Limits::dct_max_progressive_scans());
         return qpdf_r_ok;
+    case qpdf_p_png_max_memory:
+        qpdf_invariant(util::fits<uint32_t>(Limits::png_max_memory()));
+        *value = static_cast<uint32_t>(Limits::png_max_memory());
+        return qpdf_r_ok;
     default:
         return qpdf_r_bad_parameter;
     }
@@ -134,6 +139,9 @@ qpdf_global_set_uint32(qpdf_param_e param, uint32_t value)
         return qpdf_r_ok;
     case qpdf_p_dct_max_progressive_scans:
         Limits::dct_max_progressive_scans(util::fits<int>(value) ? static_cast<int>(value) : 0);
+        return qpdf_r_ok;
+    case qpdf_p_png_max_memory:
+        Limits::png_max_memory(value);
         return qpdf_r_ok;
     default:
         return qpdf_r_bad_parameter;

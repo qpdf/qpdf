@@ -400,6 +400,35 @@ namespace qpdf::global
             set_uint32(qpdf_p_dct_max_progressive_scans, val);
         }
 
+        /// @brief  Retrieves the maximum amount of memory in bytes allowed for PNG filter
+        ///         processing.
+        ///
+        /// Streams requiring memory in excess of the limit are treated as unfilterable. A value of
+        /// 0 indicates no limit. The default is 0.
+        ///
+        /// @return The configured maximum memory in bytes for PNG processing.
+        ///
+        /// @since 12.4
+        inline uint32_t
+        png_max_memory()
+        {
+            return get_uint32(qpdf_p_png_max_memory);
+        }
+
+        /// @brief  Sets the maximum amount of memory in bytes allowed for PNG filter processing.
+        ///
+        /// Streams requiring memory in excess of the limit are treated as unfilterable. A value of
+        /// 0 indicates no limit. The default is 0.
+        ///
+        /// @param val The maximum memory in bytes to allow for PNG processing.
+        ///
+        /// @since 12.4
+        inline void
+        png_max_memory(uint32_t val)
+        {
+            set_uint32(qpdf_p_png_max_memory, val);
+        }
+
     } // namespace limits
 
 } // namespace qpdf::global

@@ -299,6 +299,9 @@ enum qpdf_param_e {
     qpdf_p_dct_max_memory = 0x14020,
     qpdf_p_dct_max_progressive_scans,
 
+    /* stream and filter limits - png limits */
+    qpdf_p_png_max_memory = 0x14040,
+
     /* next section = 0x20000 */
     qpdf_enum_max = 0x7fffffff,
 };

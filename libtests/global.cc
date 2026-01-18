@@ -6,6 +6,7 @@
 
 #include <qpdf/Pl_DCT.hh>
 #include <qpdf/Pl_Discard.hh>
+#include <qpdf/Pl_PNGFilter.hh>
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDFJob.hh>
 #include <qpdf/QPDFObjectHandle_private.hh>
@@ -162,10 +163,15 @@ test_1(QPDF&, char const*)
     assert(dct_max_progressive_scans() == 0);
     assert(dct_throw_on_corrupt_data());
 
+    // Check default for PNG memory limit
+    assert(png_max_memory() == 0);
+
     // Set DCT limits and throw flag via global limits and verify
     dct_max_memory(123456);
     dct_max_progressive_scans(7);
     dct_throw_on_corrupt_data(false);
+    // Set PNG limit and verify
+    png_max_memory(1234567);
 
     assert(dct_max_memory() == 123456);
     assert(get_uint32(qpdf_p_dct_max_memory) == 123456);
@@ -173,16 +179,20 @@ test_1(QPDF&, char const*)
     assert(get_uint32(qpdf_p_dct_max_progressive_scans) == 7);
     assert(!dct_throw_on_corrupt_data());
     assert(get_uint32(qpdf_p_dct_throw_on_corrupt_data) == 0);
+    assert(png_max_memory() == 1234567);
+    assert(get_uint32(qpdf_p_png_max_memory) == 1234567);
 
-    // Now set via Pl_DCT helpers and verify they update the same global state
+    // Now set via Pl_DCT and Pl_PNGFilter helpers and verify they update the same global state
     Pl_DCT::setMemoryLimit(12345);
     assert(dct_max_memory() == 12345);
     Pl_DCT::setScanLimit(8);
     Pl_DCT::setThrowOnCorruptData(true);
+    Pl_PNGFilter::setMemoryLimit(54321);
 
     assert(dct_max_memory() == 12345);
     assert(dct_max_progressive_scans() == 8);
     assert(dct_throw_on_corrupt_data());
+    assert(png_max_memory() == 54321);
 
     // Check disabling default limits does not override filter limits or throw flag
     default_limits(false);
@@ -190,6 +200,7 @@ test_1(QPDF&, char const*)
     assert(dct_max_memory() == 12345);
     assert(dct_max_progressive_scans() == 8);
     assert(dct_throw_on_corrupt_data());
+    assert(png_max_memory() == 54321);
 }
 
 // Test C-API setters
@@ -206,6 +217,8 @@ test_2(QPDF&, char const*)
     assert(dct_max_progressive_scans() == 6);
     set_uint32(qpdf_p_dct_throw_on_corrupt_data, 0);
     assert(!dct_throw_on_corrupt_data());
+    set_uint32(qpdf_p_png_max_memory, 12345);
+    assert(png_max_memory() == 12345);
 }
 
 // Test fuzz_mode behavior
@@ -216,12 +229,15 @@ test_3(QPDF&, char const*)
     assert(!fuzz_mode());
 
     // Enable fuzz mode and check that DCT limits are tightened
+    // and PNG memory limit and corrupt-data behavior are set.
     fuzz_mode(true);
     assert(fuzz_mode());
     assert(get_uint32(qpdf_p_fuzz_mode) == 1);
 
     assert(dct_max_memory() == 10'000'000);
     assert(dct_max_progressive_scans() == 50);
+    assert(dct_throw_on_corrupt_data());
+    assert(png_max_memory() == 1'000'000);
 
     // Attempting to disable fuzz mode is a no-op; fuzz_mode should remain true
     fuzz_mode(false);
