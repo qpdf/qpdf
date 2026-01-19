@@ -14,7 +14,7 @@ more detail.
 .. x.y.z: not yet released
 
 
-12.3.1: not yet released
+12.3.1: January 19, 2026
   - Bug fixes
 
     - Fix failure of ``QPDFJob::run`` and ``QPDFJob::createQPDF`` when
