@@ -67,6 +67,9 @@ Inspection mode is intended for manual investigations and repairs. As such,
 stability is less of a concern than for other uses of qpdf. The exact effect
 of specifying inspection mode will evolve from version to version.
 
+Before using inspection mode, please read :ref:`inspection` for more details
+about its behavior.
+
 .. _design-goals:
 
 Design Goals
