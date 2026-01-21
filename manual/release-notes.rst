@@ -14,6 +14,8 @@ more detail.
 .. x.y.z: not yet released
 
 
+12.3.2: not yet released
+
 12.3.1: January 19, 2026
   - Bug fixes
 
