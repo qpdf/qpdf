@@ -149,9 +149,7 @@ namespace qpdf
 
           private:
             std::shared_ptr<QPDFLogger> log_;
-
-            size_t max_warnings_{0};
-
+            size_t max_warnings_{global::Limits::doc_max_warnings()};
             bool password_is_hex_key_{false};
             bool ignore_xref_streams_{false};
             bool suppress_warnings_{false};

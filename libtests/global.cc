@@ -48,6 +48,9 @@ test_0(QPDF&, char const*)
     assert(max_stream_filters() == 25);
     assert(default_limits());
 
+    // Check default for document max warnings (0 == no limit)
+    assert(doc_max_warnings() == 0);
+
     // Test disabling optional default limits
     default_limits(false);
     assert(parser_max_nesting() == 499);
@@ -67,12 +70,14 @@ test_0(QPDF&, char const*)
     parser_max_container_size(13);
     parser_max_container_size_damaged(14);
     max_stream_filters(15);
+    doc_max_warnings(16);
 
     assert(parser_max_nesting() == 11);
     assert(parser_max_errors() == 12);
     assert(parser_max_container_size() == 13);
     assert(parser_max_container_size_damaged() == 14);
     assert(max_stream_filters() == 15);
+    assert(doc_max_warnings() == 16);
 
     // Check disabling default limits does not override explicit limits
     default_limits(false);
@@ -81,6 +86,7 @@ test_0(QPDF&, char const*)
     assert(parser_max_container_size() == 13);
     assert(parser_max_container_size_damaged() == 14);
     assert(max_stream_filters() == 15);
+    assert(doc_max_warnings() == 16);
 
     // Test parameter checking
     QUtil::handle_result_code(qpdf_r_ok, "");
@@ -169,6 +175,9 @@ test_1(QPDF&, char const*)
     // Check default for PNG memory limit
     assert(png_max_memory() == 0);
 
+    // Check default for document max warnings (0 == no limit)
+    assert(doc_max_warnings() == 0);
+
     // Check default for Flate memory limit
     assert(flate_max_memory() == 0);
 
@@ -182,6 +191,8 @@ test_1(QPDF&, char const*)
     dct_max_memory(123456);
     dct_max_progressive_scans(7);
     dct_throw_on_corrupt_data(false);
+    // Set document max warnings and verify
+    doc_max_warnings(77);
     // Set PNG limit and verify
     png_max_memory(1234567);
     // Set Flate limit via global limits and verify
@@ -205,6 +216,7 @@ test_1(QPDF&, char const*)
     assert(get_uint32(qpdf_p_run_length_max_memory) == 111000);
     assert(tiff_max_memory() == 7654321);
     assert(get_uint32(qpdf_p_tiff_max_memory) == 7654321);
+    assert(doc_max_warnings() == 77);
 
     // Now set via Pl_DCT, Pl_PNGFilter, Pl_Flate, and Pl_RunLength helpers and verify they update
     // the same global state
@@ -224,6 +236,7 @@ test_1(QPDF&, char const*)
     assert(flate_max_memory() == 32123);
     assert(run_length_max_memory() == 22222);
     assert(tiff_max_memory() == 54321);
+    assert(doc_max_warnings() == 77);
 
     // Check disabling default limits does not override filter limits or throw flag
     default_limits(false);
@@ -235,6 +248,7 @@ test_1(QPDF&, char const*)
     assert(flate_max_memory() == 32123);
     assert(run_length_max_memory() == 22222);
     assert(tiff_max_memory() == 54321);
+    assert(doc_max_warnings() == 77);
 }
 
 // Test C-API setters
@@ -244,7 +258,6 @@ test_2(QPDF&, char const*)
     set_uint32(qpdf_p_fuzz_mode, 1);
     assert(fuzz_mode());
 
-    // DCT-specific limits
     set_uint32(qpdf_p_dct_max_memory, 1234);
     assert(dct_max_memory() == 1234);
     set_uint32(qpdf_p_dct_max_progressive_scans, 6);
@@ -259,6 +272,8 @@ test_2(QPDF&, char const*)
     assert(run_length_max_memory() == 33333);
     set_uint32(qpdf_p_tiff_max_memory, 44444);
     assert(tiff_max_memory() == 44444);
+    set_uint32(qpdf_p_doc_max_warnings, 444);
+    assert(doc_max_warnings() == 444);
 }
 
 // Test fuzz_mode behavior
@@ -284,6 +299,8 @@ test_3(QPDF&, char const*)
     assert(run_length_max_memory() == 1'000'000);
     // TIFF memory limit should also be set in fuzz_mode
     assert(tiff_max_memory() == 1'000'000);
+    // Document max warnings should be set to a fuzzer-friendly default
+    assert(doc_max_warnings() == 200);
 
     // Attempting to disable fuzz mode is a no-op; fuzz_mode should remain true
     fuzz_mode(false);

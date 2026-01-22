@@ -44,7 +44,7 @@ test_0(QPDF&, char const*)
     assert(!fits<int32_t>(below_int_min));
     assert(!fits<int32_t>(above_int_max));
 
-    // fits<uint16_t(int) : uint16_t contained in int
+    // fits<uint16_t>(int) : uint16_t contained in int
     assert(fits<uint16_t>(12345));
     assert(fits<uint16_t>(static_cast<int>(0)));
     assert(fits<uint16_t>(static_cast<int>(std::numeric_limits<uint16_t>::max())));

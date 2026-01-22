@@ -26,6 +26,9 @@ Options::fuzz_mode(bool value)
         Limits::flate_max_memory(200'000);
         Limits::run_length_max_memory(1'000'000);
         Limits::tiff_max_memory(1'000'000);
+        // Set a reasonable default maximum warnings per document for fuzzing to avoid time-outs due
+        // to extensive recovery efforts.
+        Limits::doc_max_warnings(200);
     }
 }
 
@@ -73,6 +76,9 @@ qpdf_global_get_uint32(qpdf_param_e param, uint32_t* value)
         return qpdf_r_ok;
     case qpdf_p_dct_throw_on_corrupt_data:
         *value = Options::dct_throw_on_corrupt_data();
+        return qpdf_r_ok;
+    case qpdf_p_doc_max_warnings:
+        *value = Limits::doc_max_warnings();
         return qpdf_r_ok;
     case qpdf_p_parser_max_nesting:
         *value = Limits::parser_max_nesting();
@@ -133,6 +139,9 @@ qpdf_global_set_uint32(qpdf_param_e param, uint32_t value)
         return qpdf_r_ok;
     case qpdf_p_dct_throw_on_corrupt_data:
         Options::dct_throw_on_corrupt_data(value);
+        return qpdf_r_ok;
+    case qpdf_p_doc_max_warnings:
+        Limits::doc_max_warnings(value);
         return qpdf_r_ok;
     case qpdf_p_parser_max_nesting:
         Limits::parser_max_nesting(value);

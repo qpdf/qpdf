@@ -194,11 +194,39 @@ namespace qpdf::global
 
     namespace limits
     {
+        /// @brief Retrieves the default maximum number of warnings accepted per document.
+        ///
+        /// This value provides a default for `QPDF::setMaxWarnings`. A value of 0 indicates no
+        /// limit. The default is 0.
+        ///
+        /// @return The configured default maximum warnings per document.
+        ///
+        /// @since 12.4
+        inline uint32_t
+        doc_max_warnings()
+        {
+            return get_uint32(qpdf_p_doc_max_warnings);
+        }
+
+        /// @brief Sets the default maximum number of warnings accepted per document.
+        ///
+        /// This value is used as the default in newly-created `QPDF` objects as the initial
+        /// setting for `QPDF::setMaxWarnings`.
+        ///
+        /// @param val The maximum warnings per document to set. A value of 0 disables the limit.
+        ///
+        /// @since 12.4
+        inline void
+        doc_max_warnings(uint32_t val)
+        {
+            set_uint32(qpdf_p_doc_max_warnings, val);
+        }
+
         /// @brief Retrieves the maximum nesting level while parsing objects.
         ///
         /// @return The maximum nesting level while parsing objects.
         ///
-        /// @note The maximum nesting level cannot be disabled by calling `default_limit(false)`.
+        /// @note The maximum nesting level cannot be disabled by calling `default_limits(false)`.
         ///
         /// @since 12.3
         inline uint32_t
@@ -211,7 +239,7 @@ namespace qpdf::global
         ///
         /// @param value The maximum nesting level to set.
         ///
-        /// @note The maximum nesting level cannot be disabled by calling `default_limit(false)`.
+        /// @note The maximum nesting level cannot be disabled by calling `default_limits(false)`.
         ///
         /// @since 12.3
         inline void

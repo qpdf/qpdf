@@ -286,6 +286,9 @@ enum qpdf_param_e {
 
     /* global limits */
 
+    /* document limits */
+    qpdf_p_doc_max_warnings = 0x12000,
+
     /* parser limits */
     qpdf_p_parser_max_nesting = 0x13000,
     qpdf_p_parser_max_errors,

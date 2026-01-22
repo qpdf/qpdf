@@ -18,6 +18,18 @@ namespace qpdf::global
         Limits& operator=(Limits&&) = delete;
 
         static uint32_t const&
+        doc_max_warnings()
+        {
+            return l.doc_max_warnings_;
+        }
+
+        static void
+        doc_max_warnings(uint32_t value)
+        {
+            l.doc_max_warnings_ = value;
+        }
+
+        static uint32_t const&
         parser_max_nesting()
         {
             return l.parser_max_nesting_;
@@ -160,6 +172,7 @@ namespace qpdf::global
 
         uint32_t errors_{0};
 
+        uint32_t doc_max_warnings_{0};
         uint32_t parser_max_nesting_{499};
         uint32_t parser_max_errors_{15};
         bool parser_max_errors_set_{false};
