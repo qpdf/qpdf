@@ -29,6 +29,7 @@ struct QPDFJob::Selection
     std::pair<const std::string, QPDFJob::Input>* in_entry{nullptr};
     std::string range; // An empty range means all pages.
     std::vector<int> selected_pages;
+    bool password_provided{false};
 };
 
 // A single input PDF.
