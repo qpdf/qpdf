@@ -2505,9 +2505,13 @@ void
 QPDFJob::Selection::password(std::string password)
 {
     auto& in = input();
-    if (!in.password.empty()) {
+    if (password_provided) {
         usage("--password already specified for this file");
     }
+    if (!(in.password.empty() || in.password == password)) {
+        usage("different --password already specified for this file");
+    }
+    password_provided = true;
     in.password = password;
 }
 

@@ -15,7 +15,7 @@ cleanup();
 
 my $td = new TestDriver('arg-parsing');
 
-my $n_tests = 33;
+my $n_tests = 35;
 
 $td->runtest("required argument",
              {$td->COMMAND => "qpdf --password minimal.pdf"},
@@ -86,6 +86,16 @@ $td->runtest("misplaced pages password",
 $td->runtest("duplicated pages password",
              {$td->COMMAND => "qpdf --pages . --password=z --password=z --"},
              {$td->REGEXP => ".*password already specified.*",
+                  $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("inconsistent pages passwords",
+             {$td->COMMAND => "qpdf --pages . --password=z --range=1 . --password=y --range=2 --"},
+             {$td->REGEXP => ".*different --password already specified.*",
+                  $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("consistent pages passwords",
+             {$td->COMMAND => "qpdf --pages . --password=z --range=1 . --password=z --range=2 --"},
+             {$td->REGEXP => ".*an input file name is required.*",
                   $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("v1-only objects json-key",

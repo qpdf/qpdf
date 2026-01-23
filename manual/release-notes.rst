@@ -13,8 +13,13 @@ more detail.
 
 .. x.y.z: not yet released
 
-
 12.3.2: not yet released
+  - Bug fixes
+
+    - Fix bug introduced in 12.3.0. If the :qpdf:ref:`--password` was specified
+      for the same file multiple times a usage error was thrown. Specifying
+      the the password multiple times is common within the :qpdf:ref:`--pages`
+      option when using the QPDFJob interface.
 
 12.3.1: January 19, 2026
   - Bug fixes
