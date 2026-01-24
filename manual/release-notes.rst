@@ -31,11 +31,9 @@ more detail.
 12.3.0: January 10, 2026
   - Release changes
 
-    - Starting with version 12.3.0, we use
-      `cosign <https://docs.sigstore.dev/cosign/>`__, rather than GPG,
-      to sign releases. See the top-level README.md for instructions.
-      We will continue to use GPG for the 12.x series. Starting with
-      qpdf version 13, only cosign will be used.
+    - Starting with version 12.3.0, we use `cosign
+      <https://docs.sigstore.dev/cosign/>`__, in addition to GPG, to
+      sign releases. See the top-level README.md for instructions.
 
   - Build changes
 

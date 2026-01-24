@@ -15,7 +15,7 @@ is https://qpdf.sourceforge.io. The source code repository is hosted at GitHub: 
 
 # Verifying Distributions
 
-Official qpdf releases are signed using [cosign](https://docs.sigstore.dev/quickstart/quickstart-cosign/). Each release includes a `sha256` file containing sha256 checksums of all the release files. To verify a release, use `cosign verify-blob`. Example:
+Official qpdf releases are signed using [cosign](https://docs.sigstore.dev/quickstart/quickstart-cosign/). Each release includes a `sha256` file containing sha256 checksums of all the release files. To verify a release, use `sha256sum file`, or similar, to generate the checksum of the file you want to verify and check to make sure it matches what's in the sha256 file. You can verify the sha256 file itself with gpg or with `cosign verify-blob`. Example:
 
 ```
 cosign verify-blob qpdf-x.y.z.sha256 --bundle qpdf-x.y.z.sha256.sigstore \
@@ -28,7 +28,7 @@ The identity `signer-identity@qpdf.org` should be replaced with the name of the 
 * Jay Berkenbilt <ejb@ql.org>
 * Manfred Holger <m.holger@qpdf.org>
 
-qpdf versions prior to version 13 were also signed using Jay Berkenbilt's GPG key, which has fingerprint `C2C9 6B10 011F E009 E6D1  DF82 8A75 D109 9801 2C7E` and can be found at https://q.ql.org/pubkey.asc or downloaded from a public key server. Starting with qpdf 13, releases are signed only using cosign.
+You can also verify qpdf releases using Jay Berkenbilt's GPG key, which has fingerprint `C2C9 6B10 011F E009 E6D1  DF82 8A75 D109 9801 2C7E` and can be found at https://q.ql.org/pubkey.asc or downloaded from a public key server.
 
 # Copyright, License
 

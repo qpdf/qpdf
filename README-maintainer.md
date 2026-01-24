@@ -607,13 +607,7 @@ When done, the following should happen:
 
 ## CREATING A RELEASE
 
-* Until qpdf 13: see also README-maintainer.md from v12.2.0 for
-  additional gpg signing steps. This includes signing the releases
-  with gpg. Do this before running cosign. Also use `git tag -s`
-  instead of `git tag -a`. When we deprecate gpg signing, this can be
-  removed.
-
-* Releases are signed using
+* Releases are dual signed with GPG and also with
   [cosign](https://docs.sigstore.dev/quickstart/quickstart-cosign/)
   using your GitHub identity. If you are creating a release, please
   make sure your correct identity is listed in README.md under
@@ -629,6 +623,7 @@ When done, the following should happen:
 
 ```sh
 version=x.y.z
+gpg --detach-sign --armor qpdf-$version.tar.gz
 ```
 
 * From the release directory, sign the releases. You need
@@ -639,6 +634,8 @@ version=x.y.z
 \rm -f *.sha256
 files=(*)
 sha256sum ${files[*]} >| qpdf-$version.sha256
+gpg --clearsign --armor qpdf-$version.sha256
+mv qpdf-$version.sha256.asc qpdf-$version.sha256
 cosign sign-blob qpdf-$version.sha256 --bundle qpdf-$version.sha256.sigstore
 chmod 444 *
 chmod 555 *.AppImage
@@ -655,7 +652,7 @@ chmod 555 *.AppImage
 
 ```sh
 git rev-parse qpdf/main @
-git tag -a v$version @ -m"qpdf $version"
+git tag -s v$version @ -m"qpdf $version"
 git push qpdf v$version
 ```
 
@@ -670,37 +667,8 @@ git push qpdf @:stable
   https://readthedocs.org/projects/qpdf/versions/ (log in with
   github), and activate the latest major/minor version
 
-* Create a github release after pushing the tag. `gcurl` is an alias
-  that includes the auth token.
-
-```sh
-# Create release
-
-GITHUB_TOKEN=$(qdata-show cred github-token)
-function gcurl() { curl -H "Authorization: token $GITHUB_TOKEN" ${1+"$@"}; }
-
-url=$(gcurl -s -XPOST https://api.github.com/repos/qpdf/qpdf/releases -d'{"tag_name": "v'$version'", "name": "qpdf '$version'", "draft": true}' | jq -r '.url')
-
-# Get upload url
-upload_url=$(gcurl -s $url | jq -r '.upload_url' | sed -E -e 's/\{.*\}//')
-echo $upload_url
-```
-
-* From the release area, Upload all the files.
-
-```sh
-for i in *; do
-  mime=$(file -b --mime-type $i)
-  gcurl -H "Content-Type: $mime" --data-binary @$i "$upload_url?name=$i"
-done
-```
-
-Go onto github, and make any manual updates such as indicating a
-pre-release, adding release notes, etc.
-
-Here is a template for the release notes. Change
-`README-what-to-download` to just a file reference for SourceForge
-since there is no relative link target from the news area.
+* Create a notes file for the GitHub release. Copy the template below
+  to /tmp/notes.md and edit as needed.
 
 ```markdown
 This is qpdf version x.y.z. (Brief description, summary of highlights)
@@ -710,28 +678,31 @@ For a full list of changes from previous releases, please see the [release notes
 This release was signed by enter-email@address.here.
 ```
 
-* Publish release. This can be done most easily directly from the
-  GitHub UI. As an alternative, or you can run
+* Create a github release after pushing the tag. Use `gh` (GitHub
+  CLI). This assumes you have `GH_TOKEN` set or are logged in. This
+  must be run from the repository directory.
 
 ```sh
-gcurl -XPOST $url -d'{"draft": false}'
+release=/path/to/release/$version
+gh release create -R qpdf/qpdf v$version --title "qpdf version $version" -F /tmp/notes.md $release/*
 ```
 
 * Upload files to sourceforge. Replace `sourceforge_login` with your
-  SourceForge login.
+  SourceForge login. **NOTE**: The command below passes `-n` to rsync.
+  This is no-op. Run it once to make sure it does the right thing,
+  then run it again without `-n` to actually copy the files.
 
 ```sh
-rsync -vrlcO ./ sourceforge_login,qpdf@frs.sourceforge.net:/home/frs/project/q/qp/qpdf/qpdf/$version/
+release=/path/to/release/$version
+rsync -n -vrlcO $release/ sourceforge_login,qpdf@frs.sourceforge.net:/home/frs/project/q/qp/qpdf/qpdf/$version/
 ```
 
 * On sourceforge, make the source package the default for all but
   Windows, and make the 64-bit msvc build the default for Windows.
 
 * Publish a news item manually on sourceforge using the release notes
-  text. Remove the relative link to README-what-to-download.md (just
-  reference the file by name)
-
-* Upload the debian package and Ubuntu ppa backports.
+  text. **Remove the relative link to README-what-to-download.md** (just
+  reference the file by name).
 
 * Email the qpdf-announce list. Mention the email address of the release signer.
 
