@@ -118,6 +118,7 @@ options:
       - coalesce-contents
       - copy-attachments-from
       - decrypt
+      - deduplicate-xobjects
       - deterministic-id
       - empty
       - encrypt
@@ -341,6 +342,7 @@ json:
   normalize-content:
   stream-data:
   compress-streams:
+  deduplicate-xobjects:
   recompress-flate:
   decode-level:
   decrypt:

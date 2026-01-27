@@ -13,6 +13,13 @@ more detail.
 
 .. x.y.z: not yet released
 
+  - New features
+
+    - New method `QPDF::deduplicateXobjects` which identifies and
+      merges XObject streams with identical content. This reduces file
+      size for PDFs containing repeated stream resources. Exposed as
+      `--deduplicate-xobjects` in the CLI.
+
 12.3.2: January 24, 2026
   - Bug fixes
 

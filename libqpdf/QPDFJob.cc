@@ -2220,6 +2220,9 @@ QPDFJob::handleTransformations(QPDF& pdf)
     if (!m->attachments_to_copy.empty()) {
         copyAttachments(pdf);
     }
+    if (m->deduplicate_xobjects) {
+        pdf.deduplicateXobjects();
+    }
 }
 
 bool
