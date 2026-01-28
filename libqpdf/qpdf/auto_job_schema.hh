@@ -12,6 +12,7 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
   "normalizeContent": "fix newlines in content streams",
   "streamData": "control stream compression",
   "compressStreams": "compress uncompressed streams",
+  "deduplicateXobjects": "merge identical XObject streams into a single object",
   "recompressFlate": "uncompress and recompress flate",
   "decodeLevel": "control which streams to uncompress",
   "decrypt": "remove encryption from input file",

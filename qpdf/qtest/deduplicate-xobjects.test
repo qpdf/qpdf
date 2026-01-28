@@ -1,0 +1,39 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+cleanup();
+
+delete $ENV{'QPDF_DEDUPE_DEBUG'};
+
+my $td = new TestDriver('deduplicate-XObjects');
+
+my $n_tests = 2;
+
+# ----------------------------------------------------------------------
+# Test: Deduplicate XObjects
+# ----------------------------------------------------------------------
+
+# 1. Run the command
+# We assert that it runs successfully (Exit 0) and produces no stdout/stderr (STRING => "")
+$td->runtest("deduplicate XObjects",
+             {$td->COMMAND => "qpdf --static-id --deduplicate-xobjects dedupe-in.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+# 2. Verify the output
+# We compare the generated 'a.pdf' byte-for-byte against the Golden 'dedupe-out.pdf'
+$td->runtest("check output",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "dedupe-out.pdf"});
+
+cleanup();
+$td->report($n_tests);

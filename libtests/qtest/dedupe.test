@@ -1,0 +1,17 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+chdir("dedupe") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+my $td = new TestDriver('dedupe');
+
+$td->runtest("dedupe",
+             {$td->COMMAND => "dedupe"},
+             {$td->FILE => "dedupe.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->report(1);

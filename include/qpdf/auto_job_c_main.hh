@@ -10,6 +10,7 @@ QPDF_DLL Config* check();
 QPDF_DLL Config* checkLinearization();
 QPDF_DLL Config* coalesceContents();
 QPDF_DLL Config* decrypt();
+QPDF_DLL Config* deduplicateXobjects();
 QPDF_DLL Config* deterministicId();
 QPDF_DLL Config* externalizeInlineImages();
 QPDF_DLL Config* filteredStreamData();

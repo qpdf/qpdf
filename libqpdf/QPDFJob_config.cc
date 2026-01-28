@@ -212,6 +212,13 @@ QPDFJob::Config::decrypt()
 }
 
 QPDFJob::Config*
+QPDFJob::Config::deduplicateXobjects()
+{
+    o.m->deduplicate_xobjects = true;
+    return this;
+}
+
+QPDFJob::Config*
 QPDFJob::Config::deterministicId()
 {
     if (o.m->encrypt || o.m->copy_encryption) {

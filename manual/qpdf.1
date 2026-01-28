@@ -362,6 +362,12 @@ Synonym for --remove-unreferenced-resources=no. Use that instead.
 For an extra newline before endstream. Using this option enables
 qpdf to preserve PDF/A when rewriting such files.
 .TP
+.B --deduplicate-xobjects \-\- merge identical XObject streams into a single object
+If the input file contains distinct XObject stream objects that
+have identical data and dictionary entries, this option causes
+qpdf to merge them into a single stream object referenced
+multiple times.
+.TP
 .B --coalesce-contents \-\- combine content streams
 If a page has an array of content streams, concatenate them into
 a single content stream.

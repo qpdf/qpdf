@@ -50,6 +50,7 @@ this->ap.addBare("check-linearization", [this](){c_main->checkLinearization();})
 this->ap.addBare("coalesce-contents", [this](){c_main->coalesceContents();});
 this->ap.addBare("copy-attachments-from", b(&ArgParser::argCopyAttachmentsFrom));
 this->ap.addBare("decrypt", [this](){c_main->decrypt();});
+this->ap.addBare("deduplicate-xobjects", [this](){c_main->deduplicateXobjects();});
 this->ap.addBare("deterministic-id", [this](){c_main->deterministicId();});
 this->ap.addBare("empty", b(&ArgParser::argEmpty));
 this->ap.addBare("encrypt", b(&ArgParser::argEncrypt));
