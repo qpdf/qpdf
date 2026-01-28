@@ -104,10 +104,15 @@ is_safe_to_dedupe(QPDFObjectHandle obj)
         return false;
     }
 
-    // 3. Exclude Soft Masks (/SMask)
-    // Context-sensitive transparency; high risk of visual corruption if merged.
+    // 3. Exclude Soft Masks (/SMask) for XObjects (except /Image XObjects)
+    // For Form XObjects, Smasks involve complex context-sensitive transparency;
+    // high risk of visual corruption if merged.
+    // For Image XObjects, /SMask is an alpha channel, safe to merge.
     if (dict.hasKey("/SMask")) {
-        return false;
+        if (!dict.hasKey("/Subtype") ||
+            dict.getKey("/Subtype").getName() != "/Image") {
+            return false;
+        }
     }
 
     // 4. Exclude Optional Content / Layers (/OC)
