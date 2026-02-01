@@ -18,6 +18,13 @@ more detail.
 
     - Fix error message when :qpdf:ref:`--check` encounters a file without any pages.
 
+  - New features
+
+    - New method `QPDF::deduplicateImageXobjects` which identifies and merges
+      image XObject streams with identical content. This reduces file size for
+      PDFs containing repeated image stream resources. Exposed as
+      `--deduplicate-image-xobjects` in the CLI.
+
 12.3.2: January 24, 2026
   - Bug fixes
 
