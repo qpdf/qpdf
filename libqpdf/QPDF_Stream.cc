@@ -20,7 +20,10 @@
 #include <qpdf/SF_FlateLzwDecode.hh>
 #include <qpdf/SF_RunLengthDecode.hh>
 
+#include <algorithm>
+#include <map>
 #include <stdexcept>
+#include <vector>
 
 using namespace std::literals;
 using namespace qpdf;
@@ -126,6 +129,78 @@ Streams::Streams(Common& common) :
     Common(common),
     copier_(std::make_shared<Copier>(*this))
 {
+}
+
+static void
+rewriteImageReferences(
+    QPDFObjectHandle oh, std::map<QPDFObjGen, QPDFObjectHandle> const& replacements)
+{
+    if (Dictionary d = oh) {
+        for (auto& [key, val]: d) {
+            if (val.isIndirect() && replacements.contains(val.getObjGen())) {
+                d.replace(key, replacements.at(val.getObjGen()));
+            } else if (!val.isIndirect()) {
+                rewriteImageReferences(val, replacements);
+            }
+        }
+    } else if (Array a = oh) {
+        for (size_t i = 0; i < a.size(); ++i) {
+            auto item = a[i];
+            if (item.isIndirect() && replacements.contains(item.getObjGen())) {
+                a.set(i, replacements.at(item.getObjGen()));
+            } else if (!item.isIndirect()) {
+                rewriteImageReferences(item, replacements);
+            }
+        }
+    }
+}
+
+void
+Streams::deduplicateImageXobjects(int64_t threshold)
+{
+    std::vector<Stream> image_candidates;
+    for (auto const& iter: m->obj_cache) {
+        QPDFObjectHandle obj(iter.second.object);
+        if (obj.isStream()) {
+            Stream oh(obj);
+            if (oh.Subtype() == "/Image") {
+                image_candidates.emplace_back(oh);
+            }
+        }
+    }
+    std::sort(
+        image_candidates.begin(), image_candidates.end(), [](const Stream& a, const Stream& b) {
+            return a.Length().value() < b.Length().value();
+        });
+    std::map<QPDFObjGen, QPDFObjectHandle> replacements;
+    for (size_t i = 0; i < image_candidates.size(); ++i) {
+        auto& master = image_candidates[i];
+        auto master_len = master.Length().value();
+        if (master_len < threshold) {
+            continue;
+        }
+        for (size_t j = i + 1; j < image_candidates.size(); ++j) {
+            auto& candidate = image_candidates[j];
+            if (candidate.Length() != master_len) {
+                break;
+            }
+            QPDFObjectHandle candidate_obj(candidate);
+            QPDFObjectHandle master_obj(master);
+            if (candidate_obj.equivalent_to(master_obj)) {
+                replacements[candidate_obj.getObjGen()] = master_obj;
+            }
+        }
+    }
+    for (auto& [og, master]: replacements) {
+        while (replacements.contains(master.getObjGen())) {
+            master = replacements.at(master.getObjGen());
+        }
+    }
+    if (!replacements.empty()) {
+        for (auto const& [og, entry]: m->obj_cache) {
+            rewriteImageReferences(QPDFObjectHandle(entry.object), replacements);
+        }
+    }
 }
 
 namespace
