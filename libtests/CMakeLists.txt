@@ -11,6 +11,7 @@ set(TEST_PROGRAMS
   crypto_provider
   dct_compress
   dct_uncompress
+  equivalence
   flate
   hex
   input_source

@@ -6,6 +6,7 @@
 #include <qpdf/Pl_QPDFTokenizer.hh>
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDF.hh>
+#include <qpdf/QPDFEquivalenceCache.hh>
 #include <qpdf/QPDFExc.hh>
 #include <qpdf/QPDFLogger.hh>
 #include <qpdf/QPDFMatrix.hh>
@@ -2424,4 +2425,201 @@ QPDFObjectHandle
 operator""_qpdf(char const* v, size_t len)
 {
     return QPDFObjectHandle::parse(std::string(v, len), "QPDFObjectHandle literal");
+}
+
+// This method determines deep structural equivalence.
+// Nomenclature Note: ISO 32000-2 Annex J uses the term "equal" for this
+// strict recursive comparison (J.4.1) and reserves "equivalent" for looser
+// semantic matches (e.g., decoded streams). We use "is_equivalent" here to
+// implement Annex J's "equality", distinguishing it from C++ shallow
+// pointer equality.
+
+bool
+BaseHandle::is_equivalent(BaseHandle const& other, EquivalenceCache& cache) const
+{
+    // 1. Identity Optimization
+    if (this->obj == other.obj) {
+        return true;
+    }
+    if (!this->obj || !other.obj) {
+        return false;
+    }
+
+    // 2. Cycle Detection / Memoization
+    auto p1 = this->obj.get();
+    auto p2 = other.obj.get();
+    if (p1 > p2) {
+        std::swap(p1, p2);
+    }
+    auto const cache_key = std::make_pair(p1, p2);
+    auto it = cache.table.find(cache_key);
+    if (it != cache.table.end()) {
+        return it->second;
+    }
+
+    // Assume true during recursion to handle circular references safely.
+    cache.table.emplace(cache_key, true);
+    cache.insertions++;
+
+    bool result = false;
+    qpdf_object_type_e t1 = this->type_code();
+    qpdf_object_type_e t2 = other.type_code();
+
+    auto oh1 = this->oh();
+    auto oh2 = other.oh();
+
+    // 3. Numeric Promotion (Integer == Real)
+    if ((t1 == ::ot_integer || t1 == ::ot_real) && (t2 == ::ot_integer || t2 == ::ot_real)) {
+        double v1, v2;
+        if (oh1.getValueAsNumber(v1) && oh2.getValueAsNumber(v2)) {
+            result = (v1 == v2);
+        }
+    } else if (t1 != t2) {
+        result = false;
+    } else {
+        // 4. Structural Comparison
+
+        switch (t1) {
+        case ::ot_uninitialized:
+            throw std::logic_error(
+                "QPDFObjectHandle: cannot determine equivalence for uninitialized objects");
+            return false; // does not return
+        case ::ot_reserved:
+            throw std::logic_error(
+                "QPDFObjectHandle: cannot determine equivalence for reserved objects");
+            return false; // does not return
+        case ::ot_destroyed:
+            throw std::logic_error(
+                "QPDFObjectHandle: cannot determine equivalence for destroyed objects");
+            return false; // does not return
+        case ::ot_null:
+            result = true;
+            break;
+        case ::ot_boolean:
+            {
+                bool b1, b2;
+                oh1.getValueAsBool(b1);
+                oh2.getValueAsBool(b2);
+                result = (b1 == b2);
+            }
+            break;
+        case ::ot_name:
+            {
+                std::string n1, n2;
+                oh1.getValueAsName(n1);
+                oh2.getValueAsName(n2);
+                result = (n1 == n2);
+            }
+            break;
+        case ::ot_string:
+            {
+                std::string s1, s2;
+                oh1.getValueAsString(s1);
+                oh2.getValueAsString(s2);
+                result = (s1 == s2);
+            }
+            break;
+
+        case ::ot_array:
+            {
+                int n = oh1.getArrayNItems();
+                if (n != oh2.getArrayNItems()) {
+                    result = false;
+                } else {
+                    result = true;
+                    for (int i = 0; i < n; ++i) {
+                        if (!oh1.getArrayItem(i).is_equivalent(oh2.getArrayItem(i), cache)) {
+                            result = false;
+                            break;
+                        }
+                    }
+                }
+            }
+            break;
+
+        case ::ot_dictionary:
+            {
+                result = true;
+                std::set<std::string> keys1 = oh1.getKeys();
+                std::set<std::string> keys2 = oh2.getKeys();
+
+                if (keys1.size() != keys2.size()) {
+                    result = false;
+                    break;
+                }
+
+                for (auto const& key: keys1) {
+                    if (!oh2.hasKey(key)) {
+                        result = false;
+                        break;
+                    }
+                    if (!oh1.getKey(key).is_equivalent(oh2.getKey(key), cache)) {
+                        result = false;
+                        break;
+                    }
+                }
+            }
+            break;
+        case ::ot_stream:
+            {
+                // 1. Fail-fast: Check the /Length key in the dictionaries first.
+                auto len1 = oh1.getDict().getKey("/Length");
+                auto len2 = oh2.getDict().getKey("/Length");
+
+                if (len1.isNumber() && len2.isNumber()) {
+                    if (len1.getNumericValue() != len2.getNumericValue()) {
+                        result = false;
+                        break;
+                    }
+                }
+
+                // 2. Structural Dictionary Check
+                if (!oh1.getDict().is_equivalent(oh2.getDict(), cache)) {
+                    result = false;
+                    break;
+                }
+
+                // 3. Data comparison
+                // Annex J deviation: compare compressed data only for efficiency.
+                auto data1 = oh1.getRawStreamData();
+                auto data2 = oh2.getRawStreamData();
+                if (!data1 || !data2) {
+                    result = false;
+                    break;
+                }
+                auto size1 = data1->getSize();
+                if (size1 != data2->getSize()) {
+                    result = false;
+                    break;
+                }
+                result = (memcmp(data1->getBuffer(), data2->getBuffer(), size1) == 0);
+            }
+            break;
+
+        default:
+            throw std::logic_error(
+                "QPDFObjectHandle: unknown object type, cannot determine equivalence");
+            return false; // does not return
+        }
+    }
+
+    // Update cache with the final result and return
+    cache.table[cache_key] = result;
+    return result;
+}
+
+// Convenience wrapper for the common case of no pre-existing cache.
+bool
+BaseHandle::is_equivalent(BaseHandle const& other) const
+{
+    // Identity Optimization
+    if (this->obj == other.obj) {
+        return true;
+    }
+    if (!this->obj || !other.obj) {
+        return false;
+    }
+
+    EquivalenceCache cache;
+    return is_equivalent(other, cache);
 }

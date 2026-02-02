@@ -41,6 +41,7 @@ namespace qpdf
     class Array;
     class BaseDictionary;
     class Dictionary;
+    struct EquivalenceCache;
     class Integer;
     class Stream;
 
@@ -67,6 +68,10 @@ namespace qpdf
         {
             return obj == other.obj;
         }
+
+        // Structural equivalence check per PDF Annex J rules.
+        bool is_equivalent(BaseHandle const& other) const;
+        bool is_equivalent(BaseHandle const& other, EquivalenceCache& cache) const;
 
         // For arrays, return the number of items in the array.
         // For null-like objects, return 0.

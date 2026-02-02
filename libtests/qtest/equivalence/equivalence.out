@@ -1,0 +1,102 @@
+
+=== Scenario 1: Basic Equality: Name and Scalars ===
+PASS: Scenario 1
+
+=== Scenario 2: Numeric Types (Int vs Real) ===
+PASS: Scenario 2
+
+=== Scenario 3: Array Order Sensitivity ===
+PASS: Scenario 3
+
+=== Scenario 4: Dictionary Key Insensitivity ===
+PASS: Scenario 4
+
+=== Scenario 5: Direct vs Indirect Equality ===
+PASS: Scenario 5
+
+=== Scenario 6: Recursive Diamond (Graph Isomorphism) ===
+PASS: Scenario 6
+
+=== Scenario 7: Circular References (Self-Loop) ===
+PASS: Scenario 7
+
+=== Scenario 8: Cross-Document Simulation (Strictness) ===
+PASS: Scenario 8
+
+=== Scenario 9: Stream Content: Match ===
+PASS: Scenario 9
+
+=== Scenario 10: Stream Content: Mismatch ===
+PASS: Scenario 10
+
+=== Scenario 11: Stream Dictionary Differences ===
+PASS: Scenario 11
+
+=== Scenario 12: J.3.6: Absent Keys vs Null ===
+PASS: Scenario 12
+
+=== Scenario 13: String Syntax: Hex vs Literal (Annex J) ===
+PASS: Scenario 13
+
+=== Scenario 14: Name Syntax (Parser) vs Distinct Names (Model) ===
+PASS: Scenario 14
+
+=== Scenario 15: Annex J Oddities: Keys, Octals, and Zeros ===
+PASS: Scenario 15
+
+=== Scenario 16: Nested Container Deep Comparison ===
+PASS: Scenario 16
+
+=== Scenario 17: Boolean and Null mismatch ===
+PASS: Scenario 17
+
+=== Scenario 18: Stream Semantics (J.3.7) - Strictness Check ===
+PASS: Scenario 18
+
+=== Scenario 19: Dictionary Value Type Mismatch ===
+PASS: Scenario 19
+
+=== Scenario 20: Mixed Direct vs Indirect Nesting ===
+PASS: Scenario 20
+
+=== Scenario 21: Dictionary Subset vs Superset ===
+PASS: Scenario 21
+
+=== Scenario 22: Stream Semantic Decode Equivalence ===
+PASS: Scenario 22
+
+=== Scenario 23: Indirect Object Identity Independence ===
+PASS: Scenario 23
+
+=== Scenario 24: Deep Recursive Structure (Stack Safety) ===
+PASS: Scenario 24
+
+=== Scenario 25: Wide Graph Fan-out (Cache Stress) ===
+PASS: Scenario 25
+
+=== Scenario 26: Equivalence Cache Hit Verification ===
+PASS: Scenario 26
+
+=== Scenario 27: Nested Dictionary Reuse / Shared Indirect Objects ===
+PASS: Scenario 27
+
+=== Scenario 28: Nested Diamond of Shared Indirect Objects (Cache Stress) ===
+PASS: Scenario 28
+
+=== Scenario 29: Direct vs Indirect Integer ===
+PASS: Scenario 29
+
+=== Scenario 30: Nested Diamond with Direct & Indirect Objects (Cache Stress) ===
+PASS: Scenario 30
+
+=== Scenario 31: Image XObjects sharing an SMask ===
+PASS: Scenario 31
+
+=== Scenario 32: Image XObjects with two distinct but identical SMasks ===
+PASS: Scenario 32
+
+=== Scenario 33: Dictionary Key Equivalence with Value Mismatch (Annex J) ===
+PASS: Scenario 33
+
+=== Summary ===
+ALL 33 SCENARIOS PASSED
