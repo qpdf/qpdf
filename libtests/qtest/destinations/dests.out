@@ -1,0 +1,20 @@
+/InvalidLegacyTarget (kind = NAME) is invalid. Raw object: << /D (potatoes) >> ==> << /D (potatoes) >>
+/InvalidLegacyTarget2 (kind = NAME): find_page_index = 0, is_remote = false, dest_array = 2 0 R ==> [ 3 0 R /XYZ 0 842 0 ]
+/InvalidLegacyTarget3 (kind = NAME): find_page_index = 0, is_remote = false, dest_array = [ 3 0 R ] ==> [ 3 0 R ]
+/InvalidLegacyTarget4 (kind = NAME): find_page_index = -1, is_remote = false, dest_array = [ ] ==> [ ]
+/InvalidLegacyTarget5 (kind = NAME) is invalid. Raw object: /LegacyTarget3 ==> /LegacyTarget3
+/InvalidLegacyTarget6 (kind = NAME): find_page_index = -1, is_remote = false, dest_array = [ null /XYZ ] ==> [ null /XYZ ]
+/InvalidLegacyTarget7 (kind = NAME): find_page_index = -1, is_remote = false, dest_array = [ -1 /XYZ ] ==> [ -1 /XYZ ]
+/LegacyTarget (kind = NAME): find_page_index = 0, is_remote = false, dest_array = [ 3 0 R /XYZ 0 842 0 ] ==> [ 3 0 R /XYZ 0 842 0 ]
+/LegacyTarget2 (kind = NAME): find_page_index = 0, is_remote = false, dest_array = [ 3 0 R /XYZ 0 842 0 ] ==> [ 3 0 R /XYZ 0 842 0 ]
+/LegacyTarget3 (kind = NAME): find_page_index = 0, is_remote = false, dest_array = 2 0 R ==> [ 3 0 R /XYZ 0 842 0 ]
+TrulyModern (kind = STRING): find_page_index = 1, is_remote = false, dest_array = [ 11 0 R /XYZ 0 842 0 ] ==> [ 11 0 R /XYZ 0 842 0 ]
+TrulyModern2 (kind = STRING): find_page_index = 1, is_remote = false, dest_array = [ 11 0 R /XYZ 0 842 0 ] ==> [ 11 0 R /XYZ 0 842 0 ]
+TrulyModern3 (kind = STRING): find_page_index = 1, is_remote = false, dest_array = 12 0 R ==> [ 11 0 R /XYZ 0 842 0 ]
+InvalidModern (kind = STRING) is invalid. Raw object: << /D (potatoes) >> ==> << /D (potatoes) >>
+InvalidModern2 (kind = STRING): find_page_index = 1, is_remote = false, dest_array = 12 0 R ==> [ 11 0 R /XYZ 0 842 0 ]
+InvalidModern3 (kind = STRING): find_page_index = 1, is_remote = false, dest_array = [ 11 0 R ] ==> [ 11 0 R ]
+InvalidModern4 (kind = STRING): find_page_index = -1, is_remote = false, dest_array = [ ] ==> [ ]
+InvalidModern5 (kind = STRING) is invalid. Raw object: /LegacyTarget3 ==> /LegacyTarget3
+InvalidModern6 (kind = STRING): find_page_index = -1, is_remote = false, dest_array = [ null /XYZ ] ==> [ null /XYZ ]
+InvalidModern7 (kind = STRING): find_page_index = -1, is_remote = false, dest_array = [ -1 /XYZ ] ==> [ -1 /XYZ ]

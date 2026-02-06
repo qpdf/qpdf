@@ -178,7 +178,6 @@ QPDFFormFieldObjectHelper Q present 1
 QPDFAcroFormDocumentHelper field found 1
 QPDFAcroFormDocumentHelper annotation found 1
 QPDFJob automatically set keep files open 1
-QPDFOutlineDocumentHelper string named dest 0
 QPDFObjectHandle merge top type mismatch 0
 QPDFObjectHandle merge shallow copy 0
 QPDFObjectHandle merge array 0
