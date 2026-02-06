@@ -150,7 +150,7 @@ cmake -S . -B build
 cmake --build build --config Release
 ```
 
-Installation can be done with `cmake --install`. Packages can be made with `cpack`.
+Installation can be done with `cmake --install` (you may need to set the `LD_LIBRARY_PATH` variable, with a command such as `export LD_LIBRARY_PATH=/usr/local/lib64:$LD_LIBRARY_PATH`). Packages can be made with `cpack`.
 
 The tests use `qtest`, and the test driver is invoked by `ctest`. To see the real underlying tests,
 run `ctest --verbose` so that you can see `qtest`'s output. If you need to turn off qtest's color output,
