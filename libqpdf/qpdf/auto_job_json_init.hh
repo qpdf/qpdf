@@ -59,6 +59,9 @@ popHandler(); // key: streamData
 pushKey("compressStreams");
 addChoices(yn_choices, true, [this](std::string const& p) { c_main->compressStreams(p); });
 popHandler(); // key: compressStreams
+pushKey("deduplicateXobjects");
+addBare([this]() { c_main->deduplicateXobjects(); });
+popHandler(); // key: deduplicateXobjects
 pushKey("recompressFlate");
 addBare([this]() { c_main->recompressFlate(); });
 popHandler(); // key: recompressFlate

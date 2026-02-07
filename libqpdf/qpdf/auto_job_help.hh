@@ -274,6 +274,11 @@ ap.addOptionHelp("--preserve-unreferenced-resources", "transformation", "use --r
 ap.addOptionHelp("--newline-before-endstream", "transformation", "force a newline before endstream", R"(For an extra newline before endstream. Using this option enables
 qpdf to preserve PDF/A when rewriting such files.
 )");
+ap.addOptionHelp("--deduplicate-xobjects", "transformation", "merge identical XObject streams into a single object", R"(If the input file contains distinct XObject stream objects that
+have identical data and dictionary entries, this option causes
+qpdf to merge them into a single stream object referenced
+multiple times.
+)");
 ap.addOptionHelp("--coalesce-contents", "transformation", "combine content streams", R"(If a page has an array of content streams, concatenate them into
 a single content stream.
 )");
@@ -284,6 +289,9 @@ ap.addOptionHelp("--ii-min-bytes", "transformation", "set minimum size for --ext
 Don't externalize inline images smaller than this size. The
 default is 1,024. Use 0 for no minimum.
 )");
+}
+static void add_help_4(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--min-version", "transformation", "set minimum PDF version", R"(--min-version=version
 
 Force the PDF version of the output to be at least the specified
@@ -292,9 +300,6 @@ version. The version number format is
 to "major.minor" and the extension level, if specified, to
 "extension-level".
 )");
-}
-static void add_help_4(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--force-version", "transformation", "set output PDF version", R"(--force-version=version
 
 Force the output PDF file's PDF version header to be the specified
@@ -425,11 +430,11 @@ ap.addOptionHelp("--oi-min-area", "modification", "minimum area for --optimize-i
 
 Don't optimize images whose area in pixels is below the specified value.
 )");
-ap.addOptionHelp("--keep-inline-images", "modification", "exclude inline images from optimization", R"(Prevent inline images from being considered by --optimize-images.
-)");
 }
 static void add_help_5(QPDFArgParser& ap)
 {
+ap.addOptionHelp("--keep-inline-images", "modification", "exclude inline images from optimization", R"(Prevent inline images from being considered by --optimize-images.
+)");
 ap.addOptionHelp("--remove-acroform", "modification", "remove the interactive form dictionary", R"(Exclude the interactive form dictionary from the output file. This
 option only removes the interactive form dictionary from the
 document catalog. It does not remove form field dictionaries or
@@ -643,13 +648,13 @@ none: disallow printing
 low: allow low-resolution printing only
 full: allow full printing (the default)
 )");
+}
+static void add_help_6(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--cleartext-metadata", "encryption", "don't encrypt metadata", R"(If specified, don't encrypt document metadata even when
 encrypting the rest of the document. This option is not
 available with 40-bit encryption.
 )");
-}
-static void add_help_6(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--use-aes", "encryption", "use AES with 128-bit encryption", R"(--use-aes=[y|n]
 
 Enables/disables use of the more secure AES encryption with
@@ -827,15 +832,15 @@ Specify the attachment's creation date in PDF format; defaults
 to the current time. Run qpdf --help=pdf-dates for information
 about the date format.
 )");
+}
+static void add_help_7(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--moddate", "add-attachment", "set attachment's modification date", R"(--moddate=date
 
 Specify the attachment's modification date in PDF format;
 defaults to the current time. Run qpdf --help=pdf-dates for
 information about the date format.
 )");
-}
-static void add_help_7(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--mimetype", "add-attachment", "attachment mime type, e.g. application/pdf", R"(--mimetype=type/subtype
 
 Specify the mime type for the attachment, such as text/plain,
@@ -926,12 +931,12 @@ standard output instead of the object's contents. See also
 ap.addOptionHelp("--show-npages", "inspection", "show number of pages", R"(Print the number of pages in the input file on a line by itself.
 Useful for scripts.
 )");
-ap.addOptionHelp("--show-pages", "inspection", "display page dictionary information", R"(Show the object and generation number for each page dictionary
-object and for each content stream associated with the page.
-)");
 }
 static void add_help_8(QPDFArgParser& ap)
 {
+ap.addOptionHelp("--show-pages", "inspection", "display page dictionary information", R"(Show the object and generation number for each page dictionary
+object and for each content stream associated with the page.
+)");
 ap.addOptionHelp("--with-images", "inspection", "include image details with --show-pages", R"(When used with --show-pages, also shows the object and
 generation numbers for the image objects on each page.
 )");
@@ -1031,6 +1036,9 @@ ap.addOptionHelp("--parser-max-errors", "global", "set the maximum number of err
 Set the maximum number of errors allowed while parsing an indirect object.
 A value of 0 means that no maximum is imposed. Defaults to 15.
 )");
+}
+static void add_help_9(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--parser-max-container-size", "global", "set the maximum container size while parsing", R"(--parser-max-container-size=n
 
 Set the maximum number of top-level objects allowed in a container while
@@ -1038,9 +1046,6 @@ parsing. The limit applies when the PDF document's xref table is undamaged
 and the object itself can be parsed without errors. The default limit
 is 4,294,967,295. See also --parser-max-container-size-damaged.
 )");
-}
-static void add_help_9(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--parser-max-container-size-damaged", "global", "set the maximum container size while parsing damaged files", R"(--parser-max-container-size-damaged=n
 
 Set the maximum number of top-level objects allowed in a container while
