@@ -2546,17 +2546,22 @@ BaseHandle::equivalent_to(BaseHandle const& other) const
                 auto const& map1 = std::get<QPDF_Dictionary>(h1.obj->value).items;
                 auto const& map2 = std::get<QPDF_Dictionary>(h2.obj->value).items;
 
-                if (map1.size() != map2.size()) {
-                    return false;
-                }
-
-                // We iterate in lockstep (O(N)) rather than doing lookups.
-                // This is valid only because QPDF_Dictionary uses
-                // std::map, which guarantees lexicographical key order.
                 auto it1 = map1.begin();
                 auto it2 = map2.begin();
-                while (it1 != map1.end()) {
-                    if (it1->first != it2->first) {
+                auto end1 = map1.end();
+                auto end2 = map2.end();
+
+                while (it1 != end1 || it2 != end2) {
+                    while (it1 != end1 && it1->second.null()) {
+                        ++it1;
+                    }
+                    while (it2 != end2 && it2->second.null()) {
+                        ++it2;
+                    }
+                    if (it1 == end1 || it2 == end2) {
+                        return (it1 == end1 && it2 == end2);
+                    }
+                    if (it1->first < it2->first || it1->first > it2->first) {
                         return false;
                     }
                     if (!self(self, it1->second, it2->second, visited, depth - 1)) {
