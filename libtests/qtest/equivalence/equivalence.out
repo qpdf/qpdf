@@ -74,19 +74,19 @@ PASS: Scenario 24
 === Scenario 25: Wide Graph Fan-out (Cache Stress) ===
 PASS: Scenario 25
 
-=== Scenario 26: Equivalence Cache Hit Verification ===
+=== Scenario 26: Equivalence Cache Hit Verification (Consistency Check) ===
 PASS: Scenario 26
 
 === Scenario 27: Nested Dictionary Reuse / Shared Indirect Objects ===
 PASS: Scenario 27
 
-=== Scenario 28: Nested Diamond of Shared Indirect Objects (Cache Stress) ===
+=== Scenario 28: Nested Diamond of Shared Indirect Objects ===
 PASS: Scenario 28
 
 === Scenario 29: Direct vs Indirect Integer ===
 PASS: Scenario 29
 
-=== Scenario 30: Nested Diamond with Direct & Indirect Objects (Cache Stress) ===
+=== Scenario 30: Nested Diamond with Direct & Indirect Objects ===
 PASS: Scenario 30
 
 === Scenario 31: Image XObjects sharing an SMask ===
@@ -98,5 +98,26 @@ PASS: Scenario 32
 === Scenario 33: Dictionary Key Equivalence with Value Mismatch (Annex J) ===
 PASS: Scenario 33
 
+=== Scenario 34: Scenario 34: Uninitialized vs. Uninitialized (!obj) ===
+PASS: Scenario 34
+
+=== Scenario 35: Scenario 35: Uninitialized vs. PDF Null ===
+PASS: Scenario 35
+
+=== Scenario 36: Scenario 36: Distinct Direct Null Objects ===
+PASS: Scenario 36
+
+=== Scenario 37: Scenario 37: Distinct Indirect Nulls (Different IDs) ===
+PASS: Scenario 37
+
+=== Scenario 38: Scenario 38: Broken References to Different Missing Objects ===
+PASS: Scenario 38
+
+=== Scenario 39: Scenario 39: Uninitialized Handle vs PDF Null (The Crash Test) ===
+PASS: Scenario 39
+
+=== Scenario 40: Scenario 40: Recursion Depth Limit (The Stack Protector) ===
+PASS: Scenario 40
+
 === Summary ===
-ALL 33 SCENARIOS PASSED
+ALL 40 SCENARIOS PASSED
