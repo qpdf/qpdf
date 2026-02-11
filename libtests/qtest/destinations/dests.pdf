@@ -1,85 +1,89 @@
 %PDF-1.3
 %¿÷¢þ
 1 0 obj
-<< /Dests << /InvalidLegacyTarget << /D (potatoes) >> /InvalidLegacyTarget2 << /D << /D 2 0 R >> >> /InvalidLegacyTarget3 [ 3 0 R ] /InvalidLegacyTarget4 [ ] /InvalidLegacyTarget5 /LegacyTarget3 /InvalidLegacyTarget6 [ null /XYZ ] /InvalidLegacyTarget7 [ -1 /XYZ ] /LegacyTarget [ 3 0 R /XYZ 0 842 0 ] /LegacyTarget2 << /D [ 3 0 R /XYZ 0 842 0 ] >> /LegacyTarget3 << /D 2 0 R >> >> /Names << /Dests 4 0 R >> /Outlines 5 0 R /Pages 6 0 R /Type /Catalog >>
+<< /Dests << /BothModernAndLegacy << /D 2 0 R /DebugLabel (From /Dests: Name keys) >> /InvalidLegacyTarget << /D (potatoes) >> /InvalidLegacyTarget2 << /D << /D 3 0 R >> >> /InvalidLegacyTarget3 [ 4 0 R ] /InvalidLegacyTarget4 [ ] /InvalidLegacyTarget5 /LegacyTarget3 /InvalidLegacyTarget6 [ null /XYZ 0 300 0 ] /InvalidLegacyTarget7 [ -1 /XYZ 0 150 0 ] /LegacyTarget [ 4 0 R /XYZ 0 48 0 ] /LegacyTarget2 << /D [ 4 0 R /XYZ 0 135 0 ] >> /LegacyTarget3 << /D 3 0 R >> >> /Names << /Dests 5 0 R >> /Outlines 6 0 R /Pages 7 0 R /Type /Catalog >>
 endobj
 2 0 obj
-[ 3 0 R /XYZ 0 842 0 ]
+[ 8 0 R /XYZ 0 842 0 ]
 endobj
 3 0 obj
-<< /Annots [ 7 0 R 8 0 R 9 0 R ] /Contents 10 0 R /MediaBox [ 0 0 612 792 ] /Parent 6 0 R /Resources << >> /Type /Page >>
+[ 4 0 R /XYZ 0 24 0 ]
 endobj
 4 0 obj
-<< /Names [ (TrulyModern) [ 11 0 R /XYZ 0 842 0 ] (TrulyModern2) << /D [ 11 0 R /XYZ 0 842 0 ] >> (TrulyModern3) 12 0 R (InvalidModern) << /D (potatoes) >> (InvalidModern2) << /D << /D 12 0 R >> >> (InvalidModern3) [ 11 0 R ] (InvalidModern4) [ ] (InvalidModern5) /LegacyTarget3 (InvalidModern6) [ null /XYZ ] (InvalidModern7) [ -1 /XYZ ] ] >>
+<< /Annots [ 9 0 R 10 0 R 11 0 R ] /Contents 12 0 R /MediaBox [ 0 0 612 792 ] /Parent 7 0 R /Resources << >> /Type /Page >>
 endobj
 5 0 obj
-<< /Count 2 /First 13 0 R /Last 14 0 R /Type /Outlines >>
+<< /Names [ (/BothModernAndLegacy) << /D 13 0 R /DebugLabel (From /Names/Dests: String key) >> (InvalidModern) << /D (potatoes) >> (InvalidModern2) << /D << /D 2 0 R >> >> (InvalidModern3) [ 8 0 R ] (InvalidModern4) [ ] (InvalidModern5) /LegacyTarget3 (InvalidModern6) [ null /XYZ 0 300 0 ] (InvalidModern7) [ -1 /XYZ ] (TrulyModern) [ 8 0 R /XYZ 0 84 0 ] (TrulyModern2) << /D [ 8 0 R /XYZ 0 42 0 ] >> (TrulyModern3) 2 0 R ] >>
 endobj
 6 0 obj
-<< /Count 2 /Kids [ 3 0 R 11 0 R ] /Type /Pages >>
+<< /Count 2 /First 14 0 R /Last 15 0 R /Type /Outlines >>
 endobj
 7 0 obj
-<< /A << /D (TrulyModern) /S /GoTo /Type /Action >> /Border [ 0 0 10 ] /Rect [ 100 600 400 650 ] /Subtype /Link /Type /Annot >>
+<< /Count 2 /Kids [ 4 0 R 8 0 R ] /Type /Pages >>
 endobj
 8 0 obj
-<< /A << /D (TrulyModern2) /S /GoTo /Type /Action >> /Border [ 0 0 10 ] /Rect [ 100 500 400 550 ] /Subtype /Link /Type /Annot >>
+<< /Annots [ 16 0 R 17 0 R 18 0 R ] /Contents 19 0 R /MediaBox [ 0 0 612 792 ] /Parent 7 0 R /Resources << >> /Type /Page >>
 endobj
 9 0 obj
-<< /A << /D (TrulyModern3) /S /GoTo /Type /Action >> /Border [ 0 0 10 ] /Rect [ 100 400 400 450 ] /Subtype /Link /Type /Annot >>
+<< /A << /D (TrulyModern) /S /GoTo /Type /Action >> /Border [ 0 0 10 ] /Rect [ 100 600 400 650 ] /Subtype /Link /Type /Annot >>
 endobj
 10 0 obj
+<< /A << /D (TrulyModern2) /S /GoTo /Type /Action >> /Border [ 0 0 10 ] /Rect [ 100 500 400 550 ] /Subtype /Link /Type /Annot >>
+endobj
+11 0 obj
+<< /A << /D (TrulyModern3) /S /GoTo /Type /Action >> /Border [ 0 0 10 ] /Rect [ 100 400 400 450 ] /Subtype /Link /Type /Annot >>
+endobj
+12 0 obj
 << /Filter /FlateDecode /Length 0 >>
 stream
 endstream
 endobj
-11 0 obj
-<< /Annots [ 15 0 R 16 0 R 17 0 R ] /Contents 18 0 R /MediaBox [ 0 0 612 792 ] /Parent 6 0 R /Resources << >> /Type /Page >>
-endobj
-12 0 obj
-[ 11 0 R /XYZ 0 842 0 ]
-endobj
 13 0 obj
-<< /Count 0 /Dest (TrulyModern) /Next 14 0 R /Parent 5 0 R /Title (Jump to Page 2 \(Modern\)) >>
+[ 5 0 R /FitH 12 ]
 endobj
 14 0 obj
-<< /Count 0 /Dest /LegacyTarget /Parent 5 0 R /Prev 13 0 R /Title (Jump to Page 1 \(Legacy\)) >>
+<< /Count 0 /Dest (TrulyModern) /Next 15 0 R /Parent 6 0 R /Title (Jump to Page 2 \(Modern\)) >>
 endobj
 15 0 obj
-<< /A << /D /LegacyTarget /S /GoTo /Type /Action >> /Border [ 0 0 1 ] /C [ 1 0 0 ] /Rect [ 100 600 400 650 ] /Subtype /Link /Type /Annot >>
+<< /Count 0 /Dest /LegacyTarget /Parent 6 0 R /Prev 14 0 R /Title (Jump to Page 1 \(Legacy\)) >>
 endobj
 16 0 obj
-<< /A << /D /LegacyTarget2 /S /GoTo /Type /Action >> /Border [ 0 0 1 ] /C [ 1 0 0 ] /Rect [ 100 500 400 550 ] /Subtype /Link /Type /Annot >>
+<< /A << /D /LegacyTarget /S /GoTo /Type /Action >> /Border [ 0 0 1 ] /C [ 1 0 0 ] /Rect [ 100 600 400 650 ] /Subtype /Link /Type /Annot >>
 endobj
 17 0 obj
-<< /A << /D /LegacyTarget3 /S /GoTo /Type /Action >> /Border [ 0 0 1 ] /C [ 1 0 0 ] /Rect [ 100 400 400 450 ] /Subtype /Link /Type /Annot >>
+<< /A << /D /LegacyTarget2 /S /GoTo /Type /Action >> /Border [ 0 0 1 ] /C [ 1 0 0 ] /Rect [ 100 500 400 550 ] /Subtype /Link /Type /Annot >>
 endobj
 18 0 obj
+<< /A << /D /LegacyTarget3 /S /GoTo /Type /Action >> /Border [ 0 0 1 ] /C [ 1 0 0 ] /Rect [ 100 400 400 450 ] /Subtype /Link /Type /Annot >>
+endobj
+19 0 obj
 << /Filter /FlateDecode /Length 0 >>
 stream
 endstream
 endobj
 xref
-0 19
+0 20
 0000000000 65535 f 
 0000000015 00000 n 
-0000000485 00000 n 
-0000000523 00000 n 
-0000000660 00000 n 
-0000001019 00000 n 
-0000001092 00000 n 
-0000001158 00000 n 
-0000001301 00000 n 
-0000001445 00000 n 
-0000001589 00000 n 
-0000001659 00000 n 
-0000001800 00000 n 
-0000001840 00000 n 
-0000001953 00000 n 
-0000002066 00000 n 
-0000002222 00000 n 
-0000002379 00000 n 
-0000002536 00000 n 
-trailer << /Root 1 0 R /Size 19 /ID [<947730462ab7eed82ef99d147606569e><a474e011c773dc6d8097ff8bf1a8f6b8>] >>
+0000000573 00000 n 
+0000000611 00000 n 
+0000000648 00000 n 
+0000000787 00000 n 
+0000001230 00000 n 
+0000001303 00000 n 
+0000001368 00000 n 
+0000001508 00000 n 
+0000001651 00000 n 
+0000001796 00000 n 
+0000001941 00000 n 
+0000002011 00000 n 
+0000002046 00000 n 
+0000002159 00000 n 
+0000002272 00000 n 
+0000002428 00000 n 
+0000002585 00000 n 
+0000002742 00000 n 
+trailer << /Root 1 0 R /Size 20 /ID [<947730462ab7eed82ef99d147606569e><f80515f2e8a978dffb0c5a434145a906>] >>
 startxref
-2606
+2812
 %%EOF

@@ -1,28 +1,33 @@
-#include <qpdf/QPDF.hh>
+#include <qpdf/QPDFDocumentHelper.hh>
 #include <qpdf/QPDFNameTreeObjectHelper.hh>
 #include <qpdf/QPDFNamedDestinationDocumentHelper.hh>
+#include <qpdf/QPDFNamedDestinationObjectHelper.hh>
+
+#include <qpdf/DLL.h>
 
 class QPDFNamedDestinationDocumentHelper::Members
 {
   public:
-    Members() = default;
+    Members(QPDF& qpdf) :
+        qpdf(qpdf)
+    {
+    }
+    QPDF& qpdf;
 };
 
 QPDFNamedDestinationDocumentHelper::QPDFNamedDestinationDocumentHelper(QPDF& qpdf) :
     QPDFDocumentHelper(qpdf),
-    m(new Members())
+    m(std::make_shared<Members>(qpdf))
 {
 }
-
-QPDFNamedDestinationDocumentHelper::~QPDFNamedDestinationDocumentHelper() = default;
 
 QPDFNamedDestinationObjectHelper
 QPDFNamedDestinationDocumentHelper::lookup(QPDFObjectHandle dest)
 {
     if (dest.isName()) {
-        return lookup_name(dest.getName());
+        return lookupName(dest.getName());
     } else if (dest.isString()) {
-        return lookup_string(dest.getUTF8Value());
+        return lookupString(dest.getUTF8Value());
     }
     return QPDFNamedDestinationObjectHelper(QPDFObjectHandle::newNull());
 }
@@ -30,15 +35,15 @@ QPDFNamedDestinationDocumentHelper::lookup(QPDFObjectHandle dest)
 QPDFNamedDestinationObjectHelper
 QPDFNamedDestinationDocumentHelper::lookup(std::string const& name)
 {
-    auto result = lookup_name(name);
-    if (result.is_null()) {
-        result = lookup_string(name);
+    auto result = lookupName(name);
+    if (result.isNull()) {
+        result = lookupString(name);
     }
     return result;
 }
 
 QPDFNamedDestinationObjectHelper
-QPDFNamedDestinationDocumentHelper::lookup_name(std::string const& name)
+QPDFNamedDestinationDocumentHelper::lookupName(std::string const& name)
 {
     auto root = qpdf.getRoot();
 
@@ -51,7 +56,7 @@ QPDFNamedDestinationDocumentHelper::lookup_name(std::string const& name)
 }
 
 QPDFNamedDestinationObjectHelper
-QPDFNamedDestinationDocumentHelper::lookup_string(std::string const& name)
+QPDFNamedDestinationDocumentHelper::lookupString(std::string const& name)
 {
     auto root = qpdf.getRoot();
 
@@ -72,7 +77,7 @@ QPDFNamedDestinationDocumentHelper::lookup_string(std::string const& name)
 }
 
 void
-QPDFNamedDestinationDocumentHelper::for_each(
+QPDFNamedDestinationDocumentHelper::forEach(
     std::function<void(std::string const&, QPDFNamedDestinationObjectHelper const&, Kind)> callback)
 {
     auto root = qpdf.getRoot();
@@ -99,10 +104,11 @@ QPDFNamedDestinationDocumentHelper::for_each(
 }
 
 int
-QPDFNamedDestinationDocumentHelper::find_page_index(QPDFExplicitDestinationObjectHelper const& dest)
+QPDFNamedDestinationDocumentHelper::findPageIndex(
+    QPDFExplicitDestinationObjectHelper const& dest) const
 {
-    QPDFObjectHandle dest_array = dest.get_explicit_array();
-    if (dest_array.isNull() || dest_array.empty() || dest.is_remote()) {
+    QPDFObjectHandle dest_array = dest.getExplicitArray();
+    if (dest_array.isNull() || dest_array.empty() || dest.isRemote()) {
         return -1;
     }
     QPDFObjectHandle page_obj = dest_array.getArrayItem(0);

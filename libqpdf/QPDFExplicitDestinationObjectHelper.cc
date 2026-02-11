@@ -6,16 +6,16 @@ QPDFExplicitDestinationObjectHelper::QPDFExplicitDestinationObjectHelper(QPDFObj
 }
 
 QPDFObjectHandle
-QPDFExplicitDestinationObjectHelper::get_explicit_array() const
+QPDFExplicitDestinationObjectHelper::getExplicitArray() const
 {
     auto obj = oh();
     return obj.isArray() ? obj : QPDFObjectHandle::newNull();
 }
 
 bool
-QPDFExplicitDestinationObjectHelper::is_remote() const
+QPDFExplicitDestinationObjectHelper::isRemote() const
 {
-    if (!strictly_compliant()) {
+    if (!isStrictlyCompliant()) {
         return false;
     }
     auto page = oh().getArrayItem(0);
@@ -23,7 +23,7 @@ QPDFExplicitDestinationObjectHelper::is_remote() const
 }
 
 bool
-QPDFExplicitDestinationObjectHelper::strictly_compliant() const
+QPDFExplicitDestinationObjectHelper::isStrictlyCompliant() const
 {
     auto obj = oh();
     if (!obj.isArray()) {

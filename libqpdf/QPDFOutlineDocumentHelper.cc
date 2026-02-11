@@ -110,9 +110,9 @@ QPDFOutlineDocumentHelper::resolveNamedDest(QPDFObjectHandle name)
         m->named_dest_document_helper = std::make_unique<QPDFNamedDestinationDocumentHelper>(qpdf);
     }
     auto named_dest_object_helper = m->named_dest_document_helper->lookup(name);
-    if (named_dest_object_helper.is_null()) {
+    if (named_dest_object_helper.isNull()) {
         return QPDFObjectHandle::newNull();
     }
     auto explicit_dest_helper = named_dest_object_helper.unwrap();
-    return explicit_dest_helper.get_explicit_array();
+    return explicit_dest_helper.getExplicitArray();
 }

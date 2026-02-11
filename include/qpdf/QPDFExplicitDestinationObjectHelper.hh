@@ -17,19 +17,19 @@ class QPDF_DLL QPDFExplicitDestinationObjectHelper: public QPDFObjectHelper
      * is an array.
      */
     QPDF_DLL
-    QPDFObjectHandle get_explicit_array() const;
+    QPDFObjectHandle getExplicitArray() const;
 
     /**
      * Returns true if the destination is remote. A remote destination is one where the first
      * element of the destination array is a non-negative integer page number.
      */
     QPDF_DLL
-    bool is_remote() const;
+    bool isRemote() const;
 
     /**
      * Returns true if the structure follows the grammar in ISO 32000-1, Table 151.
      */
-    QPDF_DLL bool strictly_compliant() const;
+    QPDF_DLL bool isStrictlyCompliant() const;
 };
 
 #endif // QPDFEXPLICITDESTINATIONOBJECTHELPER_HH
