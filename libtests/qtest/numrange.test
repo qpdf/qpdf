@@ -73,6 +73,10 @@ my @nrange_tests = (
     ["4-10,x7-9,12-8,xr5",
      "numeric range 4-10,x7-9,12-8,xr5 -> 4 5 6 10 12 10 9 8",
      0],
+    ,
+    ["4-m10",
+     "numeric range 4-m10 -> 4 5 6 7 8 9 10",
+     0],
     );
 foreach my $d (@nrange_tests)
 {
