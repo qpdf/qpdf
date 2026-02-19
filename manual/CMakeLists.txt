@@ -38,6 +38,7 @@ SET(MANUAL_DEPS
   download.rst
   encryption.rst
   index.rst
+  inspection.rst
   installation.rst
   json.rst
   contributing.rst
