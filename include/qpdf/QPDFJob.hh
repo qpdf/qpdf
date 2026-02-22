@@ -180,7 +180,7 @@ class QPDFJob
     //   needed, which you can't do with references. Returning pointers instead of references makes
     //   for a more uniform interface.
 
-    // Maintainer documentation: see the section in README-maintainer called "HOW TO ADD A
+    // Maintainer documentation: see the section in README-developer called "HOW TO ADD A
     // COMMAND-LINE ARGUMENT", which contains references to additional places in the documentation.
 
     class Config;

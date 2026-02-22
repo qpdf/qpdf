@@ -16,7 +16,7 @@ from contextlib import contextmanager
 
 # Documentation of QPDFJob is divided among three places:
 #
-# * "HOW TO ADD A COMMAND-LINE ARGUMENT" in README-maintainer provides
+# * "HOW TO ADD A COMMAND-LINE ARGUMENT" in README-developer provides
 #   a quick reminder for how to add a command-line argument
 #
 # * This file has a detailed explanation about how QPDFJob and

@@ -35,5 +35,5 @@ if [ "$sum1" = "$sum2" ]; then
     exit 2
 fi
 
-# If this fails, please see ZLIB COMPATIBILITY in README-maintainer.md.
+# If this fails, please see ZLIB COMPATIBILITY in README-developer.md.
 (cd build; ctest --verbose)

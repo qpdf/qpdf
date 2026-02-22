@@ -35,7 +35,7 @@ realmain(int argc, char* argv[])
 
     QPDFJob j;
     try {
-        // See "HOW TO ADD A COMMAND-LINE ARGUMENT" in README-maintainer.
+        // See "HOW TO ADD A COMMAND-LINE ARGUMENT" in README-developer.
         j.initializeFromArgv(argv);
         auto qpdf_sp = j.createQPDF();
         auto& pdf = *qpdf_sp;
