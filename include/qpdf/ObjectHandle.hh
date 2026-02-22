@@ -68,6 +68,9 @@ namespace qpdf
             return obj == other.obj;
         }
 
+        // Structural equivalence check per PDF Annex J rules.
+        bool equivalent_to(BaseHandle const& other) const;
+
         // For arrays, return the number of items in the array.
         // For null-like objects, return 0.
         // For all other objects, return 1.

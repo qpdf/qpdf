@@ -2425,3 +2425,200 @@ operator""_qpdf(char const* v, size_t len)
 {
     return QPDFObjectHandle::parse(std::string(v, len), "QPDFObjectHandle literal");
 }
+
+// This method determines deep structural equivalence.
+//
+// Nomenclature note: ISO 32000-2 Annex J uses the term "equal" for this
+// strict recursive comparison (J.4.1). We use "equivalent_to" here to
+// implement Annex J's "equality", distinguishing it from C++ shallow
+// pointer equality.
+//
+// Implementation note: we deviate from Annex J by comparing raw streams
+// only, without decoding.
+
+bool
+BaseHandle::equivalent_to(BaseHandle const& other) const
+{
+    // Identity check
+    if (obj == other.obj) {
+        return true;
+    }
+
+    // usage of std::set avoids custom hash boilerplate for std::pair.
+    // O(log N) is acceptable here given the recursion depth limit.
+    using VisitedSet = std::set<std::pair<QPDFObjGen, QPDFObjGen>>;
+
+    // Recursive lambda
+    auto internal = [](auto&& self,
+                       BaseHandle const& h1,
+                       BaseHandle const& h2,
+                       VisitedSet& visited,
+                       int depth) -> bool {
+        // A. Identity & limit checks
+        if (h1.obj == h2.obj) {
+            return true;
+        }
+        if (depth < 0) {
+            return false;
+        }
+
+        qpdf_object_type_e t1 = h1.resolved_type_code();
+        qpdf_object_type_e t2 = h2.resolved_type_code();
+
+        // Numeric equivalence per Annex J
+        if ((t1 == ::ot_integer || t1 == ::ot_real) && (t2 == ::ot_integer || t2 == ::ot_real)) {
+            if (t1 == ::ot_integer && t2 == ::ot_integer) {
+                return std::get<QPDF_Integer>(h1.obj->value).val ==
+                    std::get<QPDF_Integer>(h2.obj->value).val;
+            }
+            return h1.oh().getNumericValue() == h2.oh().getNumericValue();
+        }
+
+        if (t1 != t2) {
+            // normalize uninitialized and null
+            return (
+                (t1 == ::ot_uninitialized && t2 == ::ot_null) ||
+                (t2 == ::ot_uninitialized && t1 == ::ot_null));
+        }
+
+        // B. Cycle detection
+        //
+        // Cycle detection tracks indirect objects (IDs) only.  PDF file
+        // format guarantees direct objects form trees; cycles require
+        // indirection.  Pathological in-memory direct cycles are invalid
+        // for serialization and caught by depth limit.
+        if (h1.obj->og.isIndirect() && h2.obj->og.isIndirect()) {
+            auto pair = std::make_pair(h1.obj->og, h2.obj->og);
+            if (visited.count(pair)) {
+                return true;
+            }
+            visited.insert(pair);
+        }
+
+        // C. Structural comparison
+        switch (t1) {
+        case ::ot_uninitialized:
+        case ::ot_null:
+            return true;
+
+        case ::ot_boolean:
+            return std::get<QPDF_Bool>(h1.obj->value).val == std::get<QPDF_Bool>(h2.obj->value).val;
+
+        case ::ot_string:
+            return std::get<QPDF_String>(h1.obj->value).val ==
+                std::get<QPDF_String>(h2.obj->value).val;
+
+        case ::ot_name:
+            return std::get<QPDF_Name>(h1.obj->value).name ==
+                std::get<QPDF_Name>(h2.obj->value).name;
+
+        case ::ot_array:
+            {
+                auto const& a1 = std::get<QPDF_Array>(h1.obj->value);
+                auto const& a2 = std::get<QPDF_Array>(h2.obj->value);
+
+                size_t s1 = a1.sp ? a1.sp->size : a1.elements.size();
+                size_t s2 = a2.sp ? a2.sp->size : a2.elements.size();
+                if (s1 != s2) {
+                    return false;
+                }
+
+                auto get_item = [](QPDF_Array const& arr, size_t idx) -> BaseHandle {
+                    if (arr.sp) {
+                        auto it = arr.sp->elements.find(idx);
+                        return (it != arr.sp->elements.end())
+                            ? it->second
+                            : BaseHandle(QPDFObjectHandle::newNull());
+                    }
+                    return arr.elements[idx];
+                };
+
+                for (size_t i = 0; i < s1; ++i) {
+                    if (!self(self, get_item(a1, i), get_item(a2, i), visited, depth - 1)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+        case ::ot_dictionary:
+            {
+                auto const& map1 = std::get<QPDF_Dictionary>(h1.obj->value).items;
+                auto const& map2 = std::get<QPDF_Dictionary>(h2.obj->value).items;
+
+                auto it1 = map1.begin();
+                auto it2 = map2.begin();
+                auto end1 = map1.end();
+                auto end2 = map2.end();
+
+                while (it1 != end1 || it2 != end2) {
+                    while (it1 != end1 && it1->second.null()) {
+                        ++it1;
+                    }
+                    while (it2 != end2 && it2->second.null()) {
+                        ++it2;
+                    }
+                    if (it1 == end1 || it2 == end2) {
+                        return (it1 == end1 && it2 == end2);
+                    }
+                    if (it1->first < it2->first || it1->first > it2->first) {
+                        return false;
+                    }
+                    if (!self(self, it1->second, it2->second, visited, depth - 1)) {
+                        return false;
+                    }
+                    ++it1;
+                    ++it2;
+                }
+                return true;
+            }
+
+        case ::ot_stream:
+            {
+                QPDFObjectHandle oh1(h1.obj);
+                QPDFObjectHandle oh2(h2.obj);
+
+                if (!self(self, oh1.getDict(), oh2.getDict(), visited, depth - 1)) {
+                    return false;
+                }
+
+                // Annex J deviation: compare compressed stream data only for efficiency.
+                auto b1 = oh1.getRawStreamData();
+                auto b2 = oh2.getRawStreamData();
+
+                if (!b1 || !b2) {
+                    return (b1 == b2); // Handle unlikely nulls
+                }
+                if (b1->getSize() != b2->getSize()) {
+                    return false;
+                }
+                return (std::memcmp(b1->getBuffer(), b2->getBuffer(), b1->getSize()) == 0);
+            }
+        case ::ot_operator:
+            return std::get<QPDF_Operator>(h1.obj->value).val ==
+                std::get<QPDF_Operator>(h2.obj->value).val;
+
+        case ::ot_inlineimage:
+            return std::get<QPDF_InlineImage>(h1.obj->value).val ==
+                std::get<QPDF_InlineImage>(h2.obj->value).val;
+
+        case ::ot_integer: // unreachable, handled already
+            return std::get<QPDF_Integer>(h1.obj->value).val ==
+                std::get<QPDF_Integer>(h2.obj->value).val;
+
+        case ::ot_real: // unreachable, handled already
+            return h1.oh().getNumericValue() == h2.oh().getNumericValue();
+
+        case ::ot_unresolved:
+        case ::ot_reference: // unreachable via resolved_type_code
+        case ::ot_destroyed: // should not happen
+        case ::ot_reserved:  // should not happen
+            return false;
+        }
+
+        return false;
+    };
+
+    VisitedSet visited;
+    return internal(internal, *this, other, visited, 500);
+}
