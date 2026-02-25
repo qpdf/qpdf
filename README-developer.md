@@ -9,6 +9,7 @@ qpdf as a library.
 * [CHECKING DOCS ON readthedocs](#checking-docs-on-readthedocs)
 * [CODING RULES](#coding-rules)
 * [ZLIB COMPATIBILITY](#zlib-compatibility)
+* [HOW TO ADD A CI TEST](#how-to-add-a-ci-test)
 * [HOW TO ADD A COMMAND-LINE ARGUMENT](#how-to-add-a-command-line-argument)
 * [RUNNING pikepdf's TEST SUITE](#running-pikepdfs-test-suite)
 * [OTHER NOTES](#other-notes)
@@ -264,6 +265,201 @@ Building docs from pull requests is also enabled.
   * NEVER replace a std::string const& return value with std::string_view in the public API.
 
 
+## HOW TO ADD A CI TEST
+
+Tests in qpdf are managed through the `qtest` framework, a Perl-based testing system that runs via
+`ctest`. To add a new CI test:
+
+### Test Output Styles
+
+Historically, tests produced output messages to the console that were compared to expected console
+output files. The preferred current style is to use assertions in the test code rather than relying
+on console output comparison. This makes tests clearer and more maintainable. See "Use of assert" in
+the CODING RULES section for details on how to include assertion headers in test code.
+
+### Identifying Test Location
+
+* **CLI and public API tests**: Add to `qpdf/qtest/` for command-line interface and public API testing.
+  If a related test file already exists (e.g., `linearization.test` for linearization tests), add your
+  tests to that file rather than creating a new one.
+* **Library unit tests (private API)**: Add to `libtests/` for testing private API functions and
+  internal library functionality. If a related test file already exists, add your tests to it.
+* **Example tests**: Add to `examples/qtest/` for example program validation
+* **Fuzzer tests**: Add to `fuzz/` for fuzz testing
+
+When adding tests to an existing `.test` file, you must update the `$n_tests` variable at the top
+of the file to reflect the new total number of tests. This variable is used by the qtest framework
+to validate that all expected tests have been run.
+
+### Adding a Test Case
+
+1. **Create or modify a .test file**: Test files are in the appropriate `qtest/` subdirectory and use
+   the `.test` extension. They use the qtest Perl framework syntax. Use qtest framework methods to
+   define what command to run and what output to expect.
+
+2. **Comparing console output**: Use the appropriate qtest comparison method based on output length.
+   Console output is automatically captured by the test framework; you do not need to redirect it.
+   By convention, expected console output files use the `.out` extension.
+   * For single-line console output, use `$td->STRING`:
+     ```perl
+     $td->runtest("test description",
+                  {$td->COMMAND => "qpdf some-args"},
+                  {$td->STRING => "expected output text\n", $td->EXIT_STATUS => 0},
+                  $td->NORMALIZE_NEWLINES);
+     ```
+   * For longer console output, use `$td->FILE` to compare against an expected output file:
+     ```perl
+     $td->runtest("test description",
+                  {$td->COMMAND => "qpdf command"},
+                  {$td->FILE => "expected-output.out", $td->EXIT_STATUS => 0},
+                  $td->NORMALIZE_NEWLINES);
+     ```
+   Always include `$td->NORMALIZE_NEWLINES` as the final parameter when comparing console output to
+   handle platform differences in line endings.
+
+3. **Comparing output files**: When you need to verify generated files (such as PDFs), use a two-test
+   pattern. First, run the command that generates the output file `a.pdf`:
+   ```perl
+   $td->runtest("test description",
+                {$td->COMMAND => "test_driver 24 minimal.pdf"},
+                {$td->STRING => "test 24 done\n", $td->EXIT_STATUS => 0},
+                $td->NORMALIZE_NEWLINES);
+   ```
+   Then, in a separate test, compare the generated file against the expected file. By convention,
+   "check output" is always used as the test description when checking output files:
+   ```perl
+   $td->runtest("check output",
+                {$td->FILE => "a.pdf"},
+                {$td->FILE => "expected-output.pdf"});
+   ```
+   Always use temporary output filenames like `a.pdf` or `b.pdf` for generated files, as these are
+   automatically cleaned up between tests.
+
+### Adding Test Functions to Existing Test Programs
+
+When adding new functionality that requires testing, check if there are existing related tests in
+one of the test programs (examples: `libtests/objects.cc` and `qpdf/test_driver.cc`). If so, add
+your new test function to the existing test program rather than creating a new one.
+
+To add a new test case to an existing test program:
+
+1. **Write your test function**: Define a function with signature:
+   ```cpp
+   static void
+   test_N(QPDF& pdf, char const* arg2)
+   {
+       // Test implementation
+   }
+   ```
+   Where `N` is the test number. Tests are numbered consecutively, so `N` should be one greater than
+   the highest existing test number in the program. The test function receives:
+   * `pdf`: A QPDF object pre-loaded with the specified input file (unless the test is in the
+     `ignore_filename` set)
+   * `arg2`: An optional second argument passed via command line, useful for parameterizing tests
+
+2. **Register your test function**: Add your test function to the `test_functions` map in the
+   `runtest()` function:
+   ```cpp
+   std::map<int, void (*)(QPDF&, char const*)> test_functions = {
+       // ... existing tests ...
+       {N, test_N}};
+   ```
+
+3. **Update ignore_filename if needed**: If your test does not require an input file, add your test
+   number to the `ignore_filename` set in the `runtest()` function:
+   ```cpp
+   std::set<int> ignore_filename = {1, 2, N};
+   ```
+   This prevents the test framework from attempting to load a file for your test.
+
+4. **Create a corresponding .test file**: In `qpdf/qtest/` or `libtests/qtest/`, add a test case
+   that calls your test program with the appropriate number and arguments:
+   ```perl
+   $td->runtest("description of test N",
+                {$td->COMMAND => "qpdf-ctest N test-file.pdf"},
+                {$td->FILE => "expected-output.out", $td->EXIT_STATUS => 0},
+                $td->NORMALIZE_NEWLINES);
+   ```
+
+5. **Create expected output files**: Create `expected-output.out` containing the exact expected output
+   from your test function. Expected output files should be located in subdirectories as follows:
+   * For `qpdf/qtest/`: in the `qpdf/qtest/qpdf/` subdirectory
+   * For other test locations: in a subdirectory with the same name as the test program (e.g., for
+     `libtests/objects.cc`, expected output goes in `libtests/qtest/objects/`)
+
+6. **Update test count**: Update the `$n_tests` variable at the top of the .test file to include
+   your new test.
+
+### Creating a New Test Program
+
+If a new test program is required (when no existing test program has related functionality):
+
+1. **Include the assertion header**: The first include file must be `#include <qpdf/assert_test.h>`.
+   See "Use of assert" in the CODING RULES section for details on assertion usage in test code.
+
+2. **Implement the test functions** following the patterns described above.
+
+3. **Register and run** your test functions via the `test_functions` map and main dispatcher, similar
+   to existing test programs.
+
+**Example**: To add test 200 to `test_driver.cc`:
+1. Write `static void test_200(QPDF& pdf, char const* arg2)` with your test implementation
+2. Add `{200, test_200}` to the test_functions map
+3. If test 200 requires an input file:
+   ```perl
+   $td->runtest("test 200 description",
+                {$td->COMMAND => "test_driver 200 test_200.pdf"},
+                {$td->FILE => "test-200.out", $td->EXIT_STATUS => 0},
+                $td->NORMALIZE_NEWLINES);
+   ```
+   If test 200 does not require an input file, add 200 to `ignore_filename` and use:
+   ```perl
+   $td->runtest("test 200 description",
+                {$td->COMMAND => "test_driver 200 -"},
+                {$td->FILE => "test-200.out", $td->EXIT_STATUS => 0},
+                $td->NORMALIZE_NEWLINES);
+   ```
+4. Create `qpdf/qtest/qpdf/test-200.out` with expected output (or appropriate location for other
+   test programs)
+5. Increment `$n_tests` in `qpdf/qtest/qpdf.test` (or `my-example.test` for a new test program)
+
+### Running Your Test Locally
+
+```bash
+# Run all tests
+cd build && ctest --output-on-failure
+
+# Run specific test group
+ctest -R qpdf       # CLI tests
+ctest -R libtests   # Library tests
+ctest -R examples   # Example tests
+
+# Run a specific test file
+ctest -V -R "pattern-matching-your-test"
+
+# Run a specific test function directly (for debugging)
+qpdf-ctest 200 minimal.pdf
+objects 5 minimal.pdf optional-arg
+```
+
+### CI Integration
+
+Tests are automatically run as part of the CI pipeline defined in `.github/workflows/main.yml`. The
+pipeline includes:
+
+* Linux builds with full test suite
+* Windows builds (MSVC and MinGW)
+* macOS builds
+* Sanitizer builds (AddressSanitizer, UndefinedBehaviorSanitizer)
+* Coverage reporting
+
+All tests must pass on all platforms before a PR can be merged. Pay attention to:
+
+* **Platform-specific issues**: Some tests may behave differently on Windows vs. Linux/macOS
+* **Output determinism**: Ensure tests produce consistent output; avoid timestamps or random data
+  unless intentional
+
+
 ## ZLIB COMPATIBILITY
 
 The qpdf test suite is designed to be independent of the output of any
@@ -354,7 +550,7 @@ predictable `/ID` for testing. Many other test cases use
 `--deterministic-id`. While `--static-id` is unaffected by file
 contents, `--deterministic-id` is based on file contents and so is
 dependent on zlib output if there is any newly compressed data. By
-using `qpdf-test-compare`, it's actually not necessary to use either
+use `qpdf-test-compare`, it's actually not necessary to use either
 `--static-id` or `--deterministic-id`. It may still be necessary to
 use `--static-aes-iv` if comparing encrypted files, but since
 `qpdf-test-compare` ignores `/Perms`, a wider range of encrypted files
