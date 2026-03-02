@@ -392,7 +392,7 @@ Pl_DCT::decompress(void* cinfo_p)
     jpeg_calc_output_dimensions(cinfo);
     unsigned int width = cinfo->output_width * QIntC::to_uint(cinfo->output_components);
     if (memory_limit > 0 &&
-        width > (static_cast<unsigned long>(memory_limit) / (20U * cinfo->output_height))) {
+        width > (static_cast<unsigned long>(memory_limit / 20) / cinfo->output_height)) {
         // Even if jpeglib does not run out of memory, qpdf will while buffering the data before
         // writing it. Furthermore, for very large images runtime can be significant before the
         // first warning is encountered causing a timeout in oss-fuzz.
