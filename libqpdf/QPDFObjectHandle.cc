@@ -322,7 +322,7 @@ BaseHandle::copy(bool shallow) const
         throw std::logic_error("attempted to shallow copy QPDFObjectHandle from destroyed QPDF");
         return {}; // does not return
     case ::ot_reference:
-        return obj->qpdf->getObject(obj->og).obj_sp();
+        return referenced_object().obj_sp();
     }
     return {}; // unreachable
 }

@@ -6,6 +6,7 @@
 #include <qpdf/QPDFObject_private.hh>
 #include <qpdf/QPDF_private.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/Util.hh>
 
 #include <concepts>
 #include <utility>
@@ -755,6 +756,33 @@ namespace qpdf
     BaseHandle::oh() const
     {
         return {obj};
+    }
+
+    /// @brief Retrieve the QPDFObjectHandle for the object referenced by a reference object.
+    ///
+    /// Look up and return the object from the document's object table using QPDF::getObject(). The
+    /// returned value is a QPDFObjectHandle that wraps the shared pointer to the underlying
+    /// QPDFObject held in the document's cache.
+    ///
+    /// @note We must perform the lookup because qpdf represents certain replacements using
+    ///       QPDF_Reference. In particular, `QPDF::makeIndirectObject` used to make the input
+    ///       object indirect and then return the original input object. To replicate that
+    ///       existing behavior the implementation now makes the input object indirect and
+    ///       returns it, while modifying the input object to become a reference to the
+    ///       newly-created indirect object. Looking up the resulting indirect object in the
+    ///       document's object table via `QPDF::getObject()` ensures callers receive the
+    ///       cached object and avoids surprises if the indirect object is subsequently
+    ///       replaced.
+    ///
+    /// @return The QPDFObjectHandle for the object referenced by a reference object.
+    ///
+    /// @since 12.3.3
+    inline QPDFObjectHandle
+    BaseHandle::referenced_object() const
+    {
+        qpdf_expect(resolved_type_code() == ::ot_reserved);
+        qpdf_expect(obj->qpdf);
+        return obj->qpdf->getObject(obj->og);
     }
 
     inline void
