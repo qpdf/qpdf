@@ -39,6 +39,12 @@ documentation, please visit `https://qpdf.readthedocs.io
    release-notes
    acknowledgement
 
+.. toctree::
+   :maxdepth: 1
+   :caption: Appendices:
+
+   inspection
+
 Indices
 =======
 
