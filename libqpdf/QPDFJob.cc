@@ -745,13 +745,17 @@ QPDFJob::doCheck(QPDF& pdf)
 
         // Create all document helper to trigger any validations they carry out.
         auto& doc = pdf.doc();
-        auto& pages = doc.page_dh();
+        auto pages = doc.page_dh().getAllPages();
         (void)doc.acroform();
         (void)doc.embedded_files();
         (void)doc.page_labels();
-        (void)doc.outlines().resolveNamedDest(QPDFObjectHandle::newString("dummy"));
-        (void)doc.outlines().getOutlinesForPage(pages.getAllPages().at(0));
-
+        (void)doc.outlines().resolveNamedDest(String("dummy"));
+        if (pages.empty()) {
+            okay = false;
+            *m->log->getError() << "ERROR: file does not contain any pages\n";
+        } else {
+            (void)doc.outlines().getOutlinesForPage(pages.at(0));
+        }
         // Write the file to nowhere, uncompressing streams.  This causes full file traversal and
         // decoding of all streams we can decode.
         Writer::Config cfg;
@@ -766,7 +770,7 @@ QPDFJob::doCheck(QPDF& pdf)
 
         // Parse all content streams
         int pageno = 0;
-        for (auto& page: pages.getAllPages()) {
+        for (auto& page: pages) {
             ++pageno;
             try {
                 page.parseContents(nullptr);
