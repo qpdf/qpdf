@@ -14,7 +14,7 @@ cleanup();
 
 my $td = new TestDriver('page-errors');
 
-my $n_tests = 9;
+my $n_tests = 10;
 
 $td->runtest("handle page no with contents",
              {$td->COMMAND => "qpdf --show-pages page-no-content.pdf"},
@@ -48,6 +48,10 @@ $td->runtest("check output",
 $td->runtest("detect loops in pages structure",
              {$td->COMMAND => "qpdf --check pages-loop.pdf"},
              {$td->FILE => "pages-loop.out", $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("file with zero pages",
+             {$td->COMMAND => "qpdf --check empty.pdf"},
+             {$td->FILE => "empty-check.out", $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);
 
 cleanup();

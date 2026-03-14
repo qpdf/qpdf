@@ -13,6 +13,11 @@ more detail.
 
 .. x.y.z: not yet released
 
+12.3.3: not yet released
+  - Bug fixes
+
+    - Fix error message when :qpdf:ref:`--check` encounters a file without any pages.
+
 12.3.2: January 24, 2026
   - Bug fixes
 
