@@ -327,6 +327,148 @@ BaseHandle::copy(bool shallow) const
     return {}; // unreachable
 }
 
+// This method determines structural equivalence up to a given depth.
+// The default depth is 10.
+//
+// Nomenclature note: ISO 32000-2 Annex J uses the term "equal" for this
+// strict recursive comparison (J.4.1). We use "equivalent_to" here to
+// implement Annex J's "equality", distinguishing it from C++ shallow
+// pointer equality.
+//
+// Implementation notes:
+//
+// (1) We deviate from Annex J by comparing raw streams only, without
+// decoding.
+//
+// (2) Loop detection is expensive and is avoided. If either object has
+// a cycle in its forward orbit, this implementation will return false.
+
+bool
+BaseHandle::equivalent_to(BaseHandle const& other, int depth) const
+{
+    // A. Identity, size & limit checks
+    if (obj == other.obj) {
+        return true;
+    }
+    if (depth < 0) {
+        return false;
+    }
+    size_t size1 = size();
+    size_t size2 = other.size();
+    if (size1 != size2) {
+        return false;
+    }
+    // B. Structural comparison
+    qpdf_object_type_e t1 = resolved_type_code();
+    qpdf_object_type_e t2 = other.resolved_type_code();
+    if (t1 == ::ot_reference) {
+        return referenced_object().equivalent_to(other, depth - 1);
+    }
+    if (t2 == ::ot_reference) {
+        return equivalent_to(other.referenced_object(), depth - 1);
+    }
+    if (t1 != t2) {
+        if ((t1 == ::ot_integer || t1 == ::ot_real) && (t2 == ::ot_integer || t2 == ::ot_real)) {
+            // Numeric equivalence per Annex J
+            return oh().getNumericValue() == other.oh().getNumericValue();
+        }
+        // normalize uninitialized and null
+        return (t1 == ::ot_uninitialized && t2 == ::ot_null) ||
+            (t2 == ::ot_uninitialized && t1 == ::ot_null);
+    }
+    switch (t1) {
+    case ::ot_uninitialized:
+    case ::ot_null:
+        return true;
+    case ::ot_boolean:
+        return std::get<QPDF_Bool>(obj->value).val == std::get<QPDF_Bool>(other.obj->value).val;
+    case ::ot_string:
+        return std::get<QPDF_String>(obj->value).val == std::get<QPDF_String>(other.obj->value).val;
+    case ::ot_name:
+        return std::get<QPDF_Name>(obj->value).name == std::get<QPDF_Name>(other.obj->value).name;
+    case ::ot_array:
+        {
+            auto const& a1 = std::get<QPDF_Array>(obj->value);
+            auto const& a2 = std::get<QPDF_Array>(other.obj->value);
+            // sizes size1, size2 were calculated above and checked to be equal
+            if (!a1.sp && !a2.sp) {
+                for (size_t i = 0; i < size1; ++i) {
+                    if (!a1.elements[i].equivalent_to(a2.elements[i], depth - 1)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            // at least one array is sparse
+            auto get_item = [](QPDF_Array const& arr, size_t idx) -> BaseHandle const& {
+                if (arr.sp) {
+                    auto it = arr.sp->elements.find(idx);
+                    if (it == arr.sp->elements.end()) {
+                        static QPDFObjectHandle null_oh = Null();
+                        return null_oh;
+                    }
+                    return it->second;
+                }
+                return arr.elements[idx];
+            };
+            for (size_t i = 0; i < size1; ++i) {
+                if (!get_item(a1, i).equivalent_to(get_item(a2, i), depth - 1)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    case ::ot_dictionary:
+        {
+            auto const& map1 = std::get<QPDF_Dictionary>(obj->value).items;
+            auto const& map2 = std::get<QPDF_Dictionary>(other.obj->value).items;
+            auto it2 = map2.begin();
+            auto end2 = map2.end();
+            for (auto const& [key1, value1]: map1) {
+                if (value1.null()) {
+                    continue;
+                }
+                while (it2 != end2 && it2->second.null()) {
+                    ++it2;
+                }
+                if (it2 == end2 || key1 != it2->first ||
+                    !value1.equivalent_to(it2->second, depth - 1)) {
+                    return false;
+                }
+                ++it2;
+            }
+            while (it2 != end2 && it2->second.null()) {
+                ++it2;
+            }
+            return it2 == end2;
+        }
+    case ::ot_stream:
+        {
+            auto const& s1 = std::get<QPDF_Stream>(obj->value);
+            auto const& s2 = std::get<QPDF_Stream>(other.obj->value);
+            if (!s1.m->stream_dict.equivalent_to(s2.m->stream_dict, depth - 1)) {
+                return false;
+            }
+            return s1.m->stream_data->view() == s2.m->stream_data->view();
+        }
+    case ::ot_operator:
+        throw std::logic_error("Internal error in BaseHandle::equivalent_to: found ot_operator");
+    case ::ot_inlineimage:
+        throw std::logic_error("Internal error in BaseHandle::equivalent_to: found ot_inlineimage");
+    case ::ot_integer:
+        return std::get<QPDF_Integer>(obj->value).val ==
+            std::get<QPDF_Integer>(other.obj->value).val;
+    case ::ot_real:
+        return oh().getNumericValue() == other.oh().getNumericValue();
+    case ::ot_unresolved: // cannot determine equivalence so return false
+    case ::ot_reference:  // handled above
+    case ::ot_destroyed:  // should not happen
+    case ::ot_reserved:   // should not happen
+        return false;
+    }
+    return false; // unreachable
+}
+
 std::string
 BaseHandle::unparse() const
 {
