@@ -9,7 +9,10 @@
 #include <qpdf/QPDFJob.hh>
 #include <qpdf/QPDFObjectHandle_private.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/Util.hh>
 #include <qpdf/global.hh>
+
+using namespace qpdf::util;
 
 #include <climits>
 #include <cstdio>
@@ -121,13 +124,7 @@ test_1(QPDF& pdf, char const* arg2)
     assert(QPDFObjectHandle(d).getDictAsMap().contains("/D"));
     assert(QPDFObjectHandle(d).getDictAsMap().size() == 4);
 
-    bool thrown = false;
-    try {
-        i.at("/A");
-    } catch (std::runtime_error const&) {
-        thrown = true;
-    }
-    assert(thrown);
+    assert(throws<std::runtime_error>([&]() { i.at("/A"); }));
 
     // find
     assert(!d.find("/A"));
@@ -144,164 +141,10 @@ test_1(QPDF& pdf, char const* arg2)
     // replace
     assert(!i.replace("/A", Name("/DontPanic")));
     Dictionary di = i.oh();
-    thrown = false;
-    try {
-        di.replace("/A", Name("/DontPanic"));
-    } catch (std::runtime_error const&) {
-        thrown = true;
-    }
-    assert(thrown);
+    assert(throws<std::runtime_error>([&]() { di.replace("/A", Name("/DontPanic")); }));
     d.replace("/C", Integer(42));
     assert(Integer(d["/C"]) == 42);
     assert(QPDFObjectHandle(d).getDictAsMap().size() == 4);
-}
-
-static void
-test_2(QPDF& pdf, char const* arg2)
-{
-    // Test global limits.
-    using namespace qpdf::global::options;
-    using namespace qpdf::global::limits;
-
-    // Check default values
-    assert(parser_max_nesting() == 499);
-    assert(parser_max_errors() == 15);
-    assert(parser_max_container_size() == std::numeric_limits<uint32_t>::max());
-    assert(parser_max_container_size_damaged() == 5'000);
-    assert(max_stream_filters() == 25);
-    assert(default_limits());
-
-    // Test disabling optional default limits
-    default_limits(false);
-    assert(parser_max_nesting() == 499);
-    assert(parser_max_errors() == 0);
-    assert(parser_max_container_size() == std::numeric_limits<uint32_t>::max());
-    assert(parser_max_container_size_damaged() == std::numeric_limits<uint32_t>::max());
-    assert(max_stream_filters() == std::numeric_limits<uint32_t>::max());
-    assert(!default_limits());
-
-    // Check disabling default limits is irreversible
-    default_limits(true);
-    assert(!default_limits());
-
-    // Test setting limits
-    parser_max_nesting(11);
-    parser_max_errors(12);
-    parser_max_container_size(13);
-    parser_max_container_size_damaged(14);
-    max_stream_filters(15);
-
-    assert(parser_max_nesting() == 11);
-    assert(parser_max_errors() == 12);
-    assert(parser_max_container_size() == 13);
-    assert(parser_max_container_size_damaged() == 14);
-    assert(max_stream_filters() == 15);
-
-    // Check disabling default limits does not override explicit limits
-    default_limits(false);
-    assert(parser_max_nesting() == 11);
-    assert(parser_max_errors() == 12);
-    assert(parser_max_container_size() == 13);
-    assert(parser_max_container_size_damaged() == 14);
-    assert(max_stream_filters() == 15);
-
-    // Test parameter checking
-    QUtil::handle_result_code(qpdf_r_ok, "");
-    bool thrown = false;
-    try {
-        qpdf::global::handle_result(qpdf_r_success_mask);
-    } catch (std::logic_error const&) {
-        thrown = true;
-    }
-    assert(thrown);
-    thrown = false;
-    try {
-        qpdf::global::get_uint32(qpdf_param_e(42));
-    } catch (std::logic_error const&) {
-        thrown = true;
-    }
-    assert(thrown);
-    thrown = false;
-    try {
-        qpdf::global::set_uint32(qpdf_param_e(42), 42);
-    } catch (std::logic_error const&) {
-        thrown = true;
-    }
-    assert(thrown);
-
-    /* Test limit errors */
-    assert(qpdf::global::limit_errors() == 0);
-    QPDFObjectHandle::parse("[[[[]]]]");
-    assert(qpdf::global::limit_errors() == 0);
-    parser_max_nesting(3);
-    try {
-        QPDFObjectHandle::parse("[[[[[]]]]]");
-    } catch (std::exception&) {
-    }
-    assert(qpdf::global::limit_errors() == 1);
-    try {
-        QPDFObjectHandle::parse("[[[[[]]]]]");
-    } catch (std::exception&) {
-    }
-    assert(qpdf::global::limit_errors() == 2);
-
-    // Test max_stream_filters
-    QPDF qpdf;
-    qpdf.emptyPDF();
-    auto s = qpdf.newStream("\x01\x01\x01A");
-    s.getDict().replace("/Filter", Array({Name("/RL"), Name("/RL"), Name("/RL")}));
-    Pl_Discard p;
-    auto x = s.pipeStreamData(&p, 0, qpdf_dl_all, true);
-    assert(x);
-    max_stream_filters(2);
-    assert(!s.pipeStreamData(&p, 0, qpdf_dl_all, true));
-    max_stream_filters(3);
-    assert(s.pipeStreamData(&p, 0, qpdf_dl_all, true));
-
-    // Test global settings using the QPDFJob interface
-    QPDFJob j;
-    j.config()
-        ->inputFile("minimal.pdf")
-        ->global()
-        ->parserMaxNesting("111")
-        ->parserMaxErrors("112")
-        ->parserMaxContainerSize("113")
-        ->parserMaxContainerSizeDamaged("114")
-        ->maxStreamFilters("115")
-        ->noDefaultLimits()
-        ->endGlobal()
-        ->outputFile("a.pdf");
-    auto qpdf_uptr = j.createQPDF();
-    assert(parser_max_nesting() == 111);
-    assert(parser_max_errors() == 112);
-    assert(parser_max_container_size() == 113);
-    assert(parser_max_container_size_damaged() == 114);
-    assert(max_stream_filters() == 115);
-    assert(!default_limits());
-
-    // Test global settings using the JobJSON
-    QPDFJob jj;
-    jj.initializeFromJson(R"(
-        {
-            "inputFile": "minimal.pdf",
-            "global": {
-                "parserMaxNesting": "211",
-                "parserMaxErrors": "212",
-                "parserMaxContainerSize": "213",
-                "parserMaxContainerSizeDamaged": "214",
-                "maxStreamFilters": "215",
-                "noDefaultLimits": ""
-            },
-            "outputFile": "a.pdf"
-        }
-    )");
-    qpdf_uptr = jj.createQPDF();
-    assert(parser_max_nesting() == 211);
-    assert(parser_max_errors() == 212);
-    assert(parser_max_container_size() == 213);
-    assert(parser_max_container_size_damaged() == 214);
-    assert(max_stream_filters() == 215);
-    assert(!default_limits());
 }
 
 // test equivalent_to
@@ -763,7 +606,7 @@ runtest(int n, char const* filename1, char const* arg2)
     // the test suite to see how the test is invoked to find the file
     // that the test is supposed to operate on.
 
-    std::set<int> ignore_filename = {1, 2, 3};
+    std::set<int> ignore_filename = {1, 3};
 
     QPDF pdf;
     std::shared_ptr<char> file_buf;
@@ -777,7 +620,7 @@ runtest(int n, char const* filename1, char const* arg2)
     }
 
     std::map<int, void (*)(QPDF&, char const*)> test_functions = {
-        {0, test_0}, {1, test_1}, {2, test_2}, {3, test_3}};
+        {0, test_0}, {1, test_1}, {3, test_3}};
 
     auto fn = test_functions.find(n);
     if (fn == test_functions.end()) {

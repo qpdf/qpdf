@@ -272,6 +272,66 @@ namespace qpdf::global
         {
             set_uint32(qpdf_p_max_stream_filters, value);
         }
+
+        /// @brief  Retrieves the maximum amount of memory in bytes allowed for DCT (JPEG)
+        ///         decompression.
+        ///
+        /// Streams requiring memory in excess of the limit for decompression are treated as
+        /// unfilterable. A value of 0 indicates no limit. The default is 0.
+        ///
+        /// @return The configured maximum memory in bytes for DCT decompression.
+        ///
+        /// @since 12.4
+        inline uint32_t
+        dct_max_memory()
+        {
+            return get_uint32(qpdf_p_dct_max_memory);
+        }
+
+        /// @brief  Sets the maximum amount of memory in bytes allowed for DCT (JPEG) decompression.
+        ///
+        /// Streams requiring memory in excess of the limit for decompression are treated as
+        /// unfilterable. A value of 0 indicates no limit. The default is 0.
+        ///
+        /// @param val The maximum memory in bytes to allow for DCT decompression.
+        ///
+        /// @since 12.4
+        inline void
+        dct_max_memory(uint32_t val)
+        {
+            set_uint32(qpdf_p_dct_max_memory, val);
+        }
+
+        /// @brief  Retrieves the maximum number of progressive scans allowed for DCT (JPEG)
+        ///         decompression.
+        ///
+        /// Streams exceeding the limit are treated as unfilterable. A value of 0 indicates no
+        /// limit. The default is 0.
+        ///
+        /// @return The configured maximum progressive scans for DCT decompression.
+        ///
+        /// @since 12.4
+        inline uint32_t
+        dct_max_progressive_scans()
+        {
+            return get_uint32(qpdf_p_dct_max_progressive_scans);
+        }
+
+        /// @brief  Sets the maximum number of progressive scans allowed for DCT (JPEG)
+        ///         decompression.
+        ///
+        /// Streams exceeding the limit are treated as unfilterable. A value of 0 indicates no
+        /// limit. The default is 0.
+        ///
+        /// @param val The maximum progressive scans to allow for DCT operations.
+        ///
+        /// @since 12.4
+        inline void
+        dct_max_progressive_scans(uint32_t val)
+        {
+            set_uint32(qpdf_p_dct_max_progressive_scans, val);
+        }
+
     } // namespace limits
 
 } // namespace qpdf::global

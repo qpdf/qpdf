@@ -290,6 +290,10 @@ enum qpdf_param_e {
     /* stream and filter limits */
     qpdf_p_max_stream_filters = 0x14000,
 
+    /* stream and filter limits - dct limits */
+    qpdf_p_dct_max_memory = 0x14020,
+    qpdf_p_dct_max_progressive_scans,
+
     /* next section = 0x20000 */
     qpdf_enum_max = 0x7fffffff,
 };

@@ -3,6 +3,7 @@
 #include <qpdf/QIntC.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/Util.hh>
+#include <qpdf/global_private.hh>
 
 #include <csetjmp>
 #include <stdexcept>
@@ -40,8 +41,8 @@ namespace
         std::string msg;
     };
 
-    long memory_limit{0};
-    int scan_limit{0};
+    static long const& memory_limit{qpdf::global::Limits::dct_max_memory()};
+    static int const& scan_limit{qpdf::global::Limits::dct_max_progressive_scans()};
     bool throw_on_corrupt_data{true};
 } // namespace
 
@@ -127,13 +128,13 @@ Pl_DCT::Pl_DCT(char const* identifier, Pipeline* next) :
 void
 Pl_DCT::setMemoryLimit(long limit)
 {
-    memory_limit = limit;
+    qpdf::global::Limits::dct_max_memory(limit);
 }
 
 void
 Pl_DCT::setScanLimit(int limit)
 {
-    scan_limit = limit;
+    qpdf::global::Limits::dct_max_progressive_scans(limit);
 }
 
 void

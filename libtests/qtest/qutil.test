@@ -9,6 +9,8 @@ require TestDriver;
 
 my $td = new TestDriver('qutil');
 
+my $n_tests = 4;
+
 $td->runtest("QUtil",
              {$td->COMMAND => "qutil"},
              {$td->FILE => "qutil.out",
@@ -31,4 +33,14 @@ else
                  $td->NORMALIZE_NEWLINES | $td->RM_WS_ONLY_LINES);
 }
 
-$td->report(2);
+$td->runtest("util::fits",
+             {$td->COMMAND => "util 0 -"},
+             {$td->STRING => "test 0 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("util::to",
+             {$td->COMMAND => "util 1 -"},
+             {$td->STRING => "test 1 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->report($n_tests);

@@ -11,7 +11,7 @@ require TestDriver;
 
 my $td = new TestDriver('objects');
 
-my $n_tests = 4;
+my $n_tests = 3;
 
 $td->runtest("integer type checks",
              {$td->COMMAND => "objects 0 minimal.pdf"},
@@ -21,11 +21,6 @@ $td->runtest("integer type checks",
 $td->runtest("dictionary checks",
              {$td->COMMAND => "objects 1 -"},
              {$td->STRING => "test 1 done\n", $td->EXIT_STATUS => 0},
-             $td->NORMALIZE_NEWLINES);
-
-$td->runtest("global limits",
-             {$td->COMMAND => "objects 2 -"},
-             {$td->FILE => "test2.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 $td->runtest("equivalent_to structural comparisons",

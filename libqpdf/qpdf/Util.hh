@@ -3,6 +3,9 @@
 
 #include <qpdf/assert_debug.h>
 
+#include <concepts>
+#include <cstdint>
+#include <limits>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -46,6 +49,49 @@ namespace qpdf::util
         if (cond) {
             throw std::runtime_error(std::forward<T>(msg));
         }
+    }
+
+    /// @brief Return true if `val` fits in `T` (predicate only).
+    ///
+    /// @tparam T integral target type
+    /// @param val value to test
+    /// @return true if `val` fits in `T`
+    template <typename T>
+        requires std::integral<T>
+    bool
+    fits(std::integral auto val)
+    {
+        if constexpr (std::cmp_less(
+                          std::numeric_limits<decltype(val)>::min(),
+                          std::numeric_limits<T>::min())) {
+            if (std::cmp_less(val, std::numeric_limits<T>::min())) {
+                return false;
+            }
+        }
+        if constexpr (std::cmp_greater(
+                          std::numeric_limits<decltype(val)>::max(),
+                          std::numeric_limits<T>::max())) {
+            if (std::cmp_greater(val, std::numeric_limits<T>::max())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /// @brief Convert `val` to `T`; throws std::range_error if out-of-range.
+    ///
+    /// @tparam T integral target type
+    /// @param val value to convert
+    /// @return Converted value as `T`
+    template <typename T>
+        requires std::integral<T>
+    T
+    to(std::integral auto val)
+    {
+        if (!fits<T>(val)) {
+            throw std::range_error("out of range converting integral values");
+        }
+        return static_cast<T>(val);
     }
 
     inline constexpr char
@@ -112,6 +158,28 @@ namespace qpdf::util
     }
 
     std::string random_string(size_t len);
+
+    // Test helpers
+
+    /// @brief Predicate: returns true if invoking `f()` throws an exception of type `E`.
+    ///
+    /// Internal test helper used by unit tests: call `throws<SomeException>([](){ ... })` and
+    /// it returns true when the callable throws `SomeException` and false otherwise.
+    /// The callable must be invocable with no arguments.
+    template <typename E, typename F>
+        requires std::invocable<F>
+    inline bool
+    throws(F&& f)
+    {
+        try {
+            std::forward<F>(f)();
+            return false;
+        } catch (E const&) {
+            return true;
+        } catch (...) {
+            return false;
+        }
+    }
 
 } // namespace qpdf::util
 
