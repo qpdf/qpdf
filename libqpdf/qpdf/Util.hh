@@ -3,6 +3,10 @@
 
 #include <qpdf/assert_debug.h>
 
+#include <qpdf/qpdf-config.h>
+
+#include <charconv>
+#include <clocale>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -112,6 +116,55 @@ namespace qpdf::util
     }
 
     std::string random_string(size_t len);
+
+    /// @brief Convert a PDF numeric token to double.
+    ///
+    /// Uses `std::from_chars` for strict parsing when floating-point overloads are available.
+    /// In fallback builds, uses `std::atof` and normalizes `.` to the current locale decimal point
+    /// before conversion.
+    ///
+    /// @param val input numeric token
+    /// @return `{true, value}` if conversion succeeds (`from_chars` path) or always in fallback
+    /// mode; `{false, value}` on strict-parse failure
+    inline std::pair<bool, double>
+    str_to_double(std::string const& val)
+    {
+#ifdef HAVE_FROM_CHARS_DOUBLE
+        size_t skip = val.starts_with('+') ? 1 : 0;
+        if (val.size() <= skip) {
+            return {false, 0};
+        }
+        double result = 0.0;
+        auto end = val.data() + val.size();
+        auto [tail, ec] = std::from_chars(val.data() + skip, end, result, std::chars_format::fixed);
+        if (ec == std::errc() && tail == end) {
+            return {true, result};
+        }
+        (void)std::from_chars(val.data() + skip, end, result, std::chars_format::general);
+        return {false, result};
+#else
+        // Use atof if floating point std::from_chars is not available
+        auto locale_decimal_point = []() {
+            if (auto* lconv = std::localeconv();
+                lconv && lconv->decimal_point && lconv->decimal_point[0] != '\0') {
+                return lconv->decimal_point[0];
+            }
+            return '.';
+        };
+        static char const decimal_point = locale_decimal_point();
+        if (decimal_point == '.') {
+            return {true, std::atof(val.data())};
+        }
+        auto copy_str = val;
+        for (char& ch: copy_str) {
+            if (ch == '.') {
+                ch = decimal_point;
+                break;
+            }
+        }
+        return {true, std::atof(copy_str.data())};
+#endif
+    }
 
 } // namespace qpdf::util
 

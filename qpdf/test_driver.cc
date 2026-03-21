@@ -368,6 +368,7 @@ test_4(QPDF& pdf, char const* arg2)
     exit(0);
 }
 
+// Numeric and string tests
 static void
 test_5(QPDF& pdf, char const* arg2)
 {

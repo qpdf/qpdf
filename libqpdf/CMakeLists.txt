@@ -107,6 +107,7 @@ include(FindPkgConfig)
 include(CheckTypeSize)
 include(CheckIncludeFile)
 include(CheckCSourceCompiles)
+include(CheckCXXSourceCompiles)
 include(CheckCSourceRuns)
 include(CheckSymbolExists)
 
@@ -313,6 +314,17 @@ list(REMOVE_DUPLICATES dep_link_libraries)
 
 check_type_size(size_t SIZEOF_SIZE_T)
 check_include_file("inttypes.h" HAVE_INTTYPES_H)
+check_cxx_source_compiles(
+"#include <charconv>
+int main(int argc, char* argv[]) {
+    double value = 0.0;
+    char const* p = \"12.5\";
+    auto [tail, ec] =
+        std::from_chars(p, p + 4, value, std::chars_format::fixed);
+    (void)tail;
+    (void)ec;
+}"
+    HAVE_FROM_CHARS_DOUBLE)
 check_symbol_exists(localtime_r "time.h" HAVE_LOCALTIME_R)
 check_symbol_exists(random "stdlib.h" HAVE_RANDOM)
 
