@@ -57,6 +57,9 @@ more detail.
       system error. Reading a line whose end-of-line run reaches the end of the file left the
       input source one byte before the start of that line, which at offset 0 is a seek to -1.
 
+    - Fix bug in ``QPDFObjectHandle::getNumericValue`` that caused it to return incorrect values
+      for real numbers when run using a locale with a decimal point other than '.'.
+
   - Build changes
 
     - Create binary release for additional platforms: Windows arm64.
@@ -76,6 +79,10 @@ more detail.
 
 12.4.0: August 9, 2026
   - Bug fixes
+
+    - Fix bug in ``QPDFObjectHandle::getNumericValue`` that caused it to
+      return incorrect values for real number when run using a locale
+      with a decimal point other than '.'.
 
     - Fix error message when :qpdf:ref:`--check` encounters a file without any pages.
 

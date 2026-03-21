@@ -16,6 +16,7 @@
 #cmakedefine HAVE_STDINT_H 1
 
 /* OS functions and symbols */
+#cmakedefine HAVE_FROM_CHARS_DOUBLE 1
 #cmakedefine HAVE_EXTERN_LONG_TIMEZONE 1
 #cmakedefine HAVE_FSEEKO 1
 #cmakedefine HAVE_FSEEKO64 1
