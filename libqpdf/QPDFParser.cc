@@ -621,7 +621,7 @@ Parser::fix_missing_keys()
     std::set<std::string> names;
     for (auto& obj: frame_->olist) {
         if (obj.raw_type_code() == ::ot_name) {
-            names.insert(obj.obj_sp()->getStringValue());
+            names.insert(obj.getName());
         }
     }
     int next_fake_key = 1;
