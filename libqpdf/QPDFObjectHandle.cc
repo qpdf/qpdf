@@ -722,28 +722,6 @@ BaseHandle::disconnect(bool only_direct)
     obj->og = QPDFObjGen();
 }
 
-std::string
-QPDFObject::getStringValue() const
-{
-    switch (getResolvedTypeCode()) {
-    case ::ot_real:
-        return std::get<QPDF_Real>(value).val;
-    case ::ot_string:
-        return std::get<QPDF_String>(value).val;
-    case ::ot_name:
-        return std::get<QPDF_Name>(value).name;
-    case ::ot_operator:
-        return std::get<QPDF_Operator>(value).val;
-    case ::ot_inlineimage:
-        return std::get<QPDF_InlineImage>(value).val;
-    case ::ot_reference:
-        return std::get<QPDF_Reference>(value).obj->getStringValue();
-    default:
-        throw std::logic_error("Internal error in QPDFObject::getStringValue");
-    }
-    return ""; // unreachable
-}
-
 bool
 QPDFObjectHandle::isSameObjectAs(QPDFObjectHandle const& rhs) const
 {
@@ -1062,23 +1040,21 @@ QPDFObjectHandle::getValueAsUInt(unsigned int& value) const
 std::string
 QPDFObjectHandle::getRealValue() const
 {
-    if (isReal()) {
-        return obj->getStringValue();
-    } else {
-        typeWarning("real", "returning 0.0");
-        QTC::TC("qpdf", "QPDFObjectHandle real returning 0.0");
-        return "0.0";
+    if (auto* real = as<QPDF_Real>()) {
+        return real->val;
     }
+    typeWarning("real", "returning 0.0");
+    return "0.0";
 }
 
 bool
 QPDFObjectHandle::getValueAsReal(std::string& value) const
 {
-    if (!isReal()) {
-        return false;
+    if (auto* real = as<QPDF_Real>()) {
+        value = real->val;
+        return true;
     }
-    value = obj->getStringValue();
-    return true;
+    return false;
 }
 
 // Name methods
@@ -1112,22 +1088,21 @@ Name::value() const
 std::string
 QPDFObjectHandle::getName() const
 {
-    if (isName()) {
-        return obj->getStringValue();
-    } else {
-        typeWarning("name", "returning dummy name");
-        return "/QPDFFakeName";
+    if (auto* name = as<QPDF_Name>()) {
+        return name->name;
     }
+    typeWarning("name", "returning dummy name");
+    return "/QPDFFakeName";
 }
 
 bool
 QPDFObjectHandle::getValueAsName(std::string& value) const
 {
-    if (!isName()) {
-        return false;
+    if (auto* name = as<QPDF_Name>()) {
+        value = name->name;
+        return true;
     }
-    value = obj->getStringValue();
-    return true;
+    return false;
 }
 
 // String methods
@@ -1241,45 +1216,41 @@ QPDFObjectHandle::getValueAsUTF8(std::string& value) const
 std::string
 QPDFObjectHandle::getOperatorValue() const
 {
-    if (isOperator()) {
-        return obj->getStringValue();
-    } else {
-        typeWarning("operator", "returning fake value");
-        QTC::TC("qpdf", "QPDFObjectHandle operator returning fake value");
-        return "QPDFFAKE";
+    if (auto* op = as<QPDF_Operator>()) {
+        return op->val;
     }
+    typeWarning("operator", "returning fake value");
+    return "QPDFFAKE";
 }
 
 bool
 QPDFObjectHandle::getValueAsOperator(std::string& value) const
 {
-    if (!isOperator()) {
-        return false;
+    if (auto* op = as<QPDF_Operator>()) {
+        value = op->val;
+        return true;
     }
-    value = obj->getStringValue();
-    return true;
+    return false;
 }
 
 std::string
 QPDFObjectHandle::getInlineImageValue() const
 {
-    if (isInlineImage()) {
-        return obj->getStringValue();
-    } else {
-        typeWarning("inlineimage", "returning empty data");
-        QTC::TC("qpdf", "QPDFObjectHandle inlineimage returning empty data");
-        return "";
+    if (auto* ii = as<QPDF_InlineImage>()) {
+        return ii->val;
     }
+    typeWarning("inlineimage", "returning empty data");
+    return {};
 }
 
 bool
 QPDFObjectHandle::getValueAsInlineImage(std::string& value) const
 {
-    if (!isInlineImage()) {
-        return false;
+    if (auto* ii = as<QPDF_InlineImage>()) {
+        value = ii->val;
+        return true;
     }
-    value = obj->getStringValue();
-    return true;
+    return false;
 }
 
 // Array accessors and mutators are in QPDF_Array.cc

@@ -119,6 +119,7 @@ class QPDF_Dictionary final
 class QPDF_InlineImage final
 {
     friend class QPDFObject;
+    friend class QPDFObjectHandle;
     friend class qpdf::BaseHandle;
 
     explicit QPDF_InlineImage(std::string val) :
@@ -145,6 +146,7 @@ class QPDF_Integer final
 class QPDF_Name final
 {
     friend class QPDFObject;
+    friend class QPDFObjectHandle;
     friend class qpdf::BaseHandle;
     friend class qpdf::Name;
 
@@ -170,6 +172,7 @@ class QPDF_Null final
 class QPDF_Operator final
 {
     friend class QPDFObject;
+    friend class QPDFObjectHandle;
     friend class qpdf::BaseHandle;
 
     QPDF_Operator(std::string val) :
@@ -183,6 +186,7 @@ class QPDF_Operator final
 class QPDF_Real final
 {
     friend class QPDFObject;
+    friend class QPDFObjectHandle;
     friend class qpdf::BaseHandle;
 
     QPDF_Real(std::string val) :
@@ -315,8 +319,6 @@ class QPDFObject
         return std::make_shared<QPDFObject>(
             qpdf, og, std::forward<T>(T(std::forward<Args>(args)...)));
     }
-
-    std::string getStringValue() const;
 
     // Return a unique type code for the resolved object
     inline qpdf_object_type_e getResolvedTypeCode() const;
