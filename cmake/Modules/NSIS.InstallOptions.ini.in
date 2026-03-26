@@ -1,0 +1,11 @@
+; This is a template for NSIS installer options.
+
+[General]
+
+[Sections]
+Section "Add to PATH"
+    AddToPath="${INSTALL_DIR}"
+EndSection
+
+[Options]
+    AllowAddToPath=true
