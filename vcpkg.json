@@ -1,0 +1,45 @@
+{
+  "name": "qpdf",
+  "version": "11.9.0",
+  "description": "A content-preserving PDF document transformer",
+  "homepage": "https://github.com/qpdf/qpdf",
+  "license": "Artistic-2.0",
+  "dependencies": [
+    {
+      "name": "zlib",
+      "platform": "!uwp"
+    },
+    {
+      "name": "jpeg",
+      "platform": "!uwp"
+    },
+    {
+      "name": "openssl",
+      "platform": "!uwp"
+    },
+    {
+      "name": "gnutls",
+      "platform": "linux"
+    }
+  ],
+  "features": {
+    "openssl": {
+      "description": "Use OpenSSL for crypto",
+      "dependencies": [
+        "openssl"
+      ]
+    },
+    "gnutls": {
+      "description": "Use GnuTLS for crypto",
+      "dependencies": [
+        {
+          "name": "gnutls",
+          "platform": "linux"
+        }
+      ]
+    }
+  },
+  "default-features": [
+    "openssl"
+  ]
+}
