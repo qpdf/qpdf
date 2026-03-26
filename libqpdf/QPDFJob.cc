@@ -30,6 +30,11 @@
 
 #include <qpdf/auto_job_schema.hh> // JOB_SCHEMA_DATA
 
+// Forward declaration for fixFormFields method
+namespace qpdf {
+    void fixFormFields(QPDF& pdf);
+}
+
 using namespace qpdf;
 
 using Pages = impl::Doc::Pages;
