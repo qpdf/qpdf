@@ -23,6 +23,9 @@ main(int argc, char* argv[])
     int r = 0;
     char* p = 0;
 
+    if (argc < 1) {
+        usage();
+    }
     if ((p = strrchr(argv[0], '/')) != NULL) {
         whoami = p + 1;
     } else if ((p = strrchr(argv[0], '\\')) != NULL) {
