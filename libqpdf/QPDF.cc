@@ -146,6 +146,7 @@ QPDF::QPDF() :
     // the lifetime of this running application.
     static std::atomic<unsigned long long> unique_id{0};
     m->unique_id = unique_id.fetch_add(1ULL);
+    m->highest_warning_severity = 0;
 }
 
 /// @brief  Initializes the AcroForm functionality for the document.
