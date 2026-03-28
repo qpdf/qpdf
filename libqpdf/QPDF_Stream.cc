@@ -683,20 +683,17 @@ Stream::pipeStreamData(
             s->stream_provider->provideStreamData(obj->getObjGen(), &count);
         }
         qpdf_offset_t actual_length = count.getCount();
-        if (s->stream_dict.hasKey("/Length")) {
-            auto desired_length = s->stream_dict.getKey("/Length").getIntValue();
+        if (auto desired_length = Length()) {
             if (actual_length != desired_length) {
-                QTC::TC("qpdf", "QPDF_Stream provider length mismatch");
                 // This would be caused by programmer error on the part of a library user, not by
                 // invalid input data.
                 throw std::runtime_error(
                     "stream data provider for " + obj->getObjGen().unparse(' ') + " provided " +
                     std::to_string(actual_length) + " bytes instead of expected " +
-                    std::to_string(desired_length) + " bytes");
+                    std::to_string(desired_length.value()) + " bytes");
             }
         } else {
-            QTC::TC("qpdf", "QPDF_Stream provider length not provided");
-            s->stream_dict.replaceKey("/Length", QPDFObjectHandle::newInteger(actual_length));
+            Length(actual_length);
         }
     } else {
         if (offset() == 0) {
@@ -781,11 +778,9 @@ Stream::replaceFilterData(
         s->stream_dict.replaceKey("/DecodeParms", decode_parms);
     }
     if (length == 0) {
-        QTC::TC("qpdf", "QPDF_Stream unknown stream length");
         s->stream_dict.removeKey("/Length");
     } else {
-        s->stream_dict.replaceKey(
-            "/Length", QPDFObjectHandle::newInteger(QIntC::to_longlong(length)));
+        Length(length);
     }
 }
 
