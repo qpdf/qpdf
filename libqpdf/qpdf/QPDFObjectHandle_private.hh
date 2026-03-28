@@ -554,6 +554,54 @@ namespace qpdf
         {
             return {stream()->stream_dict};
         }
+
+        /// @brief Returns the stream dictionary's `/Length` entry.
+        ///
+        /// @return A typed Integer handle for `/Length`, or an invalid Integer if not present.
+        Integer
+        Length() const
+        {
+            return {getDict()["/Length"]};
+        }
+
+        /// @brief Sets the stream dictionary's `/Length` entry.
+        ///
+        /// @param val The typed Integer handle to store as `/Length`.
+        void
+        Length(Integer val)
+        {
+            qpdf_expect(val);
+            getDict().replace("/Length", val);
+        }
+
+        /// @brief Sets the stream dictionary's `/Length` entry.
+        ///
+        /// @param val The value to store as `/Length`.
+        void
+        Length(std::integral auto val)
+        {
+            qpdf_expect(val >= 0);
+            getDict().replace("/Length", Integer(val));
+        }
+
+        /// @brief Returns the stream dictionary's `/Subtype` entry.
+        ///
+        /// @return A typed Name handle for `/Subtype`, or an invalid Name if not present.
+        Name
+        Subtype() const
+        {
+            return {getDict()["/Subtype"]};
+        }
+
+        /// @brief Returns the stream dictionary's `/Type` entry.
+        ///
+        /// @return A typed Name handle for `/Type`, or an invalid Name if not present.
+        Name
+        Type() const
+        {
+            return {getDict()["/Type"]};
+        }
+
         bool
         isDataModified() const
         {

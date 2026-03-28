@@ -901,7 +901,11 @@ QPDFObjectHandle::isDictionaryOfType(std::string const& type, std::string const&
 bool
 QPDFObjectHandle::isStreamOfType(std::string const& type, std::string const& subtype) const
 {
-    return isStream() && getDict().isDictionaryOfType(type, subtype);
+    if (auto stream = as_stream()) {
+        return stream && (type.empty() || stream.Type() == type) &&
+            (subtype.empty() || stream.Subtype() == subtype);
+    }
+    return false;
 }
 
 // Bool accessors

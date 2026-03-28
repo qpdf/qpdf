@@ -92,7 +92,6 @@ qpdf-c called qpdf_set_static_aes_IV 0
 qpdf-c called qpdf_has_error 0
 qpdf-c called qpdf_get_qpdf_version 0
 QPDF_Stream pipe replaced stream data 0
-QPDF_Stream provider length mismatch 0
 QPDFObjectHandle newStream 0
 QPDFObjectHandle newStream with data 0
 QPDFObjectHandle prepend page contents 0
@@ -114,8 +113,6 @@ QPDF insert page 2
 QPDF insert indirect page 0
 QPDF_Stream ERR shallow copy stream 0
 QPDFObjectHandle newStream with string 0
-QPDF_Stream provider length not provided 0
-QPDF_Stream unknown stream length 0
 QPDF replaceReserved 0
 QPDFWriter copy use_aes 1
 QPDFObjectHandle trailing data in parse 0
