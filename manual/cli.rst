@@ -1201,6 +1201,19 @@ Related Options
    this at least prevents it from removing compliance on already
    compliant files.
 
+.. qpdf:option:: --deduplicate-image-xobjects
+
+   .. help: merge identical image XObject streams into a single object
+
+      If the input file contains distinct but equivalent image XObject
+      stream objects, this option causes qpdf to merge them into a
+      single stream object referenced multiple times.
+
+   This option inspects every image XObject stream in the file. If two
+   streams are identical, it merges them so that they share a single
+   underlying PDF object. This can reduce file size for PDFs generated
+   by concatenating files or tools that redundantly embed images.
+
 .. qpdf:option:: --coalesce-contents
 
    .. help: combine content streams
@@ -4188,6 +4201,10 @@ generate:
 - ``--object-streams=generate``: generate object streams, which means
   that more of the PDF file's structural content will be compressed
   (see :qpdf:ref:`--object-streams`)
+
+- ``--deduplicate-image-xobjects``: replace redundant image XObject
+  stream data with references (see
+  :qpdf:ref:`--deduplicate-image-xobjects`)
 
 .. _zopfli:
 
