@@ -11,7 +11,7 @@ require TestDriver;
 
 my $td = new TestDriver('objects');
 
-my $n_tests = 4;
+my $n_tests = 6;
 
 $td->runtest("integer type checks",
              {$td->COMMAND => "objects 0 minimal.pdf"},
@@ -31,6 +31,16 @@ $td->runtest("global limits",
 $td->runtest("equivalent_to structural comparisons",
              {$td->COMMAND => "objects 3 -"},
              {$td->STRING => "test 3 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("getNumericValue real number conversion",
+             {$td->COMMAND => "objects 4 -"},
+             {$td->STRING => "test 4 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("getNumericValue real number conversion using locale with comma",
+             {$td->COMMAND => "objects 4 - comma"},
+             {$td->STRING => "test 4 done\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 $td->report($n_tests);

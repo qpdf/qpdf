@@ -16,6 +16,10 @@ more detail.
 12.3.3: not yet released
   - Bug fixes
 
+    - Fix bug in ``QPDFObjectHandle::getNumericValue`` that caused it to
+      return incorrect values for real number when run using a locale
+      with a decimal point other than '.'.
+
     - Fix error message when :qpdf:ref:`--check` encounters a file without any pages.
 
 12.3.2: January 24, 2026

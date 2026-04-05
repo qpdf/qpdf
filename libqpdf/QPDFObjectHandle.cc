@@ -15,6 +15,7 @@
 #include <qpdf/QTC.hh>
 #include <qpdf/Util.hh>
 
+#include <algorithm>
 #include <array>
 #include <cctype>
 #include <climits>
@@ -812,13 +813,17 @@ QPDFObjectHandle::getNumericValue() const
 {
     if (isInteger()) {
         return static_cast<double>(getIntValue());
-    } else if (isReal()) {
-        return atof(getRealValue().c_str());
-    } else {
-        typeWarning("number", "returning 0");
-        QTC::TC("qpdf", "QPDFObjectHandle numeric non-numeric");
-        return 0;
     }
+    if (auto* real = as<QPDF_Real>()) {
+        auto [valid, result] = util::str_to_double(real->val);
+        if (!valid) {
+            warnIfPossible(
+                "QPDFObjectHandle::getNumericValue: found invalid real value");
+        }
+        return result;
+    }
+    typeWarning("number", "returning 0");
+    return 0;
 }
 
 bool
@@ -1874,7 +1879,20 @@ QPDFObjectHandle::newNull()
 QPDFObjectHandle
 QPDFObjectHandle::newReal(std::string const& value)
 {
-    return {QPDFObject::create<QPDF_Real>(value)};
+    if (!(value.empty() || std::isspace(value.front()) || std::isspace(value.back()))) {
+        return {QPDFObject::create<QPDF_Real>(value)};
+    }
+    *QPDFLogger::defaultLogger()->getError()
+        << "newReal called with empty string or extra white-space\n";
+    auto cs = value;
+
+    cs.erase(
+        std::remove_if(cs.begin(), cs.end(), [](unsigned char x) { return std::isspace(x); }),
+        cs.end());
+    if (cs.empty()) {
+        cs = "0.0";
+    }
+    return {QPDFObject::create<QPDF_Real>(cs)};
 }
 
 QPDFObjectHandle
