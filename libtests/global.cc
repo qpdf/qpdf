@@ -9,6 +9,7 @@
 #include <qpdf/Pl_Flate.hh>
 #include <qpdf/Pl_PNGFilter.hh>
 #include <qpdf/Pl_RunLength.hh>
+#include <qpdf/Pl_TIFFPredictor.hh>
 #include <qpdf/QIntC.hh>
 #include <qpdf/QPDFJob.hh>
 #include <qpdf/QPDFObjectHandle_private.hh>
@@ -174,6 +175,9 @@ test_1(QPDF&, char const*)
     // Check default for RunLength memory limit
     assert(run_length_max_memory() == 0);
 
+    // Check default for TIFF memory limit
+    assert(tiff_max_memory() == 0);
+
     // Set DCT limits and throw flag via global limits and verify
     dct_max_memory(123456);
     dct_max_progressive_scans(7);
@@ -184,6 +188,8 @@ test_1(QPDF&, char const*)
     flate_max_memory(654321);
     // Set RunLength limit via global limits and verify
     run_length_max_memory(111000);
+    // Set TIFF limit and verify
+    tiff_max_memory(7654321);
 
     assert(dct_max_memory() == 123456);
     assert(get_uint32(qpdf_p_dct_max_memory) == 123456);
@@ -197,6 +203,8 @@ test_1(QPDF&, char const*)
     assert(get_uint32(qpdf_p_flate_max_memory) == 654321);
     assert(Pl_Flate::memory_limit() == 654321);
     assert(get_uint32(qpdf_p_run_length_max_memory) == 111000);
+    assert(tiff_max_memory() == 7654321);
+    assert(get_uint32(qpdf_p_tiff_max_memory) == 7654321);
 
     // Now set via Pl_DCT, Pl_PNGFilter, Pl_Flate, and Pl_RunLength helpers and verify they update
     // the same global state
@@ -207,6 +215,7 @@ test_1(QPDF&, char const*)
     Pl_PNGFilter::setMemoryLimit(54321);
     Pl_Flate::memory_limit(32123);
     Pl_RunLength::setMemoryLimit(22222);
+    Pl_TIFFPredictor::setMemoryLimit(54321);
 
     assert(dct_max_memory() == 12345);
     assert(dct_max_progressive_scans() == 8);
@@ -214,6 +223,7 @@ test_1(QPDF&, char const*)
     assert(png_max_memory() == 54321);
     assert(flate_max_memory() == 32123);
     assert(run_length_max_memory() == 22222);
+    assert(tiff_max_memory() == 54321);
 
     // Check disabling default limits does not override filter limits or throw flag
     default_limits(false);
@@ -224,6 +234,7 @@ test_1(QPDF&, char const*)
     assert(png_max_memory() == 54321);
     assert(flate_max_memory() == 32123);
     assert(run_length_max_memory() == 22222);
+    assert(tiff_max_memory() == 54321);
 }
 
 // Test C-API setters
@@ -246,6 +257,8 @@ test_2(QPDF&, char const*)
     assert(flate_max_memory() == 654321);
     set_uint32(qpdf_p_run_length_max_memory, 33333);
     assert(run_length_max_memory() == 33333);
+    set_uint32(qpdf_p_tiff_max_memory, 44444);
+    assert(tiff_max_memory() == 44444);
 }
 
 // Test fuzz_mode behavior
@@ -269,6 +282,8 @@ test_3(QPDF&, char const*)
     assert(flate_max_memory() == 200'000);
     // RunLength memory limit should also be set in fuzz_mode
     assert(run_length_max_memory() == 1'000'000);
+    // TIFF memory limit should also be set in fuzz_mode
+    assert(tiff_max_memory() == 1'000'000);
 
     // Attempting to disable fuzz mode is a no-op; fuzz_mode should remain true
     fuzz_mode(false);

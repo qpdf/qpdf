@@ -489,6 +489,34 @@ namespace qpdf::global
             set_uint32(qpdf_p_run_length_max_memory, val);
         }
 
+        /// @brief  Retrieves the maximum amount of memory in bytes allowed for TIFF processing.
+        ///
+        /// Streams requiring memory in excess of the limit for TIFF processing are treated as
+        /// unfilterable. A value of 0 indicates no limit. The default is 0.
+        ///
+        /// @return The configured maximum memory in bytes for TIFF processing.
+        ///
+        /// @since 12.4
+        inline uint32_t
+        tiff_max_memory()
+        {
+            return get_uint32(qpdf_p_tiff_max_memory);
+        }
+
+        /// @brief  Sets the maximum amount of memory in bytes allowed for TIFF processing.
+        ///
+        /// Streams requiring memory in excess of the limit for processing are treated as
+        /// unfilterable. A value of 0 indicates no limit. The default is 0.
+        ///
+        /// @param val The maximum memory in bytes to allow for TIFF processing.
+        ///
+        /// @since 12.4
+        inline void
+        tiff_max_memory(uint32_t val)
+        {
+            set_uint32(qpdf_p_tiff_max_memory, val);
+        }
+
     } // namespace limits
 
 } // namespace qpdf::global

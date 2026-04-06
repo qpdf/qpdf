@@ -4,6 +4,7 @@
 #include <qpdf/BitWriter.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/Util.hh>
+#include <qpdf/global_private.hh>
 
 #include <climits>
 #include <stdexcept>
@@ -12,7 +13,7 @@ using namespace qpdf;
 
 namespace
 {
-    unsigned long long memory_limit{0};
+    unsigned long long const& memory_limit = global::Limits::tiff_max_memory();
 } // namespace
 
 Pl_TIFFPredictor::Pl_TIFFPredictor(
@@ -45,7 +46,7 @@ Pl_TIFFPredictor::Pl_TIFFPredictor(
 void
 Pl_TIFFPredictor::setMemoryLimit(unsigned long long limit)
 {
-    memory_limit = limit;
+    global::Limits::tiff_max_memory(limit);
 }
 
 void

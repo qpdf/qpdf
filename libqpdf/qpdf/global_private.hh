@@ -123,6 +123,18 @@ namespace qpdf::global
             l.run_length_max_memory_ = util::fits<uint32_t>(value) ? value : 0;
         }
 
+        static unsigned long long const&
+        tiff_max_memory()
+        {
+            return l.tiff_max_memory_;
+        }
+
+        static void
+        tiff_max_memory(unsigned long long value)
+        {
+            l.tiff_max_memory_ = util::fits<uint32_t>(value) ? value : 0;
+        }
+
         /// Record a limit error.
         static void
         error()
@@ -161,6 +173,7 @@ namespace qpdf::global
         unsigned long long flate_max_memory_{0};      // constraint to uint32_t range in setter
         unsigned long long png_max_memory_{0};        // constraint to uint32_t range in setter
         unsigned long long run_length_max_memory_{0}; // constraint to uint32_t range in setter
+        unsigned long long tiff_max_memory_{0};       // constraint to uint32_t range in setter
     };
 
     class Options
