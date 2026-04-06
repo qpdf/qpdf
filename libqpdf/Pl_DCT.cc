@@ -3,6 +3,7 @@
 #include <qpdf/QIntC.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/Util.hh>
+#include <qpdf/global_private.hh>
 
 #include <csetjmp>
 #include <stdexcept>
@@ -40,9 +41,9 @@ namespace
         std::string msg;
     };
 
-    long memory_limit{0};
-    int scan_limit{0};
-    bool throw_on_corrupt_data{true};
+    long const& memory_limit{global::Limits::dct_max_memory()};
+    int const& scan_limit{global::Limits::dct_max_progressive_scans()};
+    bool const& throw_on_corrupt_data{global::Options::dct_throw_on_corrupt_data()};
 } // namespace
 
 static void
@@ -127,19 +128,19 @@ Pl_DCT::Pl_DCT(char const* identifier, Pipeline* next) :
 void
 Pl_DCT::setMemoryLimit(long limit)
 {
-    memory_limit = limit;
+    global::Limits::dct_max_memory(limit);
 }
 
 void
 Pl_DCT::setScanLimit(int limit)
 {
-    scan_limit = limit;
+    global::Limits::dct_max_progressive_scans(limit);
 }
 
 void
 Pl_DCT::setThrowOnCorruptData(bool treat_as_error)
 {
-    throw_on_corrupt_data = treat_as_error;
+    global::options::dct_throw_on_corrupt_data(treat_as_error);
 }
 
 Pl_DCT::Pl_DCT(

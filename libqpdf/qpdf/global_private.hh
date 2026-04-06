@@ -1,9 +1,11 @@
 #ifndef GLOBAL_PRIVATE_HH
 #define GLOBAL_PRIVATE_HH
 
+#include <qpdf/Util.hh>
 #include <qpdf/global.hh>
 
 #include <limits>
+#include <utility>
 
 namespace qpdf::global
 {
@@ -14,6 +16,18 @@ namespace qpdf::global
         Limits(Limits&&) = delete;
         Limits& operator=(Limits const&) = delete;
         Limits& operator=(Limits&&) = delete;
+
+        static uint32_t const&
+        doc_max_warnings()
+        {
+            return l.doc_max_warnings_;
+        }
+
+        static void
+        doc_max_warnings(uint32_t value)
+        {
+            l.doc_max_warnings_ = value;
+        }
 
         static uint32_t const&
         parser_max_nesting()
@@ -61,6 +75,78 @@ namespace qpdf::global
             l.max_stream_filters_ = value;
         }
 
+        static long const&
+        dct_max_memory()
+        {
+            return l.dct_max_memory_;
+        }
+
+        static void
+        dct_max_memory(long value)
+        {
+            l.dct_max_memory_ = util::fits<uint32_t>(value) ? value : 0;
+        }
+
+        static int const&
+        dct_max_progressive_scans()
+        {
+            return l.dct_max_progressive_scans_;
+        }
+
+        static void
+        dct_max_progressive_scans(int value)
+        {
+            l.dct_max_progressive_scans_ = util::fits<uint32_t>(value) ? value : 0;
+        }
+
+        static unsigned long long const&
+        flate_max_memory()
+        {
+            return l.flate_max_memory_;
+        }
+
+        static void
+        flate_max_memory(unsigned long long value)
+        {
+            l.flate_max_memory_ = util::fits<uint32_t>(value) ? value : 0;
+        }
+
+        static unsigned long long const&
+        png_max_memory()
+        {
+            return l.png_max_memory_;
+        }
+
+        static void
+        png_max_memory(unsigned long long value)
+        {
+            l.png_max_memory_ = util::fits<uint32_t>(value) ? value : 0;
+        }
+
+        static unsigned long long const&
+        run_length_max_memory()
+        {
+            return l.run_length_max_memory_;
+        }
+
+        static void
+        run_length_max_memory(unsigned long long value)
+        {
+            l.run_length_max_memory_ = util::fits<uint32_t>(value) ? value : 0;
+        }
+
+        static unsigned long long const&
+        tiff_max_memory()
+        {
+            return l.tiff_max_memory_;
+        }
+
+        static void
+        tiff_max_memory(unsigned long long value)
+        {
+            l.tiff_max_memory_ = util::fits<uint32_t>(value) ? value : 0;
+        }
+
         /// Record a limit error.
         static void
         error()
@@ -86,6 +172,7 @@ namespace qpdf::global
 
         uint32_t errors_{0};
 
+        uint32_t doc_max_warnings_{0};
         uint32_t parser_max_nesting_{499};
         uint32_t parser_max_errors_{15};
         bool parser_max_errors_set_{false};
@@ -94,6 +181,12 @@ namespace qpdf::global
         bool parser_max_container_size_damaged_set_{false};
         uint32_t max_stream_filters_{25};
         bool max_stream_filters_set_{false};
+        long dct_max_memory_{0};                      // constraint to uint32_t range in setter
+        int dct_max_progressive_scans_{0};            // constraint to uint32_t range in setter
+        unsigned long long flate_max_memory_{0};      // constraint to uint32_t range in setter
+        unsigned long long png_max_memory_{0};        // constraint to uint32_t range in setter
+        unsigned long long run_length_max_memory_{0}; // constraint to uint32_t range in setter
+        unsigned long long tiff_max_memory_{0};       // constraint to uint32_t range in setter
     };
 
     class Options
@@ -114,6 +207,14 @@ namespace qpdf::global
         }
 
         static bool
+        fuzz_mode()
+        {
+            return static_cast<bool>(o.fuzz_mode_);
+        }
+
+        static void fuzz_mode(bool value);
+
+        static bool
         default_limits()
         {
             return static_cast<bool>(o.default_limits_);
@@ -128,11 +229,25 @@ namespace qpdf::global
             }
         }
 
+        static bool const&
+        dct_throw_on_corrupt_data()
+        {
+            return o.dct_throw_on_corrupt_data_;
+        }
+
+        static void
+        dct_throw_on_corrupt_data(bool value)
+        {
+            o.dct_throw_on_corrupt_data_ = value;
+        }
+
       private:
         static Options o;
 
         bool inspection_mode_{false};
         bool default_limits_{true};
+        bool fuzz_mode_{false};
+        bool dct_throw_on_corrupt_data_{true};
     };
 } // namespace qpdf::global
 

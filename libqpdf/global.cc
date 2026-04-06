@@ -9,6 +9,30 @@ Limits Limits::l;
 Options Options::o;
 
 void
+Options::fuzz_mode(bool value)
+{
+    if (value) {
+        o.fuzz_mode_ = true;
+        // Limit the memory used to decompress JPEG files during fuzzing. Excessive memory use
+        // during fuzzing is due to corrupt JPEG data which sometimes cannot be detected before
+        // jpeg_start_decompress is called. During normal use of qpdf very large JPEGs can
+        // occasionally occur legitimately and therefore must be allowed during normal operations.
+        Limits::dct_max_memory(10'000'000);
+        Limits::dct_max_progressive_scans(50);
+        // Do not decompress corrupt data. This may cause extended runtime within jpeglib without
+        // exercising additional code paths in qpdf.
+        dct_throw_on_corrupt_data(true);
+        Limits::png_max_memory(1'000'000);
+        Limits::flate_max_memory(200'000);
+        Limits::run_length_max_memory(1'000'000);
+        Limits::tiff_max_memory(1'000'000);
+        // Set a reasonable default maximum warnings per document for fuzzing to avoid time-outs due
+        // to extensive recovery efforts.
+        Limits::doc_max_warnings(200);
+    }
+}
+
+void
 Limits::parser_max_container_size(bool damaged, uint32_t value)
 {
     if (damaged) {
@@ -41,11 +65,20 @@ qpdf_global_get_uint32(qpdf_param_e param, uint32_t* value)
     case qpdf_p_inspection_mode:
         *value = Options::inspection_mode();
         return qpdf_r_ok;
+    case qpdf_p_fuzz_mode:
+        *value = Options::fuzz_mode();
+        return qpdf_r_ok;
     case qpdf_p_default_limits:
         *value = Options::default_limits();
         return qpdf_r_ok;
     case qpdf_p_limit_errors:
         *value = Limits::errors();
+        return qpdf_r_ok;
+    case qpdf_p_dct_throw_on_corrupt_data:
+        *value = Options::dct_throw_on_corrupt_data();
+        return qpdf_r_ok;
+    case qpdf_p_doc_max_warnings:
+        *value = Limits::doc_max_warnings();
         return qpdf_r_ok;
     case qpdf_p_parser_max_nesting:
         *value = Limits::parser_max_nesting();
@@ -62,6 +95,30 @@ qpdf_global_get_uint32(qpdf_param_e param, uint32_t* value)
     case qpdf_p_max_stream_filters:
         *value = Limits::max_stream_filters();
         return qpdf_r_ok;
+    case qpdf_p_dct_max_memory:
+        qpdf_invariant(util::fits<uint32_t>(Limits::dct_max_memory()));
+        *value = static_cast<uint32_t>(Limits::dct_max_memory());
+        return qpdf_r_ok;
+    case qpdf_p_dct_max_progressive_scans:
+        qpdf_invariant(util::fits<uint32_t>(Limits::dct_max_progressive_scans()));
+        *value = static_cast<uint32_t>(Limits::dct_max_progressive_scans());
+        return qpdf_r_ok;
+    case qpdf_p_flate_max_memory:
+        qpdf_invariant(util::fits<uint32_t>(Limits::flate_max_memory()));
+        *value = static_cast<uint32_t>(Limits::flate_max_memory());
+        return qpdf_r_ok;
+    case qpdf_p_png_max_memory:
+        qpdf_invariant(util::fits<uint32_t>(Limits::png_max_memory()));
+        *value = static_cast<uint32_t>(Limits::png_max_memory());
+        return qpdf_r_ok;
+    case qpdf_p_run_length_max_memory:
+        qpdf_invariant(util::fits<uint32_t>(Limits::run_length_max_memory()));
+        *value = static_cast<uint32_t>(Limits::run_length_max_memory());
+        return qpdf_r_ok;
+    case qpdf_p_tiff_max_memory:
+        qpdf_invariant(util::fits<uint32_t>(Limits::tiff_max_memory()));
+        *value = static_cast<uint32_t>(Limits::tiff_max_memory());
+        return qpdf_r_ok;
     default:
         return qpdf_r_bad_parameter;
     }
@@ -74,8 +131,17 @@ qpdf_global_set_uint32(qpdf_param_e param, uint32_t value)
     case qpdf_p_inspection_mode:
         Options::inspection_mode(value);
         return qpdf_r_ok;
+    case qpdf_p_fuzz_mode:
+        Options::fuzz_mode(value);
+        return qpdf_r_ok;
     case qpdf_p_default_limits:
         Options::default_limits(value);
+        return qpdf_r_ok;
+    case qpdf_p_dct_throw_on_corrupt_data:
+        Options::dct_throw_on_corrupt_data(value);
+        return qpdf_r_ok;
+    case qpdf_p_doc_max_warnings:
+        Limits::doc_max_warnings(value);
         return qpdf_r_ok;
     case qpdf_p_parser_max_nesting:
         Limits::parser_max_nesting(value);
@@ -91,6 +157,24 @@ qpdf_global_set_uint32(qpdf_param_e param, uint32_t value)
         return qpdf_r_ok;
     case qpdf_p_max_stream_filters:
         Limits::max_stream_filters(value);
+        return qpdf_r_ok;
+    case qpdf_p_dct_max_memory:
+        Limits::dct_max_memory(util::fits<long>(value) ? static_cast<long>(value) : 0);
+        return qpdf_r_ok;
+    case qpdf_p_dct_max_progressive_scans:
+        Limits::dct_max_progressive_scans(util::fits<int>(value) ? static_cast<int>(value) : 0);
+        return qpdf_r_ok;
+    case qpdf_p_flate_max_memory:
+        Limits::flate_max_memory(value);
+        return qpdf_r_ok;
+    case qpdf_p_png_max_memory:
+        Limits::png_max_memory(value);
+        return qpdf_r_ok;
+    case qpdf_p_run_length_max_memory:
+        Limits::run_length_max_memory(value);
+        return qpdf_r_ok;
+    case qpdf_p_tiff_max_memory:
+        Limits::tiff_max_memory(value);
         return qpdf_r_ok;
     default:
         return qpdf_r_bad_parameter;

@@ -278,8 +278,16 @@ enum qpdf_param_e {
 
     /* global options */
     qpdf_p_inspection_mode = 0x11000,
+    qpdf_p_fuzz_mode = 0x11010,
     qpdf_p_default_limits = 0x11100,
+
+    /* stream and filter options */
+    qpdf_p_dct_throw_on_corrupt_data = 0x11400,
+
     /* global limits */
+
+    /* document limits */
+    qpdf_p_doc_max_warnings = 0x12000,
 
     /* parser limits */
     qpdf_p_parser_max_nesting = 0x13000,
@@ -289,6 +297,22 @@ enum qpdf_param_e {
 
     /* stream and filter limits */
     qpdf_p_max_stream_filters = 0x14000,
+
+    /* stream and filter limits - dct limits */
+    qpdf_p_dct_max_memory = 0x14020,
+    qpdf_p_dct_max_progressive_scans,
+
+    /* stream and filter limits - flate limits */
+    qpdf_p_flate_max_memory = 0x14030,
+
+    /* stream and filter limits - png limits */
+    qpdf_p_png_max_memory = 0x14040,
+
+    /* stream and filter limits - runlength limits */
+    qpdf_p_run_length_max_memory = 0x14050,
+
+    /* stream and filter limits - tiff limits */
+    qpdf_p_tiff_max_memory = 0x14060,
 
     /* next section = 0x20000 */
     qpdf_enum_max = 0x7fffffff,

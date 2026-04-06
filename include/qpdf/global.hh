@@ -61,7 +61,8 @@ namespace qpdf::global
     /// @return The number of limit errors.
     ///
     /// @since 12.3
-    uint32_t inline limit_errors()
+    inline uint32_t
+    limit_errors()
     {
         return get_uint32(qpdf_p_limit_errors);
     }
@@ -73,7 +74,8 @@ namespace qpdf::global
         /// @return True if inspection mode is set.
         ///
         /// @since 12.3
-        bool inline inspection_mode()
+        inline bool
+        inspection_mode()
         {
             return get_uint32(qpdf_p_inspection_mode) != 0;
         }
@@ -87,9 +89,78 @@ namespace qpdf::global
         /// @param value A boolean indicating whether to enable (true) inspection mode.
         ///
         /// @since 12.3
-        void inline inspection_mode(bool value)
+        inline void
+        inspection_mode(bool value)
         {
             set_uint32(qpdf_p_inspection_mode, value ? QPDF_TRUE : QPDF_FALSE);
+        }
+
+        /// @brief  Retrieves whether fuzz mode is set.
+        ///
+        /// Fuzz mode is intended for use when building fuzzers and sets various global limits with
+        /// the aim of avoiding spurious time-outs and out-of-memory errors as well as limiting the
+        /// time spent fuzzing qpdf's dependencies instead of fuzzing qpdf itself. These limits
+        /// cannot be imposed on qpdf during normal operation since legitimate PDF files can be very
+        /// large and complex and as result may require more memory and longer runtimes than is
+        /// allowed during fuzzing. By default fuzz mode is off.
+        ///
+        /// @return True if fuzz mode is set.
+        ///
+        /// @since 12.4
+        inline bool
+        fuzz_mode()
+        {
+            return get_uint32(qpdf_p_fuzz_mode) != 0;
+        }
+
+        /// @brief  Set fuzz mode if `true` is passed.
+        ///
+        /// This function enables fuzz mode if `true` is passed. Fuzz mode is intended for use when
+        /// building fuzzers and sets various global limits with the aim of avoiding spurious
+        /// time-outs and out-of-memory errors as well as limiting the time spent fuzzing qpdf's
+        /// dependencies instead of fuzzing qpdf itself. These limits cannot be imposed on qpdf
+        /// during normal operation since legitimate PDF files can be very large and complex and as
+        /// result may require more memory and longer runtimes than is allowed during fuzzing. By
+        /// default fuzz mode is off. Calling `fuzz_mode(false)` is not supported and currently is a
+        /// no-op.
+        ///
+        /// @param value A boolean indicating whether to enable (true) fuzz mode.
+        ///
+        /// @since 12.4
+        inline void
+        fuzz_mode(bool value)
+        {
+            set_uint32(qpdf_p_fuzz_mode, value ? QPDF_TRUE : QPDF_FALSE);
+        }
+
+        /// @brief  Retrieves whether DCT throw-on-corrupt-data option is set.
+        ///
+        /// When enabled, DCT decompression will treat corrupt data as an error and throw an
+        /// exception. By default this option is enabled.
+        ///
+        /// @return True if DCT throw-on-corrupt-data is set.
+        ///
+        /// @since 12.4
+        inline bool
+        dct_throw_on_corrupt_data()
+        {
+            return get_uint32(qpdf_p_dct_throw_on_corrupt_data) != 0;
+        }
+
+        /// @brief  Set the DCT throw-on-corrupt-data option.
+        ///
+        /// When enabled, DCT decompression will treat corrupt data as an error and throw an
+        /// exception. Passing `false` will cause the decompressor to attempt to continue on
+        /// corrupt JPEG data where possible.
+        ///
+        /// @param value A boolean indicating whether to enable (true) or disable (false) the
+        ///              behavior.
+        ///
+        /// @since 12.4
+        inline void
+        dct_throw_on_corrupt_data(bool value)
+        {
+            set_uint32(qpdf_p_dct_throw_on_corrupt_data, value ? QPDF_TRUE : QPDF_FALSE);
         }
 
         /// @brief  Retrieves whether default limits are enabled.
@@ -97,7 +168,8 @@ namespace qpdf::global
         /// @return True if default limits are enabled.
         ///
         /// @since 12.3
-        bool inline default_limits()
+        inline bool
+        default_limits()
         {
             return get_uint32(qpdf_p_default_limits) != 0;
         }
@@ -112,7 +184,8 @@ namespace qpdf::global
         /// @param value A boolean indicating whether to disable (false) the default limits.
         ///
         /// @since 12.3
-        void inline default_limits(bool value)
+        inline void
+        default_limits(bool value)
         {
             set_uint32(qpdf_p_default_limits, value ? QPDF_TRUE : QPDF_FALSE);
         }
@@ -121,14 +194,43 @@ namespace qpdf::global
 
     namespace limits
     {
+        /// @brief Retrieves the default maximum number of warnings accepted per document.
+        ///
+        /// This value provides a default for `QPDF::setMaxWarnings`. A value of 0 indicates no
+        /// limit. The default is 0.
+        ///
+        /// @return The configured default maximum warnings per document.
+        ///
+        /// @since 12.4
+        inline uint32_t
+        doc_max_warnings()
+        {
+            return get_uint32(qpdf_p_doc_max_warnings);
+        }
+
+        /// @brief Sets the default maximum number of warnings accepted per document.
+        ///
+        /// This value is used as the default in newly-created `QPDF` objects as the initial
+        /// setting for `QPDF::setMaxWarnings`.
+        ///
+        /// @param val The maximum warnings per document to set. A value of 0 disables the limit.
+        ///
+        /// @since 12.4
+        inline void
+        doc_max_warnings(uint32_t val)
+        {
+            set_uint32(qpdf_p_doc_max_warnings, val);
+        }
+
         /// @brief Retrieves the maximum nesting level while parsing objects.
         ///
         /// @return The maximum nesting level while parsing objects.
         ///
-        /// @note The maximum nesting level cannot be disabled by calling `default_limit(false)`.
+        /// @note The maximum nesting level cannot be disabled by calling `default_limits(false)`.
         ///
         /// @since 12.3
-        uint32_t inline parser_max_nesting()
+        inline uint32_t
+        parser_max_nesting()
         {
             return get_uint32(qpdf_p_parser_max_nesting);
         }
@@ -137,10 +239,11 @@ namespace qpdf::global
         ///
         /// @param value The maximum nesting level to set.
         ///
-        /// @note The maximum nesting level cannot be disabled by calling `default_limit(false)`.
+        /// @note The maximum nesting level cannot be disabled by calling `default_limits(false)`.
         ///
         /// @since 12.3
-        void inline parser_max_nesting(uint32_t value)
+        inline void
+        parser_max_nesting(uint32_t value)
         {
             set_uint32(qpdf_p_parser_max_nesting, value);
         }
@@ -152,7 +255,8 @@ namespace qpdf::global
         /// @return The maximum number of errors allowed while parsing objects.
         ///
         /// @since 12.3
-        uint32_t inline parser_max_errors()
+        inline uint32_t
+        parser_max_errors()
         {
             return get_uint32(qpdf_p_parser_max_errors);
         }
@@ -164,7 +268,8 @@ namespace qpdf::global
         /// @param value The maximum number of errors allowed while parsing objects to set.
         ///
         /// @since 12.3
-        void inline parser_max_errors(uint32_t value)
+        inline void
+        parser_max_errors(uint32_t value)
         {
             set_uint32(qpdf_p_parser_max_errors, value);
         }
@@ -179,7 +284,8 @@ namespace qpdf::global
         ///         objects.
         ///
         /// @since 12.3
-        uint32_t inline parser_max_container_size()
+        inline uint32_t
+        parser_max_container_size()
         {
             return get_uint32(qpdf_p_parser_max_container_size);
         }
@@ -194,7 +300,8 @@ namespace qpdf::global
         ///               parsing objects to set.
         ///
         /// @since 12.3
-        void inline parser_max_container_size(uint32_t value)
+        inline void
+        parser_max_container_size(uint32_t value)
         {
             set_uint32(qpdf_p_parser_max_container_size, value);
         }
@@ -209,7 +316,8 @@ namespace qpdf::global
         ///         objects.
         ///
         /// @since 12.3
-        uint32_t inline parser_max_container_size_damaged()
+        inline uint32_t
+        parser_max_container_size_damaged()
         {
             return get_uint32(qpdf_p_parser_max_container_size_damaged);
         }
@@ -225,7 +333,8 @@ namespace qpdf::global
         ///               parsing objects to set.
         ///
         /// @since 12.3
-        void inline parser_max_container_size_damaged(uint32_t value)
+        inline void
+        parser_max_container_size_damaged(uint32_t value)
         {
             set_uint32(qpdf_p_parser_max_container_size_damaged, value);
         }
@@ -239,7 +348,8 @@ namespace qpdf::global
         /// @return The maximum number of filters allowed when filtering streams.
         ///
         /// @since 12.3
-        uint32_t inline max_stream_filters()
+        inline uint32_t
+        max_stream_filters()
         {
             return get_uint32(qpdf_p_max_stream_filters);
         }
@@ -253,10 +363,188 @@ namespace qpdf::global
         /// @param value  The maximum number of filters allowed when filtering streams to set.
         ///
         /// @since 12.3
-        void inline max_stream_filters(uint32_t value)
+        inline void
+        max_stream_filters(uint32_t value)
         {
             set_uint32(qpdf_p_max_stream_filters, value);
         }
+
+        /// @brief  Retrieves the maximum amount of memory in bytes allowed for DCT (JPEG)
+        ///         decompression.
+        ///
+        /// Streams requiring memory in excess of the limit for decompression are treated as
+        /// unfilterable. A value of 0 indicates no limit. The default is 0.
+        ///
+        /// @return The configured maximum memory in bytes for DCT decompression.
+        ///
+        /// @since 12.4
+        inline uint32_t
+        dct_max_memory()
+        {
+            return get_uint32(qpdf_p_dct_max_memory);
+        }
+
+        /// @brief  Sets the maximum amount of memory in bytes allowed for DCT (JPEG) decompression.
+        ///
+        /// Streams requiring memory in excess of the limit for decompression are treated as
+        /// unfilterable. A value of 0 indicates no limit. The default is 0.
+        ///
+        /// @param val The maximum memory in bytes to allow for DCT decompression.
+        ///
+        /// @since 12.4
+        inline void
+        dct_max_memory(uint32_t val)
+        {
+            set_uint32(qpdf_p_dct_max_memory, val);
+        }
+
+        /// @brief  Retrieves the maximum number of progressive scans allowed for DCT (JPEG)
+        ///         decompression.
+        ///
+        /// Streams exceeding the limit are treated as unfilterable. A value of 0 indicates no
+        /// limit. The default is 0.
+        ///
+        /// @return The configured maximum progressive scans for DCT decompression.
+        ///
+        /// @since 12.4
+        inline uint32_t
+        dct_max_progressive_scans()
+        {
+            return get_uint32(qpdf_p_dct_max_progressive_scans);
+        }
+
+        /// @brief  Sets the maximum number of progressive scans allowed for DCT (JPEG)
+        ///         decompression.
+        ///
+        /// Streams exceeding the limit are treated as unfilterable. A value of 0 indicates no
+        /// limit. The default is 0.
+        ///
+        /// @param val The maximum progressive scans to allow for DCT operations.
+        ///
+        /// @since 12.4
+        inline void
+        dct_max_progressive_scans(uint32_t val)
+        {
+            set_uint32(qpdf_p_dct_max_progressive_scans, val);
+        }
+
+        /// @brief  Retrieves the maximum amount of memory in bytes allowed for Flate (zlib)
+        ///         decompression/processing.
+        ///
+        /// Streams requiring memory in excess of the limit for Flate processing are treated as
+        /// unfilterable. A value of 0 indicates no limit. The default is 0.
+        ///
+        /// @return The configured maximum memory in bytes for Flate processing.
+        ///
+        /// @since 12.4
+        inline uint32_t
+        flate_max_memory()
+        {
+            return get_uint32(qpdf_p_flate_max_memory);
+        }
+
+        /// @brief  Sets the maximum amount of memory in bytes allowed for Flate (zlib)
+        ///         decompression/processing.
+        ///
+        /// Streams requiring memory in excess of the limit for processing are treated as
+        /// unfilterable. A value of 0 indicates no limit. The default is 0.
+        ///
+        /// @param val The maximum memory in bytes to allow for Flate processing.
+        ///
+        /// @since 12.4
+        inline void
+        flate_max_memory(uint32_t val)
+        {
+            set_uint32(qpdf_p_flate_max_memory, val);
+        }
+
+        /// @brief  Retrieves the maximum amount of memory in bytes allowed for PNG filter
+        ///         processing.
+        ///
+        /// Streams requiring memory in excess of the limit are treated as unfilterable. A value of
+        /// 0 indicates no limit. The default is 0.
+        ///
+        /// @return The configured maximum memory in bytes for PNG processing.
+        ///
+        /// @since 12.4
+        inline uint32_t
+        png_max_memory()
+        {
+            return get_uint32(qpdf_p_png_max_memory);
+        }
+
+        /// @brief  Sets the maximum amount of memory in bytes allowed for PNG filter processing.
+        ///
+        /// Streams requiring memory in excess of the limit are treated as unfilterable. A value of
+        /// 0 indicates no limit. The default is 0.
+        ///
+        /// @param val The maximum memory in bytes to allow for PNG processing.
+        ///
+        /// @since 12.4
+        inline void
+        png_max_memory(uint32_t val)
+        {
+            set_uint32(qpdf_p_png_max_memory, val);
+        }
+
+        /// @brief  Retrieves the maximum amount of memory in bytes allowed for RunLength
+        ///         decoding/processing.
+        ///
+        /// Streams requiring memory in excess of the limit for run-length processing are treated
+        /// as unfilterable. A value of 0 indicates no limit. The default is 0.
+        ///
+        /// @return The configured maximum memory in bytes for run-length processing.
+        ///
+        /// @since 12.4
+        inline uint32_t
+        run_length_max_memory()
+        {
+            return get_uint32(qpdf_p_run_length_max_memory);
+        }
+
+        /// @brief  Sets the maximum amount of memory in bytes allowed for RunLength
+        ///         decoding/processing.
+        ///
+        /// Streams requiring memory in excess of the limit for processing are treated as
+        /// unfilterable. A value of 0 indicates no limit. The default is 0.
+        ///
+        /// @param val The maximum memory in bytes to allow for run-length processing.
+        ///
+        /// @since 12.4
+        inline void
+        run_length_max_memory(uint32_t val)
+        {
+            set_uint32(qpdf_p_run_length_max_memory, val);
+        }
+
+        /// @brief  Retrieves the maximum amount of memory in bytes allowed for TIFF processing.
+        ///
+        /// Streams requiring memory in excess of the limit for TIFF processing are treated as
+        /// unfilterable. A value of 0 indicates no limit. The default is 0.
+        ///
+        /// @return The configured maximum memory in bytes for TIFF processing.
+        ///
+        /// @since 12.4
+        inline uint32_t
+        tiff_max_memory()
+        {
+            return get_uint32(qpdf_p_tiff_max_memory);
+        }
+
+        /// @brief  Sets the maximum amount of memory in bytes allowed for TIFF processing.
+        ///
+        /// Streams requiring memory in excess of the limit for processing are treated as
+        /// unfilterable. A value of 0 indicates no limit. The default is 0.
+        ///
+        /// @param val The maximum memory in bytes to allow for TIFF processing.
+        ///
+        /// @since 12.4
+        inline void
+        tiff_max_memory(uint32_t val)
+        {
+            set_uint32(qpdf_p_tiff_max_memory, val);
+        }
+
     } // namespace limits
 
 } // namespace qpdf::global
