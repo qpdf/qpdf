@@ -20,9 +20,9 @@ Pl_TIFFPredictor::Pl_TIFFPredictor(
     char const* identifier,
     Pipeline* next,
     action_e action,
-    unsigned int columns,
-    unsigned int samples_per_pixel,
-    unsigned int bits_per_sample) :
+    uint32_t columns,
+    uint32_t samples_per_pixel,
+    uint32_t bits_per_sample) :
     Pipeline(identifier, next),
     action(action),
     columns(columns),
@@ -35,12 +35,17 @@ Pl_TIFFPredictor::Pl_TIFFPredictor(
     util::no_ci_rt_error_if(
         bits_per_sample < 1 || bits_per_sample > (8 * (sizeof(unsigned long long))),
         "TIFFPredictor created with invalid bits_per_sample");
-    unsigned long long bpr = ((columns * bits_per_sample * samples_per_pixel) + 7) / 8;
+    auto bits_per_pixel = 1ULL * bits_per_sample * samples_per_pixel;
     util::no_ci_rt_error_if(
-        bpr == 0 || bpr > (UINT_MAX - 1), "TIFFPredictor created with invalid columns value");
+        !util::fits<uint32_t>(bits_per_pixel + 7),
+        "TIFFPredictor created with bits_per_sample and samples_per_pixel values that cause "
+        "overflow");
+    auto bpr = (columns * bits_per_pixel + 7) / 8;
     util::no_ci_rt_error_if(
-        memory_limit > 0 && bpr > (memory_limit / 2U), "TIFFPredictor memory limit exceeded");
-    this->bytes_per_row = bpr & UINT_MAX;
+        bpr == 0 || !util::fits<uint32_t>(bpr), "TIFFPredictor created with invalid columns value");
+    util::no_ci_rt_error_if(
+        memory_limit > 0 && bpr > (memory_limit / 2ULL), "TIFFPredictor memory limit exceeded");
+    bytes_per_row = static_cast<uint32_t>(bpr);
 }
 
 void
@@ -77,7 +82,7 @@ Pl_TIFFPredictor::processRow()
     if (bits_per_sample != 8) {
         BitWriter bw(next());
         BitStream in(cur_row.data(), cur_row.size());
-        for (unsigned int col = 0; col < this->columns; ++col) {
+        for (uint32_t col = 0; col < this->columns; ++col) {
             for (auto& prev: previous) {
                 long long sample = in.getBitsSigned(this->bits_per_sample);
                 long long new_sample = sample;

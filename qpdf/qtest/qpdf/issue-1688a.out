@@ -1,0 +1,3 @@
+WARNING: issue-1688a.pdf, stream object 4 0: error while getting stream data: TIFFPredictor created with bits_per_sample and samples_per_pixel values that cause overflow
+WARNING: issue-1688a.pdf, stream object 4 0: qpdf will attempt to write the damaged stream unchanged
+qpdf: operation succeeded with warnings; resulting file may have some problems
