@@ -24,17 +24,17 @@ jobs:
       - name: 'Run pre-build steps'
         run: build-scripts/prebuild ${{ secrets.GITHUB_TOKEN }}
       - name: 'Upload documentation for later build steps'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: doc
           path: doc.zip
       - name: 'Upload external libs'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: external-libs
           path: external-libs-dist
       - name: 'Upload doc distribution'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: distribution-prebuild
           path: distribution
@@ -45,7 +45,7 @@ jobs:
       - name: 'Generate, build, and test'
         run: build-scripts/build-linux
       - name: Upload distribution
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: distribution-linux
           path: distribution
@@ -77,7 +77,7 @@ jobs:
         shell: cmd
         run: build-scripts/build-windows.bat ${{ matrix.wordsize }} ${{ matrix.tool }}
       - name: 'Upload binary distributions'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: distribution-windows-${{ matrix.wordsize }}-${{ matrix.tool }}
           path: distribution
@@ -96,7 +96,7 @@ jobs:
       - name: 'Build AppImage'
         run: build-scripts/build-appimage
       - name: 'Upload AppImage'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: distribution-appimage
           path: distribution
@@ -173,7 +173,7 @@ jobs:
        - AppImage
      steps:
        - name: Merge Artifacts
-         uses: actions/upload-artifact/merge@v4
+         uses: actions/upload-artifact/merge@v7
          with:
            name: distribution
            pattern: distribution-*
