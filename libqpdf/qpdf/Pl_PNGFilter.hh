@@ -3,6 +3,8 @@
 
 #include <qpdf/Pipeline.hh>
 
+#include <cstdint>
+
 // This pipeline applies or reverses the application of a PNG filter as described in the PNG
 // specification.
 //
@@ -18,9 +20,9 @@ class Pl_PNGFilter final: public Pipeline
         char const* identifier,
         Pipeline* next,
         action_e action,
-        unsigned int columns,
-        unsigned int samples_per_pixel = 1,
-        unsigned int bits_per_sample = 8);
+        uint32_t columns,
+        uint32_t samples_per_pixel = 1,
+        uint32_t bits_per_sample = 8);
     ~Pl_PNGFilter() final = default;
 
     // Limit the memory used.
@@ -41,8 +43,8 @@ class Pl_PNGFilter final: public Pipeline
     int PaethPredictor(int a, int b, int c);
 
     action_e action;
-    unsigned int bytes_per_row;
-    unsigned int bytes_per_pixel;
+    uint32_t bytes_per_row;
+    uint32_t bytes_per_pixel;
     unsigned char* cur_row{nullptr};  // points to buf1 or buf2
     unsigned char* prev_row{nullptr}; // points to buf1 or buf2
     std::shared_ptr<unsigned char> buf1;

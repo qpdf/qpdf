@@ -1,13 +1,11 @@
 #include <qpdf/Pl_PNGFilter.hh>
 
-#include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/Util.hh>
 #include <qpdf/global_private.hh>
 
 #include <climits>
 #include <cstring>
-#include <stdexcept>
 
 using namespace qpdf;
 
@@ -26,9 +24,9 @@ Pl_PNGFilter::Pl_PNGFilter(
     char const* identifier,
     Pipeline* next,
     action_e action,
-    unsigned int columns,
-    unsigned int samples_per_pixel,
-    unsigned int bits_per_sample) :
+    uint32_t columns,
+    uint32_t samples_per_pixel,
+    uint32_t bits_per_sample) :
     Pipeline(identifier, next),
     action(action)
 {
@@ -39,13 +37,17 @@ Pl_PNGFilter::Pl_PNGFilter(
         !(bits_per_sample == 1 || bits_per_sample == 2 || bits_per_sample == 4 ||
           bits_per_sample == 8 || bits_per_sample == 16),
         "PNGFilter created with invalid bits_per_sample not 1, 2, 4, 8, or 16");
-    bytes_per_pixel = ((bits_per_sample * samples_per_pixel) + 7) / 8;
-    unsigned long long bpr = ((columns * bits_per_sample * samples_per_pixel) + 7) / 8;
+    auto bits_per_pixel = 1ULL * bits_per_sample * samples_per_pixel;
     util::no_ci_rt_error_if(
-        bpr == 0 || bpr > (UINT_MAX - 1), "PNGFilter created with invalid columns value");
+        !util::fits<uint32_t>(bits_per_pixel + 7),
+        "PNGFilter created with bits_per_sample and samples_per_pixel values that cause overflow");
+    bytes_per_pixel = static_cast<uint32_t>((bits_per_pixel + 7) / 8);
+    auto bpr = ((columns * bits_per_pixel) + 7) / 8;
+    util::no_ci_rt_error_if(
+        bpr == 0 || !util::fits<uint32_t>(bpr), "PNGFilter created with invalid columns value");
     util::no_ci_rt_error_if(
         memory_limit > 0 && bpr > (memory_limit / 2U), "PNGFilter memory limit exceeded");
-    bytes_per_row = bpr & UINT_MAX;
+    bytes_per_row = static_cast<uint32_t>(bpr);
     buf1 = QUtil::make_shared_array<unsigned char>(bytes_per_row + 1);
     buf2 = QUtil::make_shared_array<unsigned char>(bytes_per_row + 1);
     memset(buf1.get(), 0, bytes_per_row + 1);
@@ -132,7 +134,6 @@ Pl_PNGFilter::decodeRow()
 void
 Pl_PNGFilter::decodeSub()
 {
-    QTC::TC("libtests", "Pl_PNGFilter decodeSub");
     unsigned char* buffer = cur_row + 1;
     unsigned int bpp = bytes_per_pixel;
 
@@ -150,7 +151,6 @@ Pl_PNGFilter::decodeSub()
 void
 Pl_PNGFilter::decodeUp()
 {
-    QTC::TC("libtests", "Pl_PNGFilter decodeUp");
     unsigned char* buffer = cur_row + 1;
     unsigned char* above_buffer = prev_row + 1;
 
@@ -163,10 +163,9 @@ Pl_PNGFilter::decodeUp()
 void
 Pl_PNGFilter::decodeAverage()
 {
-    QTC::TC("libtests", "Pl_PNGFilter decodeAverage");
     unsigned char* buffer = cur_row + 1;
     unsigned char* above_buffer = prev_row + 1;
-    unsigned int bpp = bytes_per_pixel;
+    auto bpp = bytes_per_pixel;
 
     for (unsigned int i = 0; i < bytes_per_row; ++i) {
         int left = 0;
@@ -184,10 +183,9 @@ Pl_PNGFilter::decodeAverage()
 void
 Pl_PNGFilter::decodePaeth()
 {
-    QTC::TC("libtests", "Pl_PNGFilter decodePaeth");
     unsigned char* buffer = cur_row + 1;
     unsigned char* above_buffer = prev_row + 1;
-    unsigned int bpp = bytes_per_pixel;
+    auto bpp = bytes_per_pixel;
 
     for (unsigned int i = 0; i < bytes_per_row; ++i) {
         int left = 0;

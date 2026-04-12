@@ -17,9 +17,9 @@ class Pl_TIFFPredictor: public Pipeline
         char const* identifier,
         Pipeline* next,
         action_e action,
-        unsigned int columns,
-        unsigned int samples_per_pixel = 1,
-        unsigned int bits_per_sample = 8);
+        uint32_t columns,
+        uint32_t samples_per_pixel = 1,
+        uint32_t bits_per_sample = 8);
     ~Pl_TIFFPredictor() override = default;
 
     // Limit the memory used.
@@ -33,10 +33,10 @@ class Pl_TIFFPredictor: public Pipeline
     void processRow();
 
     action_e action;
-    unsigned int columns;
-    unsigned int bytes_per_row;
-    unsigned int samples_per_pixel;
-    unsigned int bits_per_sample;
+    uint32_t columns;
+    uint32_t bytes_per_row;
+    uint32_t samples_per_pixel;
+    uint32_t bits_per_sample;
     std::vector<unsigned char> cur_row;
     std::vector<long long> previous;
     std::vector<unsigned char> out;

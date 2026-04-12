@@ -40,6 +40,8 @@ my @bug_tests = (
     ["335b", "ozz-fuzz-14845", 2],
     ["1503", "linearize with bad outlines", 3, "--linearize"],
     ["fuzz-16214", "stream in object stream", 3, "--preserve-unreferenced"],
+    ["1688a", "TIFF int overflow", 3, "--recompress-flate"],
+    ["1688b", "PNG int overflow", 3, "--recompress-flate"],
     # When adding to this list, consider adding to CORPUS_FROM_TEST in
     # fuzz/CMakeLists.txt and updating the count in
     # fuzz/qtest/fuzz.test.
