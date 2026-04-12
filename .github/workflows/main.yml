@@ -141,7 +141,7 @@ jobs:
             echo "override_branch=" >> $GITHUB_OUTPUT
           fi
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           override_branch: ${{ steps.set_branch.outputs.override_branch }}
