@@ -64,12 +64,12 @@ jobs:
         run: git config --global core.autocrlf input
       - uses: actions/checkout@v4
       - name: 'Download documentation'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: doc
           path: .
       - name: 'Download external libs'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: external-libs
           path: .
