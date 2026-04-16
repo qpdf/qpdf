@@ -139,6 +139,12 @@ struct QPDFJob::PageLabelSpec
     std::string prefix;
 };
 
+struct QPDFJob::OutputSpec
+{
+    std::string filename;
+    std::string page_range;
+};
+
 class QPDFJob::Members
 {
     friend class QPDFJob;
@@ -263,6 +269,8 @@ class QPDFJob::Members
     bool check_requires_password{false};
     bool empty_input{false};
     std::string outfilename;
+    std::vector<OutputSpec> output_specs;
+    int multi_output_threads{1};
     bool json_input{false};
     bool json_output{false};
     std::string update_from_json;

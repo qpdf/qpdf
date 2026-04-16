@@ -1555,6 +1555,60 @@ Related Options
    if you don't require the document-level data. A future version of
    qpdf may support preservation of some document-level information.
 
+.. qpdf:option:: --multi-output page-ranges
+
+   .. help: write page groups to separate output files
+
+      Write specified page groups to separate output files. The argument
+      is a semicolon-separated list of page ranges, where each range
+      produces one output file. Output file names are generated from
+      the output file pattern using the same rules as --split-pages.
+      Each page range uses the same syntax as --pages.
+      Example: --multi-output "1-3;4-6;7-9" output-%d.pdf
+
+   Write specified page groups to separate output files. The argument
+   is a semicolon-separated list of page ranges, where each range
+   produces one output file. Page ranges use qpdf's standard page
+   range syntax (see :ref:`page-ranges`).
+
+   Output file names are generated from the specified output file using
+   the same rules as :qpdf:ref:`--split-pages`:
+
+   - If the string ``%d`` appears in the output file name, it is
+     replaced with a zero-padded output number starting from 1.
+
+   - Otherwise, if the output file name ends in :file:`.pdf` (case
+     insensitive), a zero-padded output number, preceded by a dash, is
+     inserted before the file extension.
+
+   - Otherwise, the file name is appended with a zero-padded output
+     number preceded by a dash.
+
+   Example: ``qpdf infile.pdf --multi-output "1-3;4-6;7-9" out-%d.pdf``
+   produces :file:`out-1.pdf` (pages 1--3), :file:`out-2.pdf` (pages
+   4--6), and :file:`out-3.pdf` (pages 7--9).
+
+   This is more efficient than running qpdf multiple times because the
+   input PDF is only read and parsed once.
+
+   This option may not be used with :qpdf:ref:`--split-pages`,
+   :qpdf:ref:`--replace-input`, or :qpdf:ref:`--copy-encryption`.
+
+.. qpdf:option:: --multi-output-threads count
+
+   .. help: set thread count for multi-output writing
+
+      Set the number of threads used for writing multi-output files.
+      Default is 1 (sequential). Use 0 for automatic detection based
+      on available CPU cores. Requires --multi-output.
+
+   Set the number of threads used for writing output files when using
+   :qpdf:ref:`--multi-output`. The default is ``1``, which writes files
+   sequentially. Use ``0`` to automatically detect the number of
+   available CPU cores. When using multiple threads, stream data is
+   copied into memory during preparation so that each output file can
+   be written independently.
+
 .. qpdf:option:: --overlay file [options] --
 
    .. help: begin overlay options

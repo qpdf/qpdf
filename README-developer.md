@@ -931,4 +931,53 @@ that clang-format produces several results. (In git this is commit
 The commits that have the bulk of automatic or mechanical reformatting are
 listed in .git-blame-ignore-revs. Any new bulk updates should be added there.
 
+
+## Fork-Specific Features
+
+This fork (IvanMicai/qpdf) includes features beyond upstream qpdf. Each fork
+feature should be documented here with implementation notes for future maintainers.
+
+### --multi-output
+
+User-facing documentation: see [docs/USAGE_MULTI_OUTPUT.md](docs/USAGE_MULTI_OUTPUT.md).
+
+Implementation notes:
+
+- `QPDFJob::doMultiOutput` (`libqpdf/QPDFJob.cc`) — main logic, two-phase
+  design:
+  1. **Single-threaded preparation:** parse input, create output QPDFs,
+     copy pages via `copyForeignObject`, fix AcroForm annotations, copy page
+     labels.
+  2. **Multi-threaded writing** (when `--multi-output-threads > 1`): each
+     worker thread picks up an output QPDF and writes it with its own
+     `QPDFWriter` instance. Uses an atomic counter for work distribution.
+
+- `QPDFJob::setWriterOptionsThreadSafe` (`libqpdf/QPDFJob.cc`) — a subset
+  of `setWriterOptions` that omits global state modifications, because
+  `Pl_Flate::setCompressionLevel` is process-global and is set once before
+  spawning threads.
+
+- Thread safety strategy: when threads > 1, `QPDF::setImmediateCopyFrom(true)`
+  is called on the source QPDF. This copies stream data to RAM during the
+  preparation phase so each output QPDF is fully independent of the source.
+  Without this, `QPDFWriter::write()` could read stream data from the source
+  file lazily, which is not safe across threads.
+
+- Constraints (validated in `checkConfiguration`): mutually exclusive with
+  `--split-pages`, `--replace-input`, `--copy-encryption`, writing to stdout
+  (`-`), and `--json` output. Compatible with `--pages`, `--encrypt`, and all
+  transformation options.
+
+- Data structures: `QPDFJob::OutputSpec` struct in `QPDFJob_private.hh` stores
+  filename + page range per output. `Members::output_specs` holds the vector
+  of specs. `Members::multi_output_threads` holds the thread count.
+
+- Config API: `Config::multiOutput(string)` parses the semicolon-separated
+  ranges and populates `output_specs`. `Config::multiOutputThreads(string)`
+  parses the thread count.
+
+- JSON job: `multiOutput` and `multiOutputThreads` keys are registered via
+  `job.yml` (simple string parameters — the auto-generated handlers just
+  forward to the Config methods).
+
 [//]: # (cSpell:ignore pikepdfs readthedocsorg dgenerate .)

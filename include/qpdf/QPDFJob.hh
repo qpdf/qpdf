@@ -439,6 +439,7 @@ class QPDFJob
     struct RotationSpec;
     struct UnderOverlay;
     struct PageLabelSpec;
+    struct OutputSpec;
 
     enum password_mode_e { pm_bytes, pm_hex_bytes, pm_unicode, pm_auto };
 
@@ -507,7 +508,9 @@ class QPDFJob
 
     // Output generation
     void doSplitPages(QPDF& pdf);
+    void doMultiOutput(QPDF& pdf);
     void setWriterOptions(qpdf::Writer&);
+    void setWriterOptionsThreadSafe(qpdf::Writer&);
     void setEncryptionOptions(QPDFWriter&);
     void maybeFixWritePassword(int R, std::string& password);
     void writeOutfile(QPDF& pdf);

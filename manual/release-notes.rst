@@ -13,6 +13,25 @@ more detail.
 
 .. x.y.z: not yet released
 
+Fork additions (IvanMicai/qpdf)
+  - New features
+
+    - Add ``--multi-output`` option to write multiple page groups
+      to separate files in a single qpdf invocation. Page ranges are
+      specified as a semicolon-separated list (e.g. ``"1-3;4-6;7-9"``).
+      Output file naming follows the same pattern as
+      ``--split-pages``. This avoids the overhead of re-parsing
+      the input PDF for each output when extracting multiple page ranges.
+
+    - Add ``--multi-output-threads`` to enable parallel writing
+      of multi-output files. Set to ``0`` for auto-detection based on
+      hardware concurrency, ``1`` for sequential (default), or ``N``
+      for explicit thread count. Uses ``QPDF::setImmediateCopyFrom`` to
+      ensure each output PDF is fully independent before parallel writes.
+
+    - Add ``Dockerfile.dev`` for building qpdf in an Ubuntu 22.04 container
+      for development and testing.
+
 12.3.3: not yet released
   - Bug fixes
 

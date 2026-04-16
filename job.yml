@@ -193,6 +193,8 @@ options:
       json-object: trailer
       keep-files-open-threshold: count
       min-version: version
+      multi-output: page-ranges
+      multi-output-threads: count
       oi-min-area: minimum
       oi-min-height: minimum
       oi-min-width: minimum
@@ -383,6 +385,8 @@ json:
   force-version:
   progress:
   split-pages:
+  multi-output:
+  multi-output-threads:
   json-output:
   remove-restrictions:
   encrypt:

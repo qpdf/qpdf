@@ -1,8 +1,10 @@
 #include <qpdf/QPDFJob_private.hh>
 
+#include <atomic>
 #include <cstring>
 #include <iostream>
 #include <memory>
+#include <thread>
 
 #include <qpdf/AcroForm.hh>
 #include <qpdf/ClosedFileInputSource.hh>
@@ -473,6 +475,8 @@ QPDFJob::writeQPDF(QPDF& pdf)
     }
     if (!createsOutput()) {
         doInspection(pdf);
+    } else if (!m->output_specs.empty()) {
+        doMultiOutput(pdf);
     } else if (m->split_pages) {
         doSplitPages(pdf);
     } else {
@@ -521,7 +525,7 @@ QPDFJob::hasWarnings() const
 bool
 QPDFJob::createsOutput() const
 {
-    return (!m->outfilename.empty() || m->replace_input);
+    return (!m->outfilename.empty() || m->replace_input || !m->output_specs.empty());
 }
 
 int
@@ -574,6 +578,28 @@ QPDFJob::checkConfiguration()
             usage("--json may not be used with --replace-input");
         }
     }
+    if (!m->output_specs.empty()) {
+        if (m->outfilename.empty()) {
+            usage("--multi-output requires an output file pattern");
+        }
+        if (m->split_pages) {
+            usage("--split-pages may not be used with --multi-output");
+        }
+        if (m->replace_input) {
+            usage("--replace-input may not be used with --multi-output");
+        }
+        if (m->json_version) {
+            usage("JSON output may not be used with --multi-output");
+        }
+        if (m->copy_encryption) {
+            usage("--copy-encryption may not be used with --multi-output");
+        }
+        for (auto const& spec : m->output_specs) {
+            if (spec.page_range.empty()) {
+                usage("each output group in --multi-output must have a page range");
+            }
+        }
+    }
     if (m->json_version && m->outfilename.empty()) {
         // The output file is optional with --json for backward compatibility and defaults to
         // standard output.
@@ -613,6 +639,9 @@ QPDFJob::checkConfiguration()
         if (m->split_pages) {
             usage("--split-pages may not be used when writing to standard output");
         }
+        if (!m->output_specs.empty()) {
+            usage("--multi-output may not be used when writing to standard output");
+        }
         save_to_stdout = true;
     }
     if (!m->attachment_to_show.empty()) {
@@ -621,7 +650,8 @@ QPDFJob::checkConfiguration()
     if (save_to_stdout) {
         m->log->saveToStandardOutput(true);
     }
-    if (!m->split_pages && QUtil::same_file(m->infile_nm(), m->outfilename.data())) {
+    if (!m->split_pages && m->output_specs.empty() &&
+        QUtil::same_file(m->infile_nm(), m->outfilename.data())) {
         usage(
             "input file and output file are the same; use --replace-input to intentionally "
             "overwrite the input file");
@@ -3033,6 +3063,217 @@ QPDFJob::doSplitPages(QPDF& pdf)
         doIfVerbose([&](Pipeline& v, std::string const& prefix) {
             v << prefix << ": wrote file " << outfile << "\n";
         });
+    }
+}
+
+void
+QPDFJob::doMultiOutput(QPDF& pdf)
+{
+    auto& doc = pdf.doc();
+
+    // Generate filenames from the output pattern (same rules as split-pages)
+    std::string before;
+    std::string after;
+    size_t len = m->outfilename.size();
+    auto num_spot = m->outfilename.find("%d");
+    if (num_spot != std::string::npos) {
+        before = m->outfilename.substr(0, num_spot);
+        after = m->outfilename.substr(num_spot + 2);
+    } else if (
+        len >= 4 && QUtil::str_compare_nocase(m->outfilename.substr(len - 4).data(), ".pdf") == 0) {
+        before = std::string(m->outfilename.data(), len - 4) + "-";
+        after = m->outfilename.data() + len - 4;
+    } else {
+        before = m->outfilename + "-";
+    }
+
+    size_t n_outputs = m->output_specs.size();
+    size_t idx_len = std::to_string(n_outputs).length();
+    for (size_t i = 0; i < n_outputs; ++i) {
+        m->output_specs[i].filename =
+            before + QUtil::uint_to_string(i + 1, QIntC::to_int(idx_len)) + after;
+    }
+
+    for (auto const& spec : m->output_specs) {
+        if (QUtil::same_file(m->infile_nm(), spec.filename.data())) {
+            throw std::runtime_error(
+                "multi-output would overwrite input file with " + spec.filename);
+        }
+    }
+
+    if (shouldRemoveUnreferencedResources(pdf)) {
+        QPDFPageDocumentHelper dh(pdf);
+        dh.removeUnreferencedResources();
+    }
+
+    auto& pldh = doc.page_labels();
+    auto& afdh = doc.acroform();
+    std::vector<QPDFObjectHandle> const& pages = doc.pages().all();
+    int num_pages = static_cast<int>(pages.size());
+
+    // Determine effective thread count
+    int n_threads = m->multi_output_threads;
+    if (n_threads == 0) {
+        n_threads = static_cast<int>(std::thread::hardware_concurrency());
+        if (n_threads < 1) {
+            n_threads = 1;
+        }
+    }
+    if (n_threads > static_cast<int>(n_outputs)) {
+        n_threads = static_cast<int>(n_outputs);
+    }
+    bool use_threads = (n_threads > 1);
+
+    // When using threads, enable immediate copy so each output QPDF is fully independent
+    if (use_threads) {
+        pdf.setImmediateCopyFrom(true);
+    }
+
+    // Set compression level before spawning threads (it's a global static)
+    if (m->compression_level >= 0) {
+        Pl_Flate::setCompressionLevel(m->compression_level);
+    }
+
+    // ── Phase 1: Preparation (single-threaded) ──
+    // Create all output QPDFs and copy pages from the source.
+
+    struct OutputBundle {
+        std::unique_ptr<QPDF> outpdf;
+        std::string filename;
+    };
+    std::vector<OutputBundle> bundles;
+    bundles.reserve(n_outputs);
+
+    for (auto const& spec : m->output_specs) {
+        std::vector<int> page_indices = parseNumrange(spec.page_range.c_str(), num_pages);
+
+        auto outpdf = std::make_unique<QPDF>();
+        outpdf->doc().config(m->d_cfg);
+        outpdf->emptyPDF();
+        impl::AcroForm* out_afdh = afdh.hasAcroForm() ? &outpdf->doc().acroform() : nullptr;
+
+        for (int pageno : page_indices) {
+            QPDFObjectHandle page = pages.at(pageno - 1);
+            outpdf->addPage(page, false);
+            auto new_page = added_page(*outpdf, page);
+            if (out_afdh) {
+                try {
+                    out_afdh->fixCopiedAnnotations(new_page, page, afdh);
+                } catch (std::exception& e) {
+                    pdf.warn(
+                        qpdf_e_damaged_pdf,
+                        "",
+                        0,
+                        ("Exception caught while fixing copied annotations. This may be a qpdf "
+                         "bug." +
+                         std::string("Exception: ") + e.what()));
+                }
+            }
+        }
+
+        if (pldh.hasPageLabels()) {
+            std::vector<QPDFObjectHandle> labels;
+            int out_pageno = 0;
+            for (int pageno : page_indices) {
+                pldh.getLabelsForPageRange(
+                    QIntC::to_longlong(pageno - 1),
+                    QIntC::to_longlong(pageno - 1),
+                    out_pageno++,
+                    labels);
+            }
+            QPDFObjectHandle page_labels = QPDFObjectHandle::newDictionary();
+            page_labels.replaceKey("/Nums", QPDFObjectHandle::newArray(labels));
+            outpdf->getRoot().replaceKey("/PageLabels", page_labels);
+        }
+
+        bundles.push_back({std::move(outpdf), spec.filename});
+    }
+
+    // ── Phase 2: Write (possibly parallel) ──
+    // Each bundle is fully independent — safe for concurrent threads.
+
+    if (!use_threads) {
+        for (auto& bundle : bundles) {
+            Writer w(*bundle.outpdf, m->w_cfg);
+            w.setOutputFilename(bundle.filename.data());
+            setWriterOptions(w);
+            w.write();
+            doIfVerbose([&](Pipeline& v, std::string const& prefix) {
+                v << prefix << ": wrote file " << bundle.filename << "\n";
+            });
+        }
+    } else {
+        std::vector<std::thread> threads;
+        std::vector<std::exception_ptr> errors(bundles.size());
+        std::atomic<size_t> next_idx{0};
+
+        auto worker = [&]() {
+            while (true) {
+                size_t idx = next_idx.fetch_add(1);
+                if (idx >= bundles.size()) {
+                    break;
+                }
+                try {
+                    auto& bundle = bundles[idx];
+                    Writer w(*bundle.outpdf, m->w_cfg);
+                    w.setOutputFilename(bundle.filename.data());
+                    setWriterOptionsThreadSafe(w);
+                    w.write();
+                } catch (...) {
+                    errors[idx] = std::current_exception();
+                }
+            }
+        };
+
+        for (int i = 1; i < n_threads; ++i) {
+            threads.emplace_back(worker);
+        }
+        worker();
+
+        for (auto& t : threads) {
+            t.join();
+        }
+
+        for (auto& bundle : bundles) {
+            doIfVerbose([&](Pipeline& v, std::string const& prefix) {
+                v << prefix << ": wrote file " << bundle.filename << "\n";
+            });
+        }
+
+        for (auto& ep : errors) {
+            if (ep) {
+                std::rethrow_exception(ep);
+            }
+        }
+    }
+}
+
+void
+QPDFJob::setWriterOptionsThreadSafe(Writer& w)
+{
+    // compression_level is already set globally before threads are spawned.
+    // copy_encryption is not supported with multi-output (validated in checkConfiguration).
+    if (m->decrypt) {
+        w.setPreserveEncryption(false);
+    }
+    if (m->static_aes_iv) {
+        w.setStaticAesIV(true);
+    }
+    if (m->encrypt) {
+        setEncryptionOptions(w);
+    }
+    w.setMinimumPDFVersion(m->max_input_version);
+    if (!m->min_version.empty()) {
+        std::string version;
+        int extension_level = 0;
+        parse_version(m->min_version, version, extension_level);
+        w.setMinimumPDFVersion(version, extension_level);
+    }
+    if (!m->force_version.empty()) {
+        std::string version;
+        int extension_level = 0;
+        parse_version(m->force_version, version, extension_level);
+        w.forcePDFVersion(version, extension_level);
     }
 }
 

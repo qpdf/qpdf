@@ -689,6 +689,43 @@ QPDFJob::Config::splitPages(std::string const& parameter)
 }
 
 QPDFJob::Config*
+QPDFJob::Config::multiOutput(std::string const& parameter)
+{
+    if (parameter.empty()) {
+        usage("--multi-output requires page range groups separated by ';'");
+    }
+    std::vector<std::string> ranges;
+    std::string current;
+    for (char c : parameter) {
+        if (c == ';') {
+            if (!current.empty()) {
+                ranges.push_back(current);
+                current.clear();
+            }
+        } else {
+            current += c;
+        }
+    }
+    if (!current.empty()) {
+        ranges.push_back(current);
+    }
+    if (ranges.empty()) {
+        usage("--multi-output requires at least one page range group");
+    }
+    for (auto& range : ranges) {
+        o.m->output_specs.push_back({"", range});
+    }
+    return this;
+}
+
+QPDFJob::Config*
+QPDFJob::Config::multiOutputThreads(std::string const& parameter)
+{
+    o.m->multi_output_threads = QUtil::string_to_int(parameter.c_str());
+    return this;
+}
+
+QPDFJob::Config*
 QPDFJob::Config::staticAesIv()
 {
     o.m->static_aes_iv = true;

@@ -475,6 +475,23 @@ preceded by a dash.
 Page ranges are single page numbers for single-page groups or first-last
 for multi-page groups.
 .TP
+.B --multi-output \-\- write page groups to separate output files
+--multi-output page-ranges
+
+Write specified page groups to separate output files. The argument
+is a semicolon-separated list of page ranges, where each range
+produces one output file. Output file names are generated from
+the output file pattern using the same rules as --split-pages.
+Each page range uses the same syntax as --pages.
+Example: --multi-output "1-3;4-6;7-9" output-%d.pdf
+.TP
+.B --multi-output-threads \-\- set thread count for multi-output writing
+--multi-output-threads count
+
+Set the number of threads used for writing multi-output files.
+Default is 1 (sequential). Use 0 for automatic detection based
+on available CPU cores. Requires --multi-output.
+.TP
 .B --overlay \-\- begin overlay options
 --overlay file [options] --
 
