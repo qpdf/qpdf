@@ -721,7 +721,9 @@ QPDFJob::Config::multiOutput(std::string const& parameter)
 QPDFJob::Config*
 QPDFJob::Config::multiOutputThreads(std::string const& parameter)
 {
-    o.m->multi_output_threads = QUtil::string_to_int(parameter.c_str());
+    o.m->multi_output_threads =
+        to_int("--multi-output-threads", parameter, std::numeric_limits<int>::max(), 0);
+    o.m->multi_output_threads_set = true;
     return this;
 }
 

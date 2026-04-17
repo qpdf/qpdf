@@ -1559,12 +1559,9 @@ Related Options
 
    .. help: write page groups to separate output files
 
-      Write specified page groups to separate output files. The argument
-      is a semicolon-separated list of page ranges, where each range
-      produces one output file. Output file names are generated from
-      the output file pattern using the same rules as --split-pages.
-      Each page range uses the same syntax as --pages.
-      Example: --multi-output "1-3;4-6;7-9" output-%d.pdf
+      Write semicolon-separated page groups to separate output files in
+      a single invocation. See the full option description for file
+      naming rules and compatibility.
 
    Write specified page groups to separate output files. The argument
    is a semicolon-separated list of page ranges, where each range
@@ -1592,7 +1589,8 @@ Related Options
    input PDF is only read and parsed once.
 
    This option may not be used with :qpdf:ref:`--split-pages`,
-   :qpdf:ref:`--replace-input`, or :qpdf:ref:`--copy-encryption`.
+   :qpdf:ref:`--replace-input`, :qpdf:ref:`--copy-encryption`, JSON
+   output, or ``-`` as the output file.
 
 .. qpdf:option:: --multi-output-threads count
 

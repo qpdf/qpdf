@@ -943,19 +943,25 @@ User-facing documentation: see [docs/USAGE_MULTI_OUTPUT.md](docs/USAGE_MULTI_OUT
 
 Implementation notes:
 
-- `QPDFJob::doMultiOutput` (`libqpdf/QPDFJob.cc`) — main logic, two-phase
-  design:
-  1. **Single-threaded preparation:** parse input, create output QPDFs,
-     copy pages via `copyForeignObject`, fix AcroForm annotations, copy page
-     labels.
-  2. **Multi-threaded writing** (when `--multi-output-threads > 1`): each
-     worker thread picks up an output QPDF and writes it with its own
-     `QPDFWriter` instance. Uses an atomic counter for work distribution.
+- `QPDFJob::doMultiOutput` (`libqpdf/QPDFJob.cc`) — main logic, with two
+  execution paths:
+  1. **Sequential** (`--multi-output-threads=1`, default): for each page
+     group, build the output QPDF (add pages from the source and let qpdf
+     copy foreign objects internally, fix AcroForm annotations, copy page
+     labels), write it, and release it. Peak memory is independent of the
+     number of output groups.
+  2. **Threaded** (`--multi-output-threads > 1` or `0` for auto): prepare
+     every output QPDF up front (single-threaded), then a worker pool
+     writes them concurrently. Each worker owns its own `QPDFWriter`
+     instance; work distribution uses an atomic counter.
 
 - `QPDFJob::setWriterOptionsThreadSafe` (`libqpdf/QPDFJob.cc`) — a subset
   of `setWriterOptions` that omits global state modifications, because
   `Pl_Flate::setCompressionLevel` is process-global and is set once before
-  spawning threads.
+  spawning threads. It also assumes encryption passwords have already been
+  normalized via `QPDFJob::normalizeEncryptionPasswords`, which runs once
+  in the single-threaded phase so workers never mutate shared password
+  state.
 
 - Thread safety strategy: when threads > 1, `QPDF::setImmediateCopyFrom(true)`
   is called on the source QPDF. This copies stream data to RAM during the

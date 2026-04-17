@@ -512,6 +512,7 @@ class QPDFJob
     void setWriterOptions(qpdf::Writer&);
     void setWriterOptionsThreadSafe(qpdf::Writer&);
     void setEncryptionOptions(QPDFWriter&);
+    void normalizeEncryptionPasswords();
     void maybeFixWritePassword(int R, std::string& password);
     void writeOutfile(QPDF& pdf);
     void writeJSON(QPDF& pdf);

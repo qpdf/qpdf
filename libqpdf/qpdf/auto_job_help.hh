@@ -370,12 +370,9 @@ for multi-page groups.
 )");
 ap.addOptionHelp("--multi-output", "modification", "write page groups to separate output files", R"(--multi-output page-ranges
 
-Write specified page groups to separate output files. The argument
-is a semicolon-separated list of page ranges, where each range
-produces one output file. Output file names are generated from
-the output file pattern using the same rules as --split-pages.
-Each page range uses the same syntax as --pages.
-Example: --multi-output "1-3;4-6;7-9" output-%d.pdf
+Write semicolon-separated page groups to separate output files in
+a single invocation. See the full option description for file
+naming rules and compatibility.
 )");
 ap.addOptionHelp("--multi-output-threads", "modification", "set thread count for multi-output writing", R"(--multi-output-threads count
 

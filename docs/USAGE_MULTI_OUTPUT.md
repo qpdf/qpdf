@@ -52,8 +52,8 @@ When threading is enabled, stream data is copied into memory during preparation 
 
 ### Memory trade-off
 
-- **Sequential** (`threads=1`, default): minimal memory — one output at a time.
-- **Parallel** (`threads>1`): all outputs exist in memory simultaneously due to `setImmediateCopyFrom(true)`. Use threading for large batches of small outputs or when wall-clock time matters more than memory.
+- **Sequential** (`threads=1`, default): one output is built and written at a time, then released — peak memory is independent of the number of output groups.
+- **Parallel** (`threads>1`): all outputs are prepared in memory via `setImmediateCopyFrom(true)` and then written concurrently. Use threading for large batches of small outputs or when wall-clock time matters more than memory.
 
 ## Compatibility
 
