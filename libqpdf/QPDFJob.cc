@@ -3168,7 +3168,7 @@ QPDFJob::doMultiOutput(QPDF& pdf)
         impl::AcroForm* out_afdh = afdh.hasAcroForm() ? &outpdf->doc().acroform() : nullptr;
 
         for (int pageno : page_indices) {
-            QPDFObjectHandle page = pages.at(pageno - 1);
+            QPDFObjectHandle page = pages.at(QIntC::to_size(pageno - 1));
             outpdf->addPage(page, false);
             auto new_page = added_page(*outpdf, page);
             if (out_afdh) {
