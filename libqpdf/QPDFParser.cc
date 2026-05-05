@@ -66,7 +66,7 @@ Parser::parse(InputSource& input, std::string const& object_description, QPDF* c
     return {QPDFObject::create<QPDF_Null>()};
 }
 
-QPDFObjectHandle
+std::pair<QPDFObjectHandle, bool>
 Parser::parse_content(
     InputSource& input,
     std::shared_ptr<QPDFObject::Description> sp_description,
@@ -85,12 +85,10 @@ Parser::parse_content(
         0,
         0,
         context && context->doc().reconstructed_xref());
-    auto result = p.parse(true);
-    if (result || p.empty_) {
-        // In content stream mode, leave object uninitialized to indicate EOF
-        return result;
+    if (auto result = p.parse(true)) {
+        return {result, false};
     }
-    return {QPDFObject::create<QPDF_Null>()};
+    return {{}, p.empty_};
 }
 
 QPDFObjectHandle

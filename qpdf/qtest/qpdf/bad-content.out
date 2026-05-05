@@ -1,0 +1,172 @@
+WARNING: bad-content.pdf: can't find PDF header
+WARNING: bad-content.pdf: file is damaged
+WARNING: bad-content.pdf: can't find startxref
+WARNING: bad-content.pdf: Attempting to reconstruct cross-reference table
+WARNING: bad-content.pdf (trailer, offset 132224): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (trailer, offset 132228): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (trailer, offset 132233): unexpected )
+WARNING: bad-content.pdf (trailer, offset 132234): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (trailer, offset 132241): treating unexpected brace token as null
+WARNING: bad-content.pdf (trailer, offset 132242): treating unexpected brace token as null
+WARNING: bad-content.pdf (trailer, offset 132243): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (trailer, offset 132246): treating unexpected brace token as null
+WARNING: bad-content.pdf (trailer, offset 132247): treating unexpected brace token as null
+WARNING: bad-content.pdf (trailer, offset 132248): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (trailer, offset 132248): too many errors; giving up on reading object
+WARNING: bad-content.pdf (trailer, offset 132202): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (trailer, offset 132206): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (trailer, offset 132211): unexpected )
+WARNING: bad-content.pdf (trailer, offset 132212): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (trailer, offset 132216): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (trailer, offset 132224): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (trailer, offset 132228): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (trailer, offset 132233): unexpected )
+WARNING: bad-content.pdf (trailer, offset 132234): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (trailer, offset 132241): treating unexpected brace token as null
+WARNING: bad-content.pdf (trailer, offset 132242): treating unexpected brace token as null
+WARNING: bad-content.pdf (trailer, offset 132243): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (trailer, offset 132246): treating unexpected brace token as null
+WARNING: bad-content.pdf (trailer, offset 132247): treating unexpected brace token as null
+WARNING: bad-content.pdf (trailer, offset 132248): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (trailer, offset 132248): limits error(parser-max-errors): too many errors during parsing; treating object as null
+WARNING: bad-content.pdf (trailer, offset 132165): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (trailer, offset 132174): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (trailer, offset 132180): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (trailer, offset 132194): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (trailer, offset 132202): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (trailer, offset 132206): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (trailer, offset 132211): unexpected )
+WARNING: bad-content.pdf (trailer, offset 132212): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (trailer, offset 132216): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (trailer, offset 132224): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (trailer, offset 132228): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (trailer, offset 132233): unexpected )
+WARNING: bad-content.pdf (trailer, offset 132234): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (trailer, offset 132241): treating unexpected brace token as null
+WARNING: bad-content.pdf (trailer, offset 132242): treating unexpected brace token as null
+WARNING: bad-content.pdf (trailer, offset 132242): limits error(parser-max-errors): too many errors during parsing; treating object as null
+WARNING: bad-content.pdf (trailer, offset 1381): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (trailer, offset 1399): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (trailer, offset 1437): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (trailer, offset 1448): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (trailer, offset 1458): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (trailer, offset 1522): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (trailer, offset 1526): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (trailer, offset 1532): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (trailer, offset 1537): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (trailer, offset 1540): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (trailer, offset 1454): expected dictionary keys but found non-name objects; ignoring
+WARNING: bad-content.pdf (trailer, offset 1561): unexpected 'endobj' or 'endstream' while reading object; giving up on reading object
+WARNING: bad-content.pdf (object 1 0, offset 1437): expected endobj
+WARNING: bad-content.pdf (object 2 0, offset 1458): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (object 2 0, offset 1522): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (object 2 0, offset 1526): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (object 2 0, offset 1532): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (object 2 0, offset 1537): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (object 2 0, offset 1540): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (object 2 0, offset 1454): expected dictionary keys but found non-name objects; ignoring
+WARNING: bad-content.pdf (object 3 0, offset 1646): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (object 3 0, offset 1653): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (object 3 0, offset 1578): expected dictionary keys but found non-name objects; ignoring
+WARNING: bad-content.pdf (object 3 0, offset 1661): expected endobj
+WARNING: bad-content.pdf (object 4 0, offset 131297): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (object 4 0, offset 131386): unexpected )
+WARNING: bad-content.pdf (object 4 0, offset 131405): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (object 4 0, offset 131266): expected dictionary keys but found non-name objects; ignoring
+WARNING: bad-content.pdf (object 5 0, offset 131448): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (object 5 0, offset 131436): stream dictionary lacks /Length key
+WARNING: bad-content.pdf (object 5 0, offset 131465): attempting to recover stream length
+WARNING: bad-content.pdf (object 5 0, offset 131465): recovered stream length: 202
+WARNING: bad-content.pdf (object 21 0, offset 132977): stream dictionary lacks /Length key
+WARNING: bad-content.pdf (object 21 0, offset 133023): attempting to recover stream length
+WARNING: bad-content.pdf (object 21 0, offset 133023): unable to recover stream data; treating stream as empty
+WARNING: bad-content.pdf (object 21 0, offset 135172): expected endobj
+WARNING: bad-content.pdf (object 21 0, offset 135172): EOF after endobj
+WARNING: bad-content.pdf (object 25 0, offset 1683): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (object 25 0, offset 1715): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (object 25 0, offset 1769): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (object 25 0, offset 1786): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (object 25 0, offset 1680): expected dictionary keys but found non-name objects; ignoring
+WARNING: bad-content.pdf (object 25 0, offset 1677): stream dictionary lacks /Length key
+WARNING: bad-content.pdf (object 25 0, offset 1823): attempting to recover stream length
+WARNING: bad-content.pdf (object 25 0, offset 1823): recovered stream length: 126798
+WARNING: bad-content.pdf (object 48 0, offset 242): unknown token while reading object; treating as string
+WARNING: bad-content.pdf (object 48 0, offset 243): expected endobj
+WARNING: bad-content.pdf (object 109 0, offset 128648): stream dictionary lacks /Length key
+WARNING: bad-content.pdf (object 109 0, offset 128695): attempting to recover stream length
+WARNING: bad-content.pdf (object 109 0, offset 128695): recovered stream length: 2554
+WARNING: bad-content.pdf (object 125 0, offset 132495): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (object 125 0, offset 132503): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (object 125 0, offset 132510): invalid character (´) in hexstring
+WARNING: bad-content.pdf (object 125 0, offset 132512): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (object 125 0, offset 132526): unknown token while reading object; treating as null
+WARNING: bad-content.pdf (object 125 0, offset 132537): treating unexpected brace token as null
+WARNING: bad-content.pdf (object 125 0, offset 132537): too many errors; giving up on reading object
+WARNING: bad-content.pdf (object 151 0, offset 642): expected endstream
+WARNING: bad-content.pdf (object 151 0, offset 385): attempting to recover stream length
+WARNING: bad-content.pdf (object 151 0, offset 385): unable to recover stream data; treating stream as empty
+WARNING: bad-content.pdf (object 158 0, offset 131767): expected dictionary keys but found non-name objects; ignoring
+WARNING: bad-content.pdf (object 158 0, offset 131764): stream dictionary lacks /Length key
+WARNING: bad-content.pdf (object 158 0, offset 131967): attempting to recover stream length
+WARNING: bad-content.pdf (object 158 0, offset 131967): recovered stream length: 292
+WARNING: bad-content.pdf, object 158 0 at offset 131767 -> dictionary key /Size: operation for integer attempted on object of type null: returning 0
+WARNING: bad-content.pdf (xref stream: object 158 0, offset 131767): expected dictionary keys but found non-name objects; ignoring
+WARNING: bad-content.pdf (xref stream: object 158 0, offset 131764): stream dictionary lacks /Length key
+WARNING: bad-content.pdf (xref stream: object 158 0, offset 131967): attempting to recover stream length
+WARNING: bad-content.pdf (xref stream: object 158 0, offset 131967): recovered stream length: 292
+WARNING: bad-content.pdf: error decoding candidate xref stream while recovering damaged file
+WARNING: bad-content.pdf, object 2 0 at offset 1454: /Type key should be /Pages but is not; overriding
+WARNING: bad-content.pdf, object 3 0 at offset 1578: kid 0 (from 0) Resources is missing or invalid; repairing
+WARNING: bad-content.pdf, object 3 0 at offset 1578: /Type key should be /Page but is not; overriding
+WARNING: bad-content.pdf, object 4 0 at offset 131266: kid 1 (from 0) MediaBox is undefined; setting to letter / ANSI A
+WARNING: bad-content.pdf, object 4 0 at offset 131266: kid 1 (from 0) Resources is missing or invalid; repairing
+WARNING: bad-content.pdf, object 4 0 at offset 131266: /Type key should be /Page but is not; overriding
+WARNING: bad-content.pdf, object 2 0 at offset 1454: kid 1 (from 0) has too many errors; ignoring page
+WARNING: object 5 1: Pages tree includes non-dictionary object; ignoring
+WARNING: bad-content.pdf, object 2 0 at offset 1518: Pages tree includes non-dictionary object; ignoring
+WARNING: bad-content.pdf, object 2 0 at offset 1520: Pages tree includes non-dictionary object; ignoring
+Pages tree includes non-dictionary object; ignoring
+Pages tree includes non-dictionary object; ignoring
+WARNING: bad-content.pdf, object 2 0 at offset 1530: Pages tree includes non-dictionary object; ignoring
+Pages tree includes non-dictionary object; ignoring
+WARNING: bad-content.pdf, object 2 0 at offset 1534: Pages tree includes non-dictionary object; ignoring
+Pages tree includes non-dictionary object; ignoring
+Pages tree includes non-dictionary object; ignoring
+checking bad-content.pdf
+PDF Version: 1.2
+R = 4
+P = -1028
+User password = 
+Supplied password is user password
+extract for accessibility: allowed
+extract for any purpose: allowed
+print low resolution: allowed
+print high resolution: allowed
+modify document assembly: not allowed
+modify forms: allowed
+modify annotations: allowed
+modify other: allowed
+modify anything: not allowed
+stream encryption method: unknown
+string encryption method: none
+file encryption method: unknown
+File is not linearized
+WARNING: bad-content.pdf (offset 188): unknown encryption filter for streams (check /StmF from /Encrypt dictionary); streams may be decrypted improperly
+WARNING: page object 3 0 stream 25 0 (content, offset 143): treating unexpected brace token as null
+WARNING: page object 3 0 stream 25 0 (content, offset 189): unexpected >
+WARNING: page object 3 0 stream 25 0 (content, offset 411): unexpected >
+WARNING: page object 3 0 stream 25 0 (content, offset 426): unexpected )
+WARNING: page object 3 0 stream 25 0 (content, offset 1752): treating unexpected brace token as null
+WARNING: page object 3 0 stream 25 0 (content, offset 1754): treating unexpected array close token as null
+WARNING: page object 3 0 stream 25 0 (content, offset 1768): treating unexpected brace token as null
+WARNING: page object 3 0 stream 25 0 (content, offset 1770): treating unexpected array close token as null
+WARNING: page object 3 0 stream 25 0 (content, offset 1783): treating unexpected brace token as null
+WARNING: page object 3 0 stream 25 0 (content, offset 1785): treating unexpected array close token as null
+WARNING: page object 3 0 stream 25 0 (content, offset 1799): treating unexpected brace token as null
+WARNING: page object 3 0 stream 25 0 (content, offset 1801): treating unexpected array close token as null
+WARNING: page object 3 0 stream 25 0 (content, offset 1815): treating unexpected brace token as null
+WARNING: page object 3 0 stream 25 0 (content, offset 1817): treating unexpected array close token as null
+WARNING: page object 3 0 stream 25 0 (content, offset 1831): treating unexpected brace token as null
+WARNING: page object 3 0 stream 25 0 (stream data, offset 1832): limits error(parser-max-errors): too many errors during content stream parsing
+qpdf: operation succeeded with warnings
+qpdf: some configurable limits were exceeded; for more details see https://qpdf.readthedocs.io/en/stable/cli.html#global-limits

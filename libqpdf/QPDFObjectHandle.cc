@@ -1780,6 +1780,7 @@ QPDFObjectHandle::parseContentStream_data(
     auto input = is::OffsetBuffer(description, stream_data);
     Tokenizer tokenizer;
     tokenizer.allowEOF();
+    auto max_bad_count = Limits::parser_max_errors();
     auto sp_description = Parser::make_description(description, "content");
     while (QIntC::to_size(input.tell()) < stream_length) {
         // Read a token and seek to the beginning. The offset we get from this process is the
@@ -1788,10 +1789,25 @@ QPDFObjectHandle::parseContentStream_data(
         tokenizer.nextToken(input, "content", true);
         qpdf_offset_t offset = input.getLastOffset();
         input.seek(offset, SEEK_SET);
-        auto obj = Parser::parse_content(input, sp_description, tokenizer, context);
-        if (!obj) {
+        auto [obj, empty] = Parser::parse_content(input, sp_description, tokenizer, context);
+        if (empty) {
             // EOF
-            break;
+            return;
+        }
+        if (!obj) {
+            if (max_bad_count && --max_bad_count == 0) {
+                Limits::error();
+                warn(
+                    context,
+                    {qpdf_e_damaged_pdf,
+                     description,
+                     "stream data",
+                     input.tell(),
+                     "limits error(parser-max-errors): too many errors during content stream "
+                     "parsing"});
+                return;
+            }
+            obj = newNull();
         }
         size_t length = QIntC::to_size(input.tell() - offset);
         if (callbacks) {
