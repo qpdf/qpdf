@@ -702,6 +702,7 @@ Parser::warn_duplicate_key()
         frame_->offset,
         "dictionary has duplicated key " + frame_->key +
             "; last occurrence overrides earlier ones");
+    check_too_many_bad_tokens();
 }
 
 void
