@@ -20,8 +20,8 @@ class FuzzHelper
 
   private:
     std::shared_ptr<QPDF> getQpdf();
-    std::shared_ptr<QPDFWriter> getWriter(std::shared_ptr<QPDF>);
-    void doWrite(std::shared_ptr<QPDFWriter> w);
+    std::unique_ptr<QPDFWriter> getWriter(std::shared_ptr<QPDF>);
+    void doWrite(QPDFWriter& w);
     void testWrite();
     void doChecks();
 
@@ -38,28 +38,27 @@ FuzzHelper::FuzzHelper(unsigned char const* data, size_t size) :
 std::shared_ptr<QPDF>
 FuzzHelper::getQpdf()
 {
-    auto is =
-        std::shared_ptr<InputSource>(new BufferInputSource("fuzz input", &this->input_buffer));
+    auto is = std::make_shared<BufferInputSource>("fuzz input", &this->input_buffer);
     auto qpdf = QPDF::create();
     qpdf->setMaxWarnings(200);
     qpdf->processInputSource(is);
     return qpdf;
 }
 
-std::shared_ptr<QPDFWriter>
+std::unique_ptr<QPDFWriter>
 FuzzHelper::getWriter(std::shared_ptr<QPDF> qpdf)
 {
-    auto w = std::make_shared<QPDFWriter>(*qpdf);
-    w->setOutputPipeline(&this->discard);
+    auto w = std::make_unique<QPDFWriter>(*qpdf);
+    w->setOutputPipeline(&discard);
     w->setDecodeLevel(qpdf_dl_all);
     return w;
 }
 
 void
-FuzzHelper::doWrite(std::shared_ptr<QPDFWriter> w)
+FuzzHelper::doWrite(QPDFWriter& w)
 {
     try {
-        w->write();
+        w.write();
     } catch (QPDFExc const& e) {
         std::cerr << e.what() << '\n';
     } catch (std::runtime_error const& e) {
@@ -81,7 +80,7 @@ FuzzHelper::testWrite()
     w->setObjectStreamMode(qpdf_o_disable);
     w->setR3EncryptionParametersInsecure(
         "u", "o", true, true, true, true, true, true, qpdf_r3p_full);
-    doWrite(w);
+    doWrite(*w);
 }
 
 void
