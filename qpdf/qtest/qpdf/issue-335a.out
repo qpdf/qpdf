@@ -123,8 +123,7 @@ WARNING: issue-335a.pdf (trailer, offset 22000): invalid character (t) in hexstr
 WARNING: issue-335a.pdf (trailer, offset 22003): unknown token while reading object; treating as null
 WARNING: issue-335a.pdf (trailer, offset 22026): treating bad indirect reference (-4 0 R) as null
 WARNING: issue-335a.pdf (trailer, offset 21936): dictionary has duplicated key /Length; last occurrence overrides earlier ones
-WARNING: issue-335a.pdf (trailer, offset 22028): unexpected >
-WARNING: issue-335a.pdf (trailer, offset 22028): too many errors; giving up on reading object
+WARNING: issue-335a.pdf (trailer, offset 22026): too many errors; giving up on reading object
 WARNING: issue-335a.pdf (trailer, offset 21837): unknown token while reading object; treating as null
 WARNING: issue-335a.pdf (trailer, offset 21861): treating bad indirect reference (0 0 R) as null
 WARNING: issue-335a.pdf (trailer, offset 21850): expected dictionary keys but found non-name objects; ignoring
