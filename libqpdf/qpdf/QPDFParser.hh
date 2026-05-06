@@ -45,8 +45,11 @@ namespace qpdf::impl
         /// @param sp_description Shared pointer to object description.
         /// @param tokenizer The tokenizer to use for parsing.
         /// @param context The QPDF context.
-        /// @return The parsed QPDFObjectHandle, or uninitialized handle on EOF.
-        static QPDFObjectHandle parse_content(
+        /// @return A pair whose first element is the parsed QPDFObjectHandle and whose
+        ///         second element is a bool indicating EOF. The object handle will be
+        ///         uninitialized on EOF or error; the bool is true if EOF was encountered
+        ///         (no object parsed).
+        static std::pair<QPDFObjectHandle, bool> parse_content(
             InputSource& input,
             std::shared_ptr<QPDFObject::Description> sp_description,
             qpdf::Tokenizer& tokenizer,
