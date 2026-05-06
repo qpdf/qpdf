@@ -6,6 +6,7 @@
 
 #include <qpdf/Pipeline.hh>
 
+#include <cstdint>
 #include <vector>
 
 class Pl_TIFFPredictor: public Pipeline

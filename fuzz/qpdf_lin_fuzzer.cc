@@ -20,8 +20,8 @@ class FuzzHelper
 
   private:
     std::shared_ptr<QPDF> getQpdf();
-    std::shared_ptr<QPDFWriter> getWriter(std::shared_ptr<QPDF>);
-    void doWrite(std::shared_ptr<QPDFWriter> w);
+    std::unique_ptr<QPDFWriter> getWriter(std::shared_ptr<QPDF>);
+    void doWrite(QPDFWriter& w);
     void testWrite();
     void doChecks();
 
@@ -46,20 +46,20 @@ FuzzHelper::getQpdf()
     return qpdf;
 }
 
-std::shared_ptr<QPDFWriter>
+std::unique_ptr<QPDFWriter>
 FuzzHelper::getWriter(std::shared_ptr<QPDF> qpdf)
 {
-    auto w = std::make_shared<QPDFWriter>(*qpdf);
-    w->setOutputPipeline(&this->discard);
+    auto w = std::make_unique<QPDFWriter>(*qpdf);
+    w->setOutputPipeline(&discard);
     w->setDecodeLevel(qpdf_dl_all);
     return w;
 }
 
 void
-FuzzHelper::doWrite(std::shared_ptr<QPDFWriter> w)
+FuzzHelper::doWrite(QPDFWriter& w)
 {
     try {
-        w->write();
+        w.write();
     } catch (QPDFExc const& e) {
         std::cerr << e.what() << '\n';
     } catch (std::runtime_error const& e) {
@@ -72,15 +72,12 @@ FuzzHelper::testWrite()
 {
     // Write in various ways to exercise QPDFWriter
 
-    std::shared_ptr<QPDF> q;
-    std::shared_ptr<QPDFWriter> w;
-
-    q = getQpdf();
-    w = getWriter(q);
+    auto q = getQpdf();
+    auto w = getWriter(q);
     w->setDeterministicID(true);
     w->setObjectStreamMode(qpdf_o_generate);
     w->setLinearization(true);
-    doWrite(w);
+    doWrite(*w);
 }
 
 void
