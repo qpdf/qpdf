@@ -1,13 +1,8 @@
 #include <qpdf/Buffer.hh>
 #include <qpdf/BufferInputSource.hh>
-#include <qpdf/Pl_DCT.hh>
 #include <qpdf/Pl_Discard.hh>
 #include <qpdf/Pl_Flate.hh>
-#include <qpdf/Pl_PNGFilter.hh>
-#include <qpdf/Pl_RunLength.hh>
-#include <qpdf/Pl_TIFFPredictor.hh>
 #include <qpdf/QPDF.hh>
-#include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/global.hh>
@@ -56,8 +51,7 @@ extern "C" int
 LLVMFuzzerTestOneInput(unsigned char const* data, size_t size)
 {
 #ifndef _WIN32
-    // Used by jpeg library to work around false positives in memory
-    // sanitizer.
+    // Used by jpeg library to work around false positives in memory sanitizer.
     setenv("JSIMD_FORCENONE", "1", 1);
 #endif
     FuzzHelper f(data, size);
