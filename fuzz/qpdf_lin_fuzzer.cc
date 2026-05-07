@@ -10,118 +10,47 @@
 #include <qpdf/QPDFPageObjectHelper.hh>
 #include <qpdf/QPDFWriter.hh>
 #include <qpdf/QUtil.hh>
-#include <cstdlib>
+#include <qpdf/global.hh>
 
 class FuzzHelper
 {
   public:
-    FuzzHelper(unsigned char const* data, size_t size);
-    void run();
+    FuzzHelper(unsigned char const* data, size_t size) :
+        // We do not modify data, so it is safe to remove the const for Buffer
+        input_buffer(const_cast<unsigned char*>(data), size)
+    {
+    }
+
+    void
+    run()
+    {
+        qpdf::global::options::fuzz_mode(true);
+        // The goal here is that you should be able to throw anything at libqpdf and it will respond
+        // without any memory errors and never do anything worse than throwing a QPDFExc or
+        // std::runtime_error. Throwing any other kind of exception, segfaulting, or having a memory
+        // error (when built with appropriate sanitizers) will all cause abnormal exit.
+        try {
+            std::cerr << "\ninfo: starting testWrite\n";
+
+            auto is = std::make_shared<BufferInputSource>("fuzz input", &input_buffer);
+            QPDF qpdf;
+            qpdf.processInputSource(is);
+            QPDFWriter w(qpdf);
+            w.setOutputPipeline(&discard);
+            w.setDecodeLevel(qpdf_dl_all);
+            w.setDeterministicID(true);
+            w.setObjectStreamMode(qpdf_o_generate);
+            w.setLinearization(true);
+            w.write();
+        } catch (std::runtime_error const& e) {
+            std::cerr << "runtime_error: " << e.what() << '\n';
+        }
+    }
 
   private:
-    std::shared_ptr<QPDF> getQpdf();
-    std::unique_ptr<QPDFWriter> getWriter(std::shared_ptr<QPDF>);
-    void doWrite(QPDFWriter& w);
-    void testWrite();
-    void doChecks();
-
     Buffer input_buffer;
     Pl_Discard discard;
 };
-
-FuzzHelper::FuzzHelper(unsigned char const* data, size_t size) :
-    // We do not modify data, so it is safe to remove the const for Buffer
-    input_buffer(const_cast<unsigned char*>(data), size)
-{
-}
-
-std::shared_ptr<QPDF>
-FuzzHelper::getQpdf()
-{
-    auto is =
-        std::shared_ptr<InputSource>(new BufferInputSource("fuzz input", &this->input_buffer));
-    auto qpdf = QPDF::create();
-    qpdf->setMaxWarnings(200);
-    qpdf->processInputSource(is);
-    return qpdf;
-}
-
-std::unique_ptr<QPDFWriter>
-FuzzHelper::getWriter(std::shared_ptr<QPDF> qpdf)
-{
-    auto w = std::make_unique<QPDFWriter>(*qpdf);
-    w->setOutputPipeline(&discard);
-    w->setDecodeLevel(qpdf_dl_all);
-    return w;
-}
-
-void
-FuzzHelper::doWrite(QPDFWriter& w)
-{
-    try {
-        w.write();
-    } catch (QPDFExc const& e) {
-        std::cerr << e.what() << '\n';
-    } catch (std::runtime_error const& e) {
-        std::cerr << e.what() << '\n';
-    }
-}
-
-void
-FuzzHelper::testWrite()
-{
-    // Write in various ways to exercise QPDFWriter
-
-    auto q = getQpdf();
-    auto w = getWriter(q);
-    w->setDeterministicID(true);
-    w->setObjectStreamMode(qpdf_o_generate);
-    w->setLinearization(true);
-    doWrite(*w);
-}
-
-void
-FuzzHelper::doChecks()
-{
-    // Limit the memory used to decompress JPEG files during fuzzing. Excessive memory use during
-    // fuzzing is due to corrupt JPEG data which sometimes cannot be detected before
-    // jpeg_start_decompress is called. During normal use of qpdf very large JPEGs can occasionally
-    // occur legitimately and therefore must be allowed during normal operations.
-    Pl_DCT::setMemoryLimit(100'000'000);
-    Pl_DCT::setScanLimit(50);
-
-    Pl_PNGFilter::setMemoryLimit(1'000'000);
-    Pl_RunLength::setMemoryLimit(1'000'000);
-    Pl_TIFFPredictor::setMemoryLimit(1'000'000);
-    Pl_Flate::memory_limit(200'000);
-
-    // Do not decompress corrupt data. This may cause extended runtime within jpeglib without
-    // exercising additional code paths in qpdf, and potentially causing counterproductive timeouts.
-    Pl_DCT::setThrowOnCorruptData(true);
-
-    // Get as much coverage as possible in parts of the library that
-    // might benefit from fuzzing.
-    std::cerr << "\ninfo: starting testWrite\n";
-    testWrite();
-}
-
-void
-FuzzHelper::run()
-{
-    // The goal here is that you should be able to throw anything at
-    // libqpdf and it will respond without any memory errors and never
-    // do anything worse than throwing a QPDFExc or
-    // std::runtime_error. Throwing any other kind of exception,
-    // segfaulting, or having a memory error (when built with
-    // appropriate sanitizers) will all cause abnormal exit.
-    try {
-        doChecks();
-    } catch (QPDFExc const& e) {
-        std::cerr << "QPDFExc: " << e.what() << '\n';
-    } catch (std::runtime_error const& e) {
-        std::cerr << "runtime_error: " << e.what() << '\n';
-    }
-}
 
 extern "C" int
 LLVMFuzzerTestOneInput(unsigned char const* data, size_t size)
