@@ -29,6 +29,7 @@
 #include <qpdf/DLL.h>
 #include <qpdf/Types.h>
 
+#include <cinttypes>
 #include <functional>
 #include <map>
 #include <memory>
@@ -1334,7 +1335,7 @@ class QPDFObjectHandle: public qpdf::BaseHandle
     void typeWarning(char const* expected_type, std::string const& warning) const;
     void objectWarning(std::string const& warning) const;
     void assertType(char const* type_name, bool istype) const;
-    void makeDirect(QPDFObjGen::set& visited, bool stop_at_streams);
+    void makeDirect(uint32_t level, QPDFObjGen::set& visited, bool stop_at_streams);
     void setParsedOffset(qpdf_offset_t offset);
     void parseContentStream_internal(std::string const& description, ParserCallbacks* callbacks);
     static void parseContentStream_data(

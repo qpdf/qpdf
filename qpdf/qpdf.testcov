@@ -35,7 +35,6 @@ QPDFTokenizer null in name 0
 QPDFTokenizer bad name 1 0
 QPDFTokenizer bad name 2 0
 QPDF UseOutlines but no Outlines 0
-QPDFObjectHandle makeDirect loop 0
 QPDFObjectHandle copy stream 1
 QPDF ignoring XRefStm in trailer 0
 SF_FlateLzwDecode PNG filter 0
