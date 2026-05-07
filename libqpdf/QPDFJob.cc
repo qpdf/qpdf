@@ -3236,6 +3236,12 @@ QPDFJob::doMultiOutput(QPDF& pdf)
     // read already-normalized values.
     normalizeEncryptionPasswords();
 
+    // Pre-warm the crypto provider singleton on the main thread. Without this,
+    // the first worker to construct an MD5 (e.g. for --deterministic-id) races
+    // with the others on lazy initialization of the provider's static state,
+    // which has manifested as glibc "double free" aborts on some Linux runners.
+    (void)QPDFCryptoProvider::getImpl();
+
     struct OutputBundle {
         std::unique_ptr<QPDF> outpdf;
         std::string filename;
