@@ -13,7 +13,7 @@ more detail.
 
 .. x.y.z: not yet released
 
-12.3.3: not yet released
+12.4.0: not yet released
   - Bug fixes
 
     - Fix error message when :qpdf:ref:`--check` encounters a file without any pages.
@@ -29,6 +29,13 @@ more detail.
       Any exceptions thrown as a result of the warning limit being exceeded indicate that
       the file is too damaged to be processed. Throwing the exception after the file is loaded
       risks that it would be treated like other exceptions that permit further processing.
+
+
+  - Security and robustness
+
+    - To reduce the risk of excessive recursion and stack overflows when processing damaged or
+      malicious PDF files, qpdf now enforces conservative limits on the depth of direct objects
+      that may be created using ``QPDFObjectHandle::makeDirect``.
 
   - Enhancements
 
@@ -174,6 +181,19 @@ more detail.
 
     - More sanity checks have been added when files with damaged xref tables
       are recovered.
+
+    - Security and robustness
+
+      - To reduce the risk of excessive recursion and stack overflows when
+        processing damaged or malicious PDF files, qpdf now enforces
+        reasonable limits on nesting and the depth of direct objects that may
+        be created while repairing or recovering documents. These safeguards
+        prevent specially crafted inputs from triggering deep recursion in
+        object-creation routines and causing crashes. The limits are chosen to
+        be conservative by default to avoid breaking legitimate files; they
+        can be adjusted using the new global limits API (see
+        :ref:`global-options`) or via the :qpdf:ref:`--global` CLI option when
+        necessary.
 
   - Other changes
 
