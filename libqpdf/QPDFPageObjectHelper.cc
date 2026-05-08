@@ -683,6 +683,10 @@ QPDFPageObjectHelper::getMatrixForTransformations(bool invert)
         }
 
         // Ignore invalid rotation angle
+        rotate %= 360;
+        if (rotate < 0) {
+            rotate += 360;
+        }
         switch (rotate) {
         case 90:
             matrix = QPDFObjectHandle::Matrix(0, -scale, scale, 0, 0, width * scale);
@@ -864,6 +868,10 @@ QPDFPageObjectHelper::flattenRotation(QPDFAcroFormDocumentHelper* afdh)
     int rotate = 0;
     if (rotate_oh.isInteger()) {
         rotate = rotate_oh.getIntValueAsInt();
+        rotate %= 360;
+        if (rotate < 0) {
+            rotate += 360;
+        }
     }
     if (!((rotate == 90) || (rotate == 180) || (rotate == 270))) {
         return;
