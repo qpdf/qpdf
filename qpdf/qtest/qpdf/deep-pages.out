@@ -1,0 +1,6 @@
+checking deep-pages.pdf
+PDF Version: 1.4
+File is not encrypted
+File is not linearized
+ERROR: deep-pages.pdf (object 103 0): /Pages structure too deeply nested (getAllPages)
+qpdf: errors detected

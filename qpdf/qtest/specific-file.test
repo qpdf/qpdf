@@ -14,7 +14,7 @@ cleanup();
 
 my $td = new TestDriver('specific-file');
 
-my $n_tests = 13;
+my $n_tests = 14;
 
 # Special PDF files that caused problems at some point
 
@@ -71,6 +71,10 @@ $td->runtest("Bad direct Root",
 $td->runtest("Bad content",
              {$td->COMMAND => "qpdf --check bad-content.pdf"},
              {$td->FILE => "bad-content.out", $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("Deep pages tree",
+             {$td->COMMAND => "qpdf --check deep-pages.pdf"},
+             {$td->FILE => "deep-pages.out", $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);
 
 cleanup();

@@ -37,6 +37,9 @@ more detail.
       malicious PDF files, qpdf now enforces conservative limits on the depth of direct objects
       that may be created using ``QPDFObjectHandle::makeDirect``.
 
+    - To reduce the risk of excessive recursion and stack overflows when processing damaged or
+      malicious PDF files, qpdf now enforces conservative limits on the depth of the pages tree.
+
   - Enhancements
 
     - Rewrite the shell completion functions for zsh and bash. In prior versions
