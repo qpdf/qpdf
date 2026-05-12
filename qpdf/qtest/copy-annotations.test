@@ -19,7 +19,7 @@ my $n_tests = 48;
 $td->runtest("complex copy annotations",
              {$td->COMMAND =>
                   "qpdf --qdf --static-id --no-original-object-ids" .
-                  " fxo-red.pdf --overlay form-fields-and-annotations.pdf" .
+                  " fxo-red-rotate.pdf --overlay form-fields-and-annotations.pdf" .
                   " --repeat=1 -- a.pdf"},
              {$td->STRING => "", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);

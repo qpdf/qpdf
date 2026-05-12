@@ -30,6 +30,9 @@ more detail.
       the file is too damaged to be processed. Throwing the exception after the file is loaded
       risks that it would be treated like other exceptions that permit further processing.
 
+    - In ``QPDFPageObjectHelper::getMatrixForTransformations`` handle ``/Rotation`` entries
+      that are less than 0 or greater than 360 correctly. Previously they were treated as 0.
+
 
   - Security and robustness
 
