@@ -14,7 +14,7 @@ cleanup();
 
 my $td = new TestDriver('specific-file');
 
-my $n_tests = 14;
+my $n_tests = 15;
 
 # Special PDF files that caused problems at some point
 
@@ -75,6 +75,10 @@ $td->runtest("Bad content",
 $td->runtest("Deep pages tree",
              {$td->COMMAND => "qpdf --check deep-pages.pdf"},
              {$td->FILE => "deep-pages.out", $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("Shared unnamed fields",
+             {$td->COMMAND => "qpdf --check shared-unnamed-field.pdf"},
+             {$td->FILE => "shared-unnamed-field.out", $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
 
 cleanup();

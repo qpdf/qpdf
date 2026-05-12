@@ -325,6 +325,7 @@ namespace qpdf::impl
         std::map<QPDFObjGen, QPDFFormFieldObjectHelper> annotation_to_field_;
         std::map<std::string, std::set<QPDFObjGen>> name_to_fields_;
         std::set<QPDFObjGen> bad_fields_;
+        std::set<QPDFObjGen> unnamed_fields_;
         bool cache_valid_{false};
 
     }; // class Acroform

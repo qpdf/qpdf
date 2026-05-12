@@ -58,6 +58,7 @@ AcroForm::invalidateCache()
     fields_.clear();
     annotation_to_field_.clear();
     bad_fields_.clear();
+    unnamed_fields_.clear();
     name_to_fields_.clear();
 }
 
@@ -401,6 +402,9 @@ AcroForm::traverseField(QPDFObjectHandle field, QPDFObjectHandle const& parent, 
         return false;
     }
     QPDFObjGen og(field.getObjGen());
+    if (unnamed_fields_.contains(og)) {
+        bad_fields_.insert(og);
+    }
     if (fields_.contains(og) || annotation_to_field_.contains(og) || bad_fields_.contains(og)) {
         field.warn("loop detected while traversing /AcroForm");
         return false;
@@ -462,6 +466,8 @@ AcroForm::traverseField(QPDFObjectHandle field, QPDFObjectHandle const& parent, 
         std::string name = node.fully_qualified_name();
         fields_[og].name = name;
         name_to_fields_[name].insert(og);
+    } else if (!is_annotation) {
+        unnamed_fields_.insert(og);
     }
 
     for (auto const& kid: node.Kids()) {

@@ -1,0 +1,31 @@
+checking shared-unnamed-field.pdf
+PDF Version: 1.4
+File is not encrypted
+File is not linearized
+WARNING: shared-unnamed-field.pdf, object 3 0 at offset 147: kid 0 (from 0) Resources is missing or invalid; repairing
+WARNING: shared-unnamed-field.pdf, object 30 0 at offset 1720: loop detected while traversing /AcroForm
+WARNING: shared-unnamed-field.pdf, object 29 0 at offset 1661: loop detected while traversing /AcroForm
+WARNING: shared-unnamed-field.pdf, object 28 0 at offset 1602: loop detected while traversing /AcroForm
+WARNING: shared-unnamed-field.pdf, object 27 0 at offset 1543: loop detected while traversing /AcroForm
+WARNING: shared-unnamed-field.pdf, object 26 0 at offset 1484: loop detected while traversing /AcroForm
+WARNING: shared-unnamed-field.pdf, object 25 0 at offset 1425: loop detected while traversing /AcroForm
+WARNING: shared-unnamed-field.pdf, object 24 0 at offset 1366: loop detected while traversing /AcroForm
+WARNING: shared-unnamed-field.pdf, object 23 0 at offset 1307: loop detected while traversing /AcroForm
+WARNING: shared-unnamed-field.pdf, object 22 0 at offset 1248: loop detected while traversing /AcroForm
+WARNING: shared-unnamed-field.pdf, object 21 0 at offset 1189: loop detected while traversing /AcroForm
+WARNING: shared-unnamed-field.pdf, object 20 0 at offset 1130: loop detected while traversing /AcroForm
+WARNING: shared-unnamed-field.pdf, object 19 0 at offset 1071: loop detected while traversing /AcroForm
+WARNING: shared-unnamed-field.pdf, object 18 0 at offset 1012: loop detected while traversing /AcroForm
+WARNING: shared-unnamed-field.pdf, object 17 0 at offset 953: loop detected while traversing /AcroForm
+WARNING: shared-unnamed-field.pdf, object 16 0 at offset 894: loop detected while traversing /AcroForm
+WARNING: shared-unnamed-field.pdf, object 15 0 at offset 835: loop detected while traversing /AcroForm
+WARNING: shared-unnamed-field.pdf, object 14 0 at offset 776: loop detected while traversing /AcroForm
+WARNING: shared-unnamed-field.pdf, object 13 0 at offset 717: loop detected while traversing /AcroForm
+WARNING: shared-unnamed-field.pdf, object 12 0 at offset 658: loop detected while traversing /AcroForm
+WARNING: shared-unnamed-field.pdf, object 11 0 at offset 599: loop detected while traversing /AcroForm
+WARNING: shared-unnamed-field.pdf, object 10 0 at offset 541: loop detected while traversing /AcroForm
+WARNING: shared-unnamed-field.pdf, object 9 0 at offset 483: loop detected while traversing /AcroForm
+WARNING: shared-unnamed-field.pdf, object 8 0 at offset 428: loop detected while traversing /AcroForm
+WARNING: shared-unnamed-field.pdf, object 7 0 at offset 373: loop detected while traversing /AcroForm
+WARNING: shared-unnamed-field.pdf, object 6 0 at offset 318: loop detected while traversing /AcroForm
+qpdf: operation succeeded with warnings

@@ -40,6 +40,9 @@ more detail.
     - To reduce the risk of excessive recursion and stack overflows when processing damaged or
       malicious PDF files, qpdf now enforces conservative limits on the depth of the pages tree.
 
+    - Detect some duplicate entries in the AcroForm field hierarchy earlier in order to avoid very
+      large runtimes in specially constructed invalid PDF files.
+
   - Enhancements
 
     - Rewrite the shell completion functions for zsh and bash. In prior versions
