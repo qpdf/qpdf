@@ -14,6 +14,7 @@
 #include <qpdf/QPDFTokenizer_private.hh>
 #include <qpdf/global_private.hh>
 
+#include <cinttypes>
 #include <exception>
 
 using namespace qpdf;
@@ -1204,6 +1205,7 @@ class QPDF::Doc::Pages: Common
     std::vector<QPDFObjectHandle> const& cache();
     void getAllPagesInternal(
         QPDFObjectHandle cur_pages,
+        uint32_t level,
         QPDFObjGen::set& visited,
         QPDFObjGen::set& seen,
         bool media_box,

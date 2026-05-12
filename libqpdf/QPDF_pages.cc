@@ -86,7 +86,7 @@ Pages::cache()
                 qpdf_e_pages, m->file->getName(), "", 0, "root of pages tree has no /Kids array");
         }
         try {
-            getAllPagesInternal(pages, visited, seen, false, false);
+            getAllPagesInternal(pages, 0, visited, seen, false, false);
         } catch (...) {
             all_pages.clear();
             invalid_page_found = false;
@@ -103,11 +103,21 @@ Pages::cache()
 void
 Pages::getAllPagesInternal(
     QPDFObjectHandle cur_node,
+    uint32_t level,
     QPDFObjGen::set& visited,
     QPDFObjGen::set& seen,
     bool media_box,
     bool resources)
 {
+    static uint32_t constexpr max_level = 100;
+    if (++level > max_level) {
+        throw QPDFExc(
+            qpdf_e_pages,
+            m->file->getName(),
+            "object " + cur_node.getObjGen().unparse(' '),
+            0,
+            "/Pages structure too deeply nested (getAllPages)");
+    }
     if (!visited.add(cur_node)) {
         throw QPDFExc(
             qpdf_e_pages,
@@ -156,7 +166,7 @@ Pages::getAllPagesInternal(
             ++errors;
         }
         if (kid.hasKey("/Kids")) {
-            getAllPagesInternal(kid, visited, seen, media_box, resources);
+            getAllPagesInternal(kid, level, visited, seen, media_box, resources);
         } else {
             if (!media_box && !kid.getKey("/MediaBox").isRectangle()) {
                 kid.warn(
