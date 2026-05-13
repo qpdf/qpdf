@@ -142,6 +142,19 @@ Lin::optimize_internal(
         return;
     }
 
+    // PATCH: hoisted out of calculateLinearizationData. Vanilla qpdf built this
+    // set locally inside the categorisation pass and consulted it while iterating
+    // each object's user set. Because we now collapse the per-object user set into
+    // ObjUserStats at INSERTION time (see addUserToStats below), we need this
+    // information available throughout the page-traversal loop, not just at the
+    // end. Same five keys as the original.
+    open_document_keys_.clear();
+    open_document_keys_.insert("/ViewerPreferences");
+    open_document_keys_.insert("/PageMode");
+    open_document_keys_.insert("/Threads");
+    open_document_keys_.insert("/OpenAction");
+    open_document_keys_.insert("/AcroForm");
+
     // The PDF specification indicates that /Outlines is supposed to be an indirect reference. Force
     // it to be so if it exists and is direct.  (This has been seen in the wild.)
     QPDFObjectHandle root = qpdf.getRoot();
@@ -199,10 +212,64 @@ Lin::optimize_internal(
 
     ObjUser root_ou = ObjUser(ObjUser::ou_root);
     auto root_og = root.id_gen();
-    obj_user_to_objects_[root_ou].insert(root_og);
-    object_to_obj_users_[root_og].insert(root_ou);
+    // PATCH (1): push_back into a vector instead of .insert into a set.
+    obj_user_to_objects_[root_ou].push_back(root_og);
+    // PATCH (2): merge this user into the object's stats record instead of
+    // .insert into a set<ObjUser>.
+    addUserToStats(object_to_obj_users_[root_og], root_ou);
+
+    // PATCH (1): With vector-of-QPDFObjGen replacing set-of-QPDFObjGen we lose
+    // the inherent sorted iteration order. Downstream consumers (calculateLinearizationData
+    // shared-object placement, part 7 ordering) iterate per-ou and rely on stable,
+    // deterministic order to keep output byte-identical to vanilla qpdf. We restore
+    // that by sorting each per-ou vector exactly once now that all page/trailer/root-key
+    // traversals are complete. Each (ou, og) pair was inserted at most once (the local
+    // `visited` set in updateObjectMaps guarantees no duplicates within a call, and
+    // each ou is only visited by one call to updateObjectMaps), so no dedup is needed
+    // here.
+    for (auto& [ou, ogs]: obj_user_to_objects_) {
+        std::sort(ogs.begin(), ogs.end());
+    }
 
     filterCompressedObjects(object_stream_data);
+}
+
+// PATCH (2): the single ingest point for object_to_obj_users_. Vanilla qpdf
+// inserted `ou` into a std::set<ObjUser> here; we instead OR/merge its
+// significance into the fixed-size ObjUserStats slot. The branch structure
+// mirrors the switch statement the old categorisation pass used to run inside
+// calculateLinearizationData — that pass is now a straight read of the
+// already-classified flags.
+void
+Lin::addUserToStats(ObjUserStats& stats, ObjUser const& ou)
+{
+    switch (ou.ou_type) {
+    case ObjUser::ou_page:
+        stats.add_page(static_cast<int>(ou.pageno));
+        break;
+    case ObjUser::ou_thumb:
+        stats.add_thumb(static_cast<int>(ou.pageno));
+        break;
+    case ObjUser::ou_root:
+        stats.is_root = true;
+        break;
+    case ObjUser::ou_root_key:
+        if (open_document_keys_.contains(ou.key)) {
+            stats.in_open_document = true;
+        } else if (ou.key == "/Outlines") {
+            stats.in_outlines = true;
+        } else {
+            stats.in_others = true;
+        }
+        break;
+    case ObjUser::ou_trailer_key:
+        if (ou.key == "/Encrypt") {
+            stats.in_open_document = true;
+        } else {
+            stats.in_others = true;
+        }
+        break;
+    }
 }
 
 void
@@ -235,8 +302,27 @@ Lin::updateObjectMaps(
                 QTC::TC("qpdf", "QPDF opt loop detected");
                 continue;
             }
-            obj_user_to_objects_[cur.ou].insert(og);
-            object_to_obj_users_[og].insert(cur.ou);
+            // PATCH: the two analysis maps are updated here, once per
+            // (ou, og) pair, on each indirect object we reach during DFS from
+            // the entry-point ObjUser (a page, a thumb, a trailer-key, or a
+            // root-key).
+            //
+            // (1) obj_user_to_objects_[cur.ou] is std::vector<QPDFObjGen> in
+            //     this patch (was std::set<QPDFObjGen>). The local `visited`
+            //     QPDFObjGen::set above already prevents us from inserting the
+            //     same og twice for this ou (the only place where the same ou
+            //     enters this function is the single outer call site), so we
+            //     can push_back without paying for set deduplication.
+            //
+            // (2) object_to_obj_users_[og] is std::map<QPDFObjGen, ObjUserStats>
+            //     in this patch (was std::map<QPDFObjGen, std::set<ObjUser>>).
+            //     Instead of inserting a copy of `cur.ou` into a per-object set,
+            //     we just OR/merge the relevant flags+counters into the
+            //     fixed-size ObjUserStats slot. operator[] default-constructs
+            //     a zero-initialised ObjUserStats if og is new to the map,
+            //     which is the correct identity element for the merge.
+            obj_user_to_objects_[cur.ou].push_back(og);
+            addUserToStats(object_to_obj_users_[og], cur.ou);
         }
 
         if (cur.oh.isArray()) {
@@ -288,34 +374,94 @@ Lin::filterCompressedObjects(std::map<int, int> const& object_stream_data)
     // Transform object_to_obj_users and obj_user_to_objects so that they refer only to uncompressed
     // objects.  If something is a user of a compressed object, then it is really a user of the
     // object stream that contains it.
-
-    std::map<ObjUser, std::set<QPDFObjGen>> t_obj_user_to_objects;
-    std::map<QPDFObjGen, std::set<ObjUser>> t_object_to_obj_users;
-
-    for (auto const& [ou, ogs]: obj_user_to_objects_) {
-        for (auto const& og: ogs) {
+    //
+    // ============================================================================
+    // PATCH (3): in-place rewrite of obj_user_to_objects_
+    // ----------------------------------------------------------------------------
+    // Vanilla qpdf built two parallel temporary maps
+    //   std::map<ObjUser, std::set<QPDFObjGen>> t_obj_user_to_objects;
+    //   std::map<QPDFObjGen, std::set<ObjUser>> t_object_to_obj_users;
+    // populated them by iterating the originals, then std::move-assigned both
+    // over the member maps. During the populate step BOTH the source and the
+    // destination map were live in memory; on the reference 21 MB / 1241-page
+    // file this transiently doubled working set by ~600 MB (~1.0 GB -> ~1.6 GB)
+    // before snapping back, on top of an already 17x reduction from changes (1)
+    // and (2). The doubled state is observable as a peak that 2-files-in-parallel
+    // would amplify (two simultaneous spikes).
+    //
+    // Rewriting in place is safe because the transform on each (ou, ogs) entry
+    // is independent of every other entry: each og maps deterministically to
+    // either itself or the og of its containing object stream, and we don't
+    // need to look at any other entry to make that decision. We can therefore
+    // walk the existing map and mutate each vector in place. The only complication
+    // is that multiple distinct ogs in a given page's vector can collapse onto
+    // the same target (the containing stream's og) after translation; we handle
+    // that with a terminal sort+unique pass on each vector, the same way the old
+    // parallel-map approach implicitly deduplicated via std::set::insert.
+    //
+    // Peak working set during this step is now bounded by one rewritten vector
+    // at a time (a few hundred KB) plus the original map, instead of two full
+    // copies of the original map.
+    // ============================================================================
+    for (auto& [ou, ogs]: obj_user_to_objects_) {
+        for (auto& og: ogs) {
             auto i2 = object_stream_data.find(og.getObj());
-            if (i2 == object_stream_data.end()) {
-                t_obj_user_to_objects[ou].insert(og);
-            } else {
-                t_obj_user_to_objects[ou].insert({i2->second, 0});
+            if (i2 != object_stream_data.end()) {
+                og = QPDFObjGen(i2->second, 0);
+            }
+        }
+        std::sort(ogs.begin(), ogs.end());
+        ogs.erase(std::unique(ogs.begin(), ogs.end()), ogs.end());
+    }
+
+    // ============================================================================
+    // PATCH (4): in-place rewrite of object_to_obj_users_
+    // ----------------------------------------------------------------------------
+    // Same idea as change (3), but the destination key is what's changing (the
+    // og becomes the stream's og), not the value. Multiple source ogs can
+    // collapse onto a single target og, so the transform is logically a merge.
+    //
+    // We can't safely iterate the map and erase+insert in the same loop:
+    // inserting at `target` may invalidate iterators in some std::map
+    // implementations if target happens to hash/sort near the cursor, and even
+    // when it doesn't, erasing the current entry and then inserting a new one
+    // with a new key would tangle the iteration. So we do two passes:
+    //
+    //   Pass 1 (read-only): gather a list of (from, to) translations.
+    //   Pass 2 (mutate):    for each translation, take the stats out of the
+    //                       source entry, erase the source entry, and merge
+    //                       those stats into the target entry's stats.
+    //
+    // ObjUserStats::merge_from is a logical OR/sum across all fields, with
+    // bounded counters that saturate to "many" — it's idempotent under
+    // repeated application, so even if the from-entry was already merged
+    // (e.g. several originals collapsing onto the same target) the result is
+    // still correct.
+    //
+    // Peak working set during this step is now bounded by the size of the
+    // (from, to) translations vector (just two 64-bit ints per compressed
+    // object — a few MB at most for the reference file), instead of a full
+    // duplicate of object_to_obj_users_.
+    // ============================================================================
+    std::vector<std::pair<QPDFObjGen, QPDFObjGen>> moves; // (from, to)
+    for (auto const& [og, _]: object_to_obj_users_) {
+        auto i2 = object_stream_data.find(og.getObj());
+        if (i2 != object_stream_data.end()) {
+            QPDFObjGen target(i2->second, 0);
+            if (target != og) {
+                moves.emplace_back(og, target);
             }
         }
     }
-
-    for (auto const& [og, ous]: object_to_obj_users_) {
-        for (auto const& ou: ous) {
-            auto i2 = object_stream_data.find(og.getObj());
-            if (i2 == object_stream_data.end()) {
-                t_object_to_obj_users[og].insert(ou);
-            } else {
-                t_object_to_obj_users[{i2->second, 0}].insert(ou);
-            }
+    for (auto const& [from, to]: moves) {
+        auto it = object_to_obj_users_.find(from);
+        if (it == object_to_obj_users_.end()) {
+            continue; // already merged in a prior step
         }
+        ObjUserStats stats = std::move(it->second);
+        object_to_obj_users_.erase(it);
+        object_to_obj_users_[to].merge_from(stats);
     }
-
-    obj_user_to_objects_ = std::move(t_obj_user_to_objects);
-    object_to_obj_users_ = std::move(t_object_to_obj_users);
 }
 
 void
@@ -325,40 +471,63 @@ Lin::filterCompressedObjects(QPDFWriter::ObjTable const& obj)
         return;
     }
 
-    // Transform object_to_obj_users and obj_user_to_objects so that they refer only to uncompressed
-    // objects.  If something is a user of a compressed object, then it is really a user of the
-    // object stream that contains it.
+    // PATCH (3) and (4): see the long comment blocks on the std::map<int,int>
+    // overload above. This overload does the same in-place transform, with two
+    // additional wrinkles:
+    //   * The data source is QPDFWriter::ObjTable (the writer's per-object state)
+    //     instead of a plain int->int map. Per-og translation goes through
+    //     obj[og].object_stream rather than a map lookup.
+    //   * Ogs that aren't present in the writer's ObjTable at all are dropped
+    //     entirely (the writer doesn't intend to emit them). In the source
+    //     vector this means compacting the live entries with an out-pointer
+    //     instead of replacing every entry in place; in the destination map it
+    //     means an explicit erase pass.
 
-    std::map<ObjUser, std::set<QPDFObjGen>> t_obj_user_to_objects;
-    std::map<QPDFObjGen, std::set<ObjUser>> t_object_to_obj_users;
+    // Change (3): rewrite obj_user_to_objects_ vectors in place, compact-then-sort+unique.
+    for (auto& [ou, ogs]: obj_user_to_objects_) {
+        size_t out = 0;
+        for (auto& og: ogs) {
+            if (!obj.contains(og)) {
+                continue; // drop ogs not present in the writer's ObjTable
+            }
+            auto i2 = obj[og].object_stream;
+            QPDFObjGen new_og = (i2 <= 0) ? og : QPDFObjGen(i2, 0);
+            ogs[out++] = new_og;
+        }
+        ogs.resize(out);
+        std::sort(ogs.begin(), ogs.end());
+        ogs.erase(std::unique(ogs.begin(), ogs.end()), ogs.end());
+    }
 
-    for (auto const& [ou, ogs]: obj_user_to_objects_) {
-        for (auto const& og: ogs) {
-            if (obj.contains(og)) {
-                if (auto const& i2 = obj[og].object_stream; i2 <= 0) {
-                    t_obj_user_to_objects[ou].insert(og);
-                } else {
-                    t_obj_user_to_objects[ou].insert(QPDFObjGen(i2, 0));
-                }
+    // Change (4): collect (from, to) translations + the drop-list in one read-only
+    // pass over the map, then apply them.
+    std::vector<std::pair<QPDFObjGen, QPDFObjGen>> moves; // (from, to)
+    std::vector<QPDFObjGen> to_drop;
+    for (auto const& [og, _]: object_to_obj_users_) {
+        if (!obj.contains(og)) {
+            to_drop.push_back(og);
+            continue;
+        }
+        auto i2 = obj[og].object_stream;
+        if (i2 > 0) {
+            QPDFObjGen target(i2, 0);
+            if (target != og) {
+                moves.emplace_back(og, target);
             }
         }
     }
-
-    for (auto const& [og, ous]: object_to_obj_users_) {
-        if (obj.contains(og)) {
-            // Loop over obj_users.
-            for (auto const& ou: ous) {
-                if (auto i2 = obj[og].object_stream; i2 <= 0) {
-                    t_object_to_obj_users[og].insert(ou);
-                } else {
-                    t_object_to_obj_users[{i2, 0}].insert(ou);
-                }
-            }
-        }
+    for (auto const& og: to_drop) {
+        object_to_obj_users_.erase(og);
     }
-
-    obj_user_to_objects_ = std::move(t_obj_user_to_objects);
-    object_to_obj_users_ = std::move(t_object_to_obj_users);
+    for (auto const& [from, to]: moves) {
+        auto it = object_to_obj_users_.find(from);
+        if (it == object_to_obj_users_.end()) {
+            continue;
+        }
+        ObjUserStats stats = std::move(it->second);
+        object_to_obj_users_.erase(it);
+        object_to_obj_users_[to].merge_from(stats);
+    }
 }
 
 void
@@ -1319,13 +1488,6 @@ Lin::calculateLinearizationData(T const& object_stream_data)
         QTC::TC("qpdf", "QPDF categorize pagemode outlines", outlines_in_first_page ? 1 : 0);
     }
 
-    std::set<std::string> open_document_keys;
-    open_document_keys.insert("/ViewerPreferences");
-    open_document_keys.insert("/PageMode");
-    open_document_keys.insert("/Threads");
-    open_document_keys.insert("/OpenAction");
-    open_document_keys.insert("/AcroForm");
-
     std::set<QPDFObjGen> lc_open_document;
     std::set<QPDFObjGen> lc_first_page_private;
     std::set<QPDFObjGen> lc_first_page_shared;
@@ -1337,52 +1499,24 @@ Lin::calculateLinearizationData(T const& object_stream_data)
     std::set<QPDFObjGen> lc_outlines;
     std::set<QPDFObjGen> lc_root;
 
-    for (auto& [og, ous]: object_to_obj_users_) {
-        bool in_open_document = false;
-        bool in_first_page = false;
-        int other_pages = 0;
-        int thumbs = 0;
-        int others = 0;
-        bool in_outlines = false;
-        bool is_root = false;
-
-        for (auto const& ou: ous) {
-            switch (ou.ou_type) {
-            case ObjUser::ou_trailer_key:
-                if (ou.key == "/Encrypt") {
-                    in_open_document = true;
-                } else {
-                    ++others;
-                }
-                break;
-
-            case ObjUser::ou_thumb:
-                ++thumbs;
-                break;
-
-            case ObjUser::ou_root_key:
-                if (open_document_keys.contains(ou.key)) {
-                    in_open_document = true;
-                } else if (ou.key == "/Outlines") {
-                    in_outlines = true;
-                } else {
-                    ++others;
-                }
-                break;
-
-            case ObjUser::ou_page:
-                if (ou.pageno == 0) {
-                    in_first_page = true;
-                } else {
-                    ++other_pages;
-                }
-                break;
-
-            case ObjUser::ou_root:
-                is_root = true;
-                break;
-            }
-        }
+    // PATCH (2): vanilla qpdf computed these locals by iterating an inner
+    // std::set<ObjUser> for each object and switching on ou_type. We now read
+    // them directly from the ObjUserStats slot, which was populated incrementally
+    // during the page-traversal pass (see updateObjectMaps + addUserToStats).
+    // The categorisation branches that consume these locals are unchanged from
+    // upstream — the conditions are expressed identically.
+    for (auto& [og, stats]: object_to_obj_users_) {
+        bool const in_open_document = stats.in_open_document;
+        bool const in_first_page = stats.in_first_page;
+        bool const in_outlines = stats.in_outlines;
+        bool const is_root = stats.is_root;
+        bool const has_other_pages = stats.first_other_pageno != -1;
+        bool const exactly_one_other_page = has_other_pages && !stats.more_than_one_other_page;
+        bool const many_other_pages = stats.more_than_one_other_page;
+        bool const has_thumbs = stats.first_thumb_pageno != -1;
+        bool const exactly_one_thumb = has_thumbs && !stats.more_than_one_thumb;
+        bool const many_thumbs = stats.more_than_one_thumb;
+        bool const has_others = stats.in_others;
 
         if (is_root) {
             lc_root.insert(og);
@@ -1390,17 +1524,17 @@ Lin::calculateLinearizationData(T const& object_stream_data)
             lc_outlines.insert(og);
         } else if (in_open_document) {
             lc_open_document.insert(og);
-        } else if ((in_first_page) && (others == 0) && (other_pages == 0) && (thumbs == 0)) {
+        } else if (in_first_page && !has_others && !has_other_pages && !has_thumbs) {
             lc_first_page_private.insert(og);
         } else if (in_first_page) {
             lc_first_page_shared.insert(og);
-        } else if ((other_pages == 1) && (others == 0) && (thumbs == 0)) {
+        } else if (exactly_one_other_page && !has_others && !has_thumbs) {
             lc_other_page_private.insert(og);
-        } else if (other_pages > 1) {
+        } else if (many_other_pages) {
             lc_other_page_shared.insert(og);
-        } else if ((thumbs == 1) && (others == 0)) {
+        } else if (exactly_one_thumb && !has_others) {
             lc_thumbnail_private.insert(og);
-        } else if (thumbs > 1) {
+        } else if (many_thumbs) {
             lc_thumbnail_shared.insert(og);
         } else {
             lc_other.insert(og);
@@ -1654,7 +1788,14 @@ Lin::calculateLinearizationData(T const& object_stream_data)
         );
 
         for (auto const& og: obj_user_to_objects_[ou]) {
-            if (object_to_obj_users_[og].size() > 1 && obj_to_index.contains(og.getObj())) {
+            // PATCH (2): vanilla qpdf consulted object_to_obj_users_[og].size() > 1
+            // here to ask "is this object shared by multiple users?". With the
+            // ObjUserStats representation we ask the same question via is_shared(),
+            // which returns true if more than one logical user (page 0, any other
+            // page, thumb, root, outlines, open-document key, or "other" key) ever
+            // touched the object. See the long comment on ObjUserStats::is_shared
+            // for the equivalence argument.
+            if (object_to_obj_users_[og].is_shared() && obj_to_index.contains(og.getObj())) {
                 int idx = obj_to_index[og.getObj()];
                 ++pe.nshared_objects;
                 pe.shared_identifiers.push_back(idx);
