@@ -1,8 +1,11 @@
 #include <qpdf/QPDFJob_private.hh>
 
+#include <atomic>
 #include <cstring>
 #include <iostream>
 #include <memory>
+#include <mutex>
+#include <thread>
 
 #include <qpdf/AcroForm.hh>
 #include <qpdf/ClosedFileInputSource.hh>
@@ -473,6 +476,8 @@ QPDFJob::writeQPDF(QPDF& pdf)
     }
     if (!createsOutput()) {
         doInspection(pdf);
+    } else if (!m->output_specs.empty()) {
+        doMultiOutput(pdf);
     } else if (m->split_pages) {
         doSplitPages(pdf);
     } else {
@@ -521,7 +526,7 @@ QPDFJob::hasWarnings() const
 bool
 QPDFJob::createsOutput() const
 {
-    return (!m->outfilename.empty() || m->replace_input);
+    return (!m->outfilename.empty() || m->replace_input || !m->output_specs.empty());
 }
 
 int
@@ -574,6 +579,33 @@ QPDFJob::checkConfiguration()
             usage("--json may not be used with --replace-input");
         }
     }
+    if (!m->output_specs.empty()) {
+        if (m->outfilename.empty()) {
+            usage("--multi-output requires an output file pattern");
+        }
+        if (m->split_pages) {
+            usage("--split-pages may not be used with --multi-output");
+        }
+        if (m->replace_input) {
+            usage("--replace-input may not be used with --multi-output");
+        }
+        if (m->json_version) {
+            usage("JSON output may not be used with --multi-output");
+        }
+        if (m->copy_encryption) {
+            usage("--copy-encryption may not be used with --multi-output");
+        }
+        if (m->progress && m->multi_output_threads != 1) {
+            usage("--progress may not be used with --multi-output-threads != 1");
+        }
+        for (auto const& spec : m->output_specs) {
+            if (spec.page_range.empty()) {
+                usage("each output group in --multi-output must have a page range");
+            }
+        }
+    } else if (m->multi_output_threads_set) {
+        usage("--multi-output-threads requires --multi-output");
+    }
     if (m->json_version && m->outfilename.empty()) {
         // The output file is optional with --json for backward compatibility and defaults to
         // standard output.
@@ -613,6 +645,9 @@ QPDFJob::checkConfiguration()
         if (m->split_pages) {
             usage("--split-pages may not be used when writing to standard output");
         }
+        if (!m->output_specs.empty()) {
+            usage("--multi-output may not be used when writing to standard output");
+        }
         save_to_stdout = true;
     }
     if (!m->attachment_to_show.empty()) {
@@ -621,7 +656,8 @@ QPDFJob::checkConfiguration()
     if (save_to_stdout) {
         m->log->saveToStandardOutput(true);
     }
-    if (!m->split_pages && QUtil::same_file(m->infile_nm(), m->outfilename.data())) {
+    if (!m->split_pages && m->output_specs.empty() &&
+        QUtil::same_file(m->infile_nm(), m->outfilename.data())) {
         usage(
             "input file and output file are the same; use --replace-input to intentionally "
             "overwrite the input file");
@@ -2777,6 +2813,31 @@ QPDFJob::maybeFixWritePassword(int R, std::string& password)
 }
 
 void
+QPDFJob::normalizeEncryptionPasswords()
+{
+    if (m->encryption_passwords_normalized || !m->encrypt) {
+        return;
+    }
+    int R = 0;
+    if (m->keylen == 40) {
+        R = 2;
+    } else if (m->keylen == 128) {
+        if (m->force_V4 || m->cleartext_metadata || m->use_aes) {
+            R = 4;
+        } else {
+            R = 3;
+        }
+    } else if (m->keylen == 256) {
+        R = m->force_R5 ? 5 : 6;
+    } else {
+        throw std::logic_error("bad encryption keylen");
+    }
+    maybeFixWritePassword(R, m->user_password);
+    maybeFixWritePassword(R, m->owner_password);
+    m->encryption_passwords_normalized = true;
+}
+
+void
 QPDFJob::setEncryptionOptions(QPDFWriter& w)
 {
     int R = 0;
@@ -2801,8 +2862,11 @@ QPDFJob::setEncryptionOptions(QPDFWriter& w)
         *m->log->getError() << m->message_prefix << ": -accessibility=n is ignored for modern"
                             << " encryption formats\n";
     }
-    maybeFixWritePassword(R, m->user_password);
-    maybeFixWritePassword(R, m->owner_password);
+    if (!m->encryption_passwords_normalized) {
+        maybeFixWritePassword(R, m->user_password);
+        maybeFixWritePassword(R, m->owner_password);
+        m->encryption_passwords_normalized = true;
+    }
     if ((R < 4) || ((R == 4) && (!m->use_aes))) {
         if (!m->allow_weak_crypto) {
             QTC::TC("qpdf", "QPDFJob weak crypto error");
@@ -3033,6 +3097,233 @@ QPDFJob::doSplitPages(QPDF& pdf)
         doIfVerbose([&](Pipeline& v, std::string const& prefix) {
             v << prefix << ": wrote file " << outfile << "\n";
         });
+    }
+}
+
+void
+QPDFJob::doMultiOutput(QPDF& pdf)
+{
+    auto& doc = pdf.doc();
+
+    // Generate filenames from the output pattern (same rules as split-pages)
+    std::string before;
+    std::string after;
+    size_t len = m->outfilename.size();
+    auto num_spot = m->outfilename.find("%d");
+    if (num_spot != std::string::npos) {
+        before = m->outfilename.substr(0, num_spot);
+        after = m->outfilename.substr(num_spot + 2);
+    } else if (
+        len >= 4 && QUtil::str_compare_nocase(m->outfilename.substr(len - 4).data(), ".pdf") == 0) {
+        before = std::string(m->outfilename.data(), len - 4) + "-";
+        after = m->outfilename.data() + len - 4;
+    } else {
+        before = m->outfilename + "-";
+    }
+
+    size_t n_outputs = m->output_specs.size();
+    size_t idx_len = std::to_string(n_outputs).length();
+    for (size_t i = 0; i < n_outputs; ++i) {
+        m->output_specs[i].filename =
+            before + QUtil::uint_to_string(i + 1, QIntC::to_int(idx_len)) + after;
+    }
+
+    for (auto const& spec : m->output_specs) {
+        if (QUtil::same_file(m->infile_nm(), spec.filename.data())) {
+            throw std::runtime_error(
+                "multi-output would overwrite input file with " + spec.filename);
+        }
+    }
+
+    if (shouldRemoveUnreferencedResources(pdf)) {
+        QPDFPageDocumentHelper dh(pdf);
+        dh.removeUnreferencedResources();
+    }
+
+    auto& pldh = doc.page_labels();
+    auto& afdh = doc.acroform();
+    std::vector<QPDFObjectHandle> const& pages = doc.pages().all();
+    int num_pages = static_cast<int>(pages.size());
+
+    // Determine effective thread count
+    int n_threads = m->multi_output_threads;
+    if (n_threads == 0) {
+        n_threads = static_cast<int>(std::thread::hardware_concurrency());
+        if (n_threads < 1) {
+            n_threads = 1;
+        }
+    }
+    if (n_threads > static_cast<int>(n_outputs)) {
+        n_threads = static_cast<int>(n_outputs);
+    }
+    bool use_threads = (n_threads > 1);
+
+    // Lambda: build one output QPDF for a given spec. Used by both paths.
+    auto build_output = [&](OutputSpec const& spec) -> std::unique_ptr<QPDF> {
+        std::vector<int> page_indices = parseNumrange(spec.page_range.c_str(), num_pages);
+
+        auto outpdf = std::make_unique<QPDF>();
+        outpdf->doc().config(m->d_cfg);
+        outpdf->emptyPDF();
+        impl::AcroForm* out_afdh = afdh.hasAcroForm() ? &outpdf->doc().acroform() : nullptr;
+
+        for (int pageno : page_indices) {
+            QPDFObjectHandle page = pages.at(QIntC::to_size(pageno - 1));
+            outpdf->addPage(page, false);
+            auto new_page = added_page(*outpdf, page);
+            if (out_afdh) {
+                try {
+                    out_afdh->fixCopiedAnnotations(new_page, page, afdh);
+                } catch (std::exception& e) {
+                    pdf.warn(
+                        qpdf_e_damaged_pdf,
+                        "",
+                        0,
+                        ("Exception caught while fixing copied annotations. This may be a qpdf "
+                         "bug." +
+                         std::string("Exception: ") + e.what()));
+                }
+            }
+        }
+
+        if (pldh.hasPageLabels()) {
+            std::vector<QPDFObjectHandle> labels;
+            int out_pageno = 0;
+            for (int pageno : page_indices) {
+                pldh.getLabelsForPageRange(
+                    QIntC::to_longlong(pageno - 1),
+                    QIntC::to_longlong(pageno - 1),
+                    out_pageno++,
+                    labels);
+            }
+            QPDFObjectHandle page_labels = QPDFObjectHandle::newDictionary();
+            page_labels.replaceKey("/Nums", QPDFObjectHandle::newArray(labels));
+            outpdf->getRoot().replaceKey("/PageLabels", page_labels);
+        }
+
+        return outpdf;
+    };
+
+    if (!use_threads) {
+        // Sequential path: stream outputs one at a time so peak memory stays
+        // independent of the number of output groups.
+        for (auto const& spec : m->output_specs) {
+            auto outpdf = build_output(spec);
+            Writer w(*outpdf, m->w_cfg);
+            w.setOutputFilename(spec.filename.data());
+            setWriterOptions(w);
+            w.write();
+            doIfVerbose([&](Pipeline& v, std::string const& prefix) {
+                v << prefix << ": wrote file " << spec.filename << "\n";
+            });
+        }
+        return;
+    }
+
+    // Threaded path: prepare every output independently, then write in parallel.
+    // setImmediateCopyFrom ensures worker threads don't read stream data from
+    // the shared source QPDF concurrently.
+    pdf.setImmediateCopyFrom(true);
+
+    // Pl_Flate::setCompressionLevel is a global static; set once before spawning
+    // workers so thread-safe Writer setup can skip it.
+    if (m->compression_level >= 0) {
+        Pl_Flate::setCompressionLevel(m->compression_level);
+    }
+
+    // Password normalization in setEncryptionOptions mutates shared QPDFJob
+    // state (user_password/owner_password); do it once here so workers only
+    // read already-normalized values.
+    normalizeEncryptionPasswords();
+
+    // Pre-warm the crypto provider singleton on the main thread. Without this,
+    // the first worker to construct an MD5 (e.g. for --deterministic-id) races
+    // with the others on lazy initialization of the provider's static state,
+    // which has manifested as glibc "double free" aborts on some Linux runners.
+    (void)QPDFCryptoProvider::getImpl();
+
+    struct OutputBundle {
+        std::unique_ptr<QPDF> outpdf;
+        std::string filename;
+    };
+    std::vector<OutputBundle> bundles;
+    bundles.reserve(n_outputs);
+    for (auto const& spec : m->output_specs) {
+        bundles.push_back({build_output(spec), spec.filename});
+    }
+
+    std::vector<std::thread> threads;
+    std::vector<std::exception_ptr> errors(bundles.size());
+    std::atomic<size_t> next_idx{0};
+    std::mutex log_mutex;
+
+    auto worker = [&]() {
+        while (true) {
+            size_t idx = next_idx.fetch_add(1);
+            if (idx >= bundles.size()) {
+                break;
+            }
+            try {
+                auto& bundle = bundles[idx];
+                Writer w(*bundle.outpdf, m->w_cfg);
+                w.setOutputFilename(bundle.filename.data());
+                setWriterOptionsThreadSafe(w);
+                w.write();
+                doIfVerbose([&](Pipeline& v, std::string const& prefix) {
+                    std::lock_guard<std::mutex> lock(log_mutex);
+                    v << prefix << ": wrote file " << bundle.filename << "\n";
+                });
+            } catch (...) {
+                errors[idx] = std::current_exception();
+            }
+        }
+    };
+
+    for (int i = 1; i < n_threads; ++i) {
+        threads.emplace_back(worker);
+    }
+    worker();
+
+    for (auto& t : threads) {
+        t.join();
+    }
+
+    for (auto& ep : errors) {
+        if (ep) {
+            std::rethrow_exception(ep);
+        }
+    }
+}
+
+void
+QPDFJob::setWriterOptionsThreadSafe(Writer& w)
+{
+    // Preconditions set by doMultiOutput before spawning workers:
+    //   - compression_level is set globally via Pl_Flate::setCompressionLevel.
+    //   - normalizeEncryptionPasswords() has been called, so setEncryptionOptions
+    //     below will not mutate shared QPDFJob password state.
+    //   - copy_encryption is rejected in checkConfiguration.
+    if (m->decrypt) {
+        w.setPreserveEncryption(false);
+    }
+    if (m->static_aes_iv) {
+        w.setStaticAesIV(true);
+    }
+    if (m->encrypt) {
+        setEncryptionOptions(w);
+    }
+    w.setMinimumPDFVersion(m->max_input_version);
+    if (!m->min_version.empty()) {
+        std::string version;
+        int extension_level = 0;
+        parse_version(m->min_version, version, extension_level);
+        w.setMinimumPDFVersion(version, extension_level);
+    }
+    if (!m->force_version.empty()) {
+        std::string version;
+        int extension_level = 0;
+        parse_version(m->force_version, version, extension_level);
+        w.forcePDFVersion(version, extension_level);
     }
 }
 

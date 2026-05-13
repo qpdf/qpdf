@@ -62,6 +62,8 @@ QPDF_DLL Config* iiMinBytes(std::string const& parameter);
 QPDF_DLL Config* jsonObject(std::string const& parameter);
 QPDF_DLL Config* keepFilesOpenThreshold(std::string const& parameter);
 QPDF_DLL Config* minVersion(std::string const& parameter);
+QPDF_DLL Config* multiOutput(std::string const& parameter);
+QPDF_DLL Config* multiOutputThreads(std::string const& parameter);
 QPDF_DLL Config* oiMinArea(std::string const& parameter);
 QPDF_DLL Config* oiMinHeight(std::string const& parameter);
 QPDF_DLL Config* oiMinWidth(std::string const& parameter);

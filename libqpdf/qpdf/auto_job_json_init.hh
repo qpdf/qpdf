@@ -107,6 +107,12 @@ popHandler(); // key: progress
 pushKey("splitPages");
 addParameter([this](std::string const& p) { c_main->splitPages(p); });
 popHandler(); // key: splitPages
+pushKey("multiOutput");
+addParameter([this](std::string const& p) { c_main->multiOutput(p); });
+popHandler(); // key: multiOutput
+pushKey("multiOutputThreads");
+addParameter([this](std::string const& p) { c_main->multiOutputThreads(p); });
+popHandler(); // key: multiOutputThreads
 pushKey("jsonOutput");
 addChoices(json_output_choices, false, [this](std::string const& p) { c_main->jsonOutput(p); });
 popHandler(); // key: jsonOutput
