@@ -123,6 +123,15 @@ QPDF::optimize(
     m->lin.optimize_internal(object_stream_data, allow_changes, skip_stream_parameters);
 }
 
+// PATCH: see QPDF.hh. Installs the analysis-phase progress callback consumed inside
+// Lin::optimize_internal's page loop. QPDFWriter::registerProgressReporter wires this up so the
+// existing --progress / qpdfjob_register_progress_reporter mechanism receives analysis events too.
+void
+QPDF::setLinearizationProgressCallback(std::function<void(int)> cb)
+{
+    m->lin_progress_cb = std::move(cb);
+}
+
 void
 Lin::optimize(
     QPDFWriter::ObjTable const& obj, std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
@@ -157,10 +166,25 @@ Lin::optimize_internal(
     m->pages.pushInheritedAttributesToPage(allow_changes, false);
     // Traverse pages
 
+    // PATCH: emit analysis-phase progress events as we walk the page tree. On
+    // supernode-heavy PDFs this loop is ~80% of total linearize wall time; previously a
+    // downstream host's progress bar sat at 0% for several minutes before snapping to 100%.
+    // We throttle to one event per integer-percent change so callback overhead is negligible
+    // regardless of page count, mirroring the throttling Writer::indicateProgress already
+    // uses on the write side. See QPDFWriter::registerProgressReporter for the receiver.
+    size_t const total = m->pages.size();
+    int last_pct = -1;
     size_t n = 0;
     for (auto const& page: m->pages) {
         updateObjectMaps(ObjUser(ObjUser::ou_page, n), page, skip_stream_parameters);
         ++n;
+        if (m->lin_progress_cb && total > 0) {
+            int pct = static_cast<int>((100ULL * n) / total);
+            if (pct != last_pct) {
+                m->lin_progress_cb(pct);
+                last_pct = pct;
+            }
+        }
     }
 
     // Traverse document-level items

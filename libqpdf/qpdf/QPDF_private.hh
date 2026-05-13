@@ -1264,6 +1264,11 @@ class QPDF::Members: Doc
     bool in_parse{false};
     bool parsed{false};
     std::set<int> resolved_object_streams;
+    // PATCH: callback installed by QPDFWriter::registerProgressReporter so that
+    // the linearization-analysis page loop (Lin::optimize_internal) can emit progress
+    // events through the same path as write-phase events. See
+    // QPDF::setLinearizationProgressCallback.
+    std::function<void(int)> lin_progress_cb;
 };
 
 // The Resolver class is restricted to QPDFObject and BaseHandle so that only it can resolve
