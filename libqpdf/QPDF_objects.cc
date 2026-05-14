@@ -2079,8 +2079,10 @@ Objects::compressible()
             QPDFObjGen og = obj.getObjGen();
             const size_t id = toS(og.getObj() - 1);
             if (id >= max_obj) {
-                throw std::logic_error(
-                    "unexpected object id encountered in getCompressibleObjGens");
+                // Object id is outside the xref-derived max. Can occur on damaged input with
+                // dangling references or after helpers mutate the graph. Skip rather than throwing
+                // an internal logic_error that escapes QPDFWriter::write.
+                continue;
             }
             if (visited[id]) {
                 continue;
