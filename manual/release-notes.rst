@@ -13,17 +13,73 @@ more detail.
 
 .. x.y.z: not yet released
 
-12.3.3: not yet released
+12.4.0: not yet released
   - Bug fixes
 
     - Fix error message when :qpdf:ref:`--check` encounters a file without any pages.
 
-  - New features
+    - In ``QPDFAcroFormDocumentHelper::fixCopiedAnnotations`` remove non-array and empty
+      ``/Annots`` entries from copied pages as well as non-dictionary annotations. Fixes a bug
+      that could cause qpdf to throw a logic error when error when copying pages with damaged
+      annotations.
 
-    - New method `QPDF::deduplicateImageXobjects` which identifies and merges
-      image XObject streams with identical content. This reduces file size for
-      PDFs containing repeated image stream resources. Exposed as
-      `--deduplicate-image-xobjects` in the CLI.
+    - Fix failure in QPDFWriter when trailer ``/ID`` entries are invalid.
+
+    - Limit the effect of ``QPDF::setMaxWarnings`` to the initial loading of the PDF file.
+      Any exceptions thrown as a result of the warning limit being exceeded indicate that
+      the file is too damaged to be processed. Throwing the exception after the file is loaded
+      risks that it would be treated like other exceptions that permit further processing.
+
+    - In ``QPDFPageObjectHelper::getMatrixForTransformations`` handle ``/Rotation`` entries
+      that are less than 0 or greater than 360 correctly. Previously they were treated as 0.
+
+
+  - Security and robustness
+
+    - To reduce the risk of excessive recursion and stack overflows when processing damaged or
+      malicious PDF files, qpdf now enforces conservative limits on the depth of direct objects
+      that may be created using ``QPDFObjectHandle::makeDirect``.
+
+    - To reduce the risk of excessive recursion and stack overflows when processing damaged or
+      malicious PDF files, qpdf now enforces conservative limits on the depth of the pages tree.
+
+    - Detect some duplicate entries in the AcroForm field hierarchy earlier in order to avoid very
+      large runtimes in specially constructed invalid PDF files.
+
+  - Enhancements
+
+    - Rewrite the shell completion functions for zsh and bash. In prior versions
+      of qpdf, the qpdf executable itself was used to provide completion
+      functionality. This was unreliable (didn't work right with spaces in
+      executable name, though there was a workaround), had various bugs when
+      qpdf was wrapped, and was potentially insecure as it could leak sensitive
+      arguments into the environment. The new approach uses ``job.yml`` to
+      autogenerate the completion functions from the same metadata that is used
+      to generate the command-line argument parsing code.
+
+  - Build changes
+
+    - The new ``REQUIRE_SHELLS`` CMake option causes completion tests to fail if
+      a new enough bash and zsh are not installed. This option is enabled by
+      default in maintainer mode.
+
+    - Windows-specific: `external-libs` is deprecated and is replaced with
+      `vcpkg`. This includes the following changes:
+
+      - Instead of downloading external-libs, you can download and extract the
+        latest zip from
+        <https://github.com/qpdf/qpdf/releases/tag/vcpkg-cache-v1>`__. CMake
+        will automatically use it.
+
+      - The script ``./vcpkg-setup-win`` is available for Windows users who want
+        to use qpdf's vcpkg integration.
+
+   - New features
+
+      - New method `QPDF::deduplicateImageXobjects` which identifies and merges
+        image XObject streams with identical content. This reduces file size for
+        PDFs containing repeated image stream resources. Exposed as
+        `--deduplicate-image-xobjects` in the CLI.
 
 12.3.2: January 24, 2026
   - Bug fixes
@@ -141,6 +197,19 @@ more detail.
 
     - More sanity checks have been added when files with damaged xref tables
       are recovered.
+
+    - Security and robustness
+
+      - To reduce the risk of excessive recursion and stack overflows when
+        processing damaged or malicious PDF files, qpdf now enforces
+        reasonable limits on nesting and the depth of direct objects that may
+        be created while repairing or recovering documents. These safeguards
+        prevent specially crafted inputs from triggering deep recursion in
+        object-creation routines and causing crashes. The limits are chosen to
+        be conservative by default to avoid breaking legitimate files; they
+        can be adjusted using the new global limits API (see
+        :ref:`global-options`) or via the :qpdf:ref:`--global` CLI option when
+        necessary.
 
   - Other changes
 

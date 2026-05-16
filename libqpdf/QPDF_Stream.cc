@@ -179,13 +179,16 @@ Streams::deduplicateImageXobjects(int64_t threshold)
         if (master_len < threshold) {
             continue;
         }
+        QPDFObjectHandle master_obj(master);
+        if (replacements.contains(master_obj.getObjGen())) {
+            continue;
+        }
         for (size_t j = i + 1; j < image_candidates.size(); ++j) {
             auto& candidate = image_candidates[j];
             if (candidate.Length() != master_len) {
                 break;
             }
             QPDFObjectHandle candidate_obj(candidate);
-            QPDFObjectHandle master_obj(master);
             if (candidate_obj.equivalent_to(master_obj)) {
                 replacements[candidate_obj.getObjGen()] = master_obj;
             }

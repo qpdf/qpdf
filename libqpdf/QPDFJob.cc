@@ -2225,6 +2225,9 @@ QPDFJob::handleTransformations(QPDF& pdf)
         copyAttachments(pdf);
     }
     if (m->deduplicate_image_xobjects) {
+        doIfVerbose([&](Pipeline& v, std::string const& prefix) {
+            v << prefix << ": deduplicating image XObjects\n";
+        });
         pdf.deduplicateImageXobjects();
     }
 }
