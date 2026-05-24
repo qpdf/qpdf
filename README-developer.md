@@ -691,7 +691,7 @@ python3 -m venv v
 source v/bin/activate
 cd pikepdf
 python3 -m pip install --upgrade pip
-python3 -m pip install '.[test]'
+python3 -m pip install . --group test
 rehash
 python3 -m pip install .
 pytest -n auto
@@ -722,7 +722,7 @@ rm -rf ../v
 python3 -m venv ../v
 source ../v/bin/activate
 python3 -m pip install --upgrade pip
-python3 -m pip install '.[test]'
+python3 -m pip install . --group test
 python3 -m pip install .
 pytest -n auto
 EOF
