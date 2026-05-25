@@ -203,7 +203,7 @@ Lin::optimize_internal(
     obj_user_to_objects_[root_ou].push_back(root_og);
     // PATCH (2): merge this user into the object's stats record instead of
     // .insert into a set<ObjUser>.
-    addUserToStats(object_to_obj_users_[root_og], root_ou);
+    object_to_obj_users_[root_og].add(root_ou);
 
     // PATCH (1): With vector-of-QPDFObjGen replacing set-of-QPDFObjGen we lose
     // the inherent sorted iteration order. Downstream consumers (calculateLinearizationData
@@ -228,33 +228,33 @@ Lin::optimize_internal(
 // calculateLinearizationData — that pass is now a straight read of the
 // already-classified flags.
 void
-Lin::addUserToStats(ObjUserStats& stats, ObjUser const& ou)
+Lin::ObjUserStats::add(ObjUser const& ou)
 {
     switch (ou.ou_type) {
     case ObjUser::ou_page:
-        stats.add_page(static_cast<int>(ou.pageno));
+        add_page(static_cast<int>(ou.pageno));
         break;
     case ObjUser::ou_thumb:
-        stats.add_thumb(static_cast<int>(ou.pageno));
+        add_thumb(static_cast<int>(ou.pageno));
         break;
     case ObjUser::ou_root:
-        stats.is_root = true;
+        is_root = true;
         break;
     case ObjUser::ou_root_key:
         if (ou.key == "/ViewerPreferences" || ou.key == "/PageMode" || ou.key == "/Threads" ||
             ou.key == "/OpenAction" || ou.key == "/AcroForm") {
-            stats.in_open_document = true;
+            in_open_document = true;
         } else if (ou.key == "/Outlines") {
-            stats.in_outlines = true;
+            in_outlines = true;
         } else {
-            stats.in_others = true;
+            in_others = true;
         }
         break;
     case ObjUser::ou_trailer_key:
         if (ou.key == "/Encrypt") {
-            stats.in_open_document = true;
+            in_open_document = true;
         } else {
-            stats.in_others = true;
+            in_others = true;
         }
         break;
     }
@@ -310,7 +310,7 @@ Lin::updateObjectMaps(
             //     a zero-initialised ObjUserStats if og is new to the map,
             //     which is the correct identity element for the merge.
             obj_user_to_objects_[cur.ou].push_back(og);
-            addUserToStats(object_to_obj_users_[og], cur.ou);
+            object_to_obj_users_[og].add(cur.ou);
         }
 
         if (cur.oh.isArray()) {

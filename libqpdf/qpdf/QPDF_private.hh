@@ -684,7 +684,6 @@ class QPDF::Doc::Linearization: Common
     // it's called both from updateObjectMaps (every indirect object reached by DFS) and
     // from optimize_internal (the explicit /Root registration after page traversal).
     struct ObjUserStats;
-    void addUserToStats(ObjUserStats& stats, ObjUser const& ou);
 
     // ===================================================================================
     //
@@ -740,6 +739,20 @@ class QPDF::Doc::Linearization: Common
     // ===================================================================================
     struct ObjUserStats
     {
+        /// @brief Record that an ObjUser references this object.
+        ///
+        /// Updates the internal statistics bits and counters that summarize  categories of users
+        /// reference the object. This includes marking whether the object is referenced from the
+        /// first page, outlines, the document root, open-document keys, other document-level keys,
+        /// thumbnail users, and tracking the first seen non-zero page/thumb and whether more than
+        /// one such page/thumb has been observed.
+        ///
+        /// This method is the single ingest path used by updateObjectMaps and optimize_internal to
+        /// record that `ou` references the object.
+        ///
+        /// @param ou  The ObjUser indicating the user and context that referenced the object.
+        void add(ObjUser const& ou);
+
         // Set true if ou_page with pageno == 0 ever references the object.
         bool in_first_page{false};
         // Set true if ou_root_key with key == "/Outlines" ever references the object.
