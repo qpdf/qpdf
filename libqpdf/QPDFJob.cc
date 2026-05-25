@@ -484,6 +484,10 @@ QPDFJob::writeQPDF(QPDF& pdf)
     } else {
         writeOutfile(pdf);
     }
+
+    m->overlay.clear();
+    m->underlay.clear();
+
     if (!pdf.getWarnings().empty()) {
         m->warnings = true;
     }
