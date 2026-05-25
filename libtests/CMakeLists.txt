@@ -9,8 +9,9 @@ set(TEST_PROGRAMS
   closed_file_input_source
   concatenate
   crypto_provider
-  dct_compress
-  dct_uncompress
+# DCT tests disabled (no JPEG support)
+#  dct_compress
+#  dct_uncompress
   flate
   global
   hex

@@ -25,8 +25,17 @@
 #include <cstddef>
 #include <functional>
 
-// jpeglib.h must be included after cstddef or else it messes up the definition of size_t.
-#include <jpeglib.h>
+// Typedef for compatibility with JPEG types without requiring jpeglib.h
+typedef unsigned int JDIMENSION;
+typedef int J_COLOR_SPACE;
+
+// JPEG color space constants
+#define JCS_UNKNOWN      0
+#define JCS_GRAYSCALE    1
+#define JCS_RGB          2
+#define JCS_YCbCr        3
+#define JCS_CMYK         4
+#define JCS_YCCK         5
 
 class QPDF_DLL_CLASS Pl_DCT: public Pipeline
 {
@@ -59,12 +68,12 @@ class QPDF_DLL_CLASS Pl_DCT: public Pipeline
         CompressConfig() = default;
         QPDF_DLL
         virtual ~CompressConfig() = default;
-        virtual void apply(jpeg_compress_struct*) = 0;
+        virtual void apply(void*) = 0;
     };
 
     QPDF_DLL
     static std::unique_ptr<CompressConfig>
-        make_compress_config(std::function<void(jpeg_compress_struct*)>);
+        make_compress_config(std::function<void(void*)>);
 
     // Constructor for compressing image data
     QPDF_DLL

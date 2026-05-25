@@ -99,10 +99,8 @@ ImageOptimizer::ImageOptimizer(
     image(image)
 {
     if (quality >= 0) {
-        // Recompress existing jpeg.
-        decode_level = qpdf_dl_all;
-        config = Pl_DCT::make_compress_config(
-            [quality](jpeg_compress_struct* cinfo) { jpeg_set_quality(cinfo, quality, FALSE); });
+        // JPEG recompression not available (compiled without libjpeg)
+        QTC::TC("qpdf", "QPDFJob JPEG quality ignored");
     }
 }
 
@@ -182,7 +180,15 @@ ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
         return {};
     }
 
-    return std::make_unique<Pl_DCT>("jpg", next, w, h, components, cs, config.get());
+    // JPEG optimization not available (compiled without libjpeg)
+    QTC::TC("qpdf", "QPDFJob JPEG optimization unavailable");
+    if (!description.empty()) {
+        o.doIfVerbose([&](Pipeline& v, std::string const& prefix) {
+            v << prefix << ": " << description
+              << ": not optimizing because JPEG support is not available\n";
+        });
+    }
+    return {};
 }
 
 bool

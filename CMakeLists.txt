@@ -291,13 +291,7 @@ else()
   qpdf_maybe_add_flag(CXX -Wold-style-cast flag_old-style-cast)
 endif()
 
-# We don't include the jpeg library's include path in the PUBLIC
-# interface for libqpdf since only Pl_DCT.hh requires it. This is
-# documented. Some examples and tests use it though so we have to
-# define it. CMakeLists.txt for libqpdf sets the value for
-# JPEG_INCLUDE which can be selectively added to include paths other
-# tools.
-set(JPEG_INCLUDE)
+# JPEG support removed
 
 if(${CMAKE_SIZEOF_VOID_P} EQUAL 8)
   set(WORDSIZE 64)

@@ -39,10 +39,9 @@ if(OSS_FUZZ)
   # our own object library without the external dependencies and add
   # what we need.
   add_library(libqpdf_fuzz STATIC $<TARGET_OBJECTS:libqpdf_object>)
-  target_link_libraries(libqpdf_fuzz INTERFACE libjpeg.a libz.a)
+  target_link_libraries(libqpdf_fuzz INTERFACE libz.a)
   target_include_directories(libqpdf_fuzz
     PUBLIC
-    ${JPEG_INCLUDE}
     ${qpdf_SOURCE_DIR}/include
     ${qpdf_SOURCE_DIR}/libqpdf)
 else()

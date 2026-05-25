@@ -32,7 +32,7 @@ foreach(PROG ${EXAMPLE_C_PROGRAMS})
   target_link_libraries(${PROG} libqpdf)
   set_property(TARGET ${PROG} PROPERTY LINKER_LANGUAGE CXX)
 endforeach()
-target_include_directories(pdf-create PRIVATE ${JPEG_INCLUDE})
+# JPEG support removed
 
 # extend-c-api contains a mixture of C and C++ files.
 add_executable(extend-c-api extend-c-api-impl.cc extend-c-api.c)
