@@ -1,0 +1,3 @@
+rm -rf build
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_STATIC_LIBS=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=ON  -DUSE_IMPLICIT_CRYPTO=OFF -DREQUIRE_CRYPTO_NATIVE=ON -DCMAKE_CXX_FLAGS="-Os -s"
+cmake --build build --parallel --target libqpdf
