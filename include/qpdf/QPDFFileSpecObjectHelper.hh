@@ -79,6 +79,10 @@ class QPDFFileSpecObjectHelper: public QPDFObjectHelper
 
     QPDF_DLL
     QPDFFileSpecObjectHelper& setDescription(std::string const&);
+
+    QPDF_DLL
+    QPDFFileSpecObjectHelper& setRelationship(std::string const&);
+
     // setFilename sets /UF to unicode_name. If compat_name is empty, it is also set to
     // unicode_name. unicode_name should be a UTF-8 encoded string. compat_name is converted to a
     // string QPDFObjectHandle literally, preserving whatever encoding it might happen to have.

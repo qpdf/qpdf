@@ -150,6 +150,7 @@ class QPDFJob
         std::string moddate;
         std::string mimetype;
         std::string description;
+        std::string relationship;
         bool replace{false};
     };
 

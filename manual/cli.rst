@@ -3228,6 +3228,22 @@ These options are valid between :qpdf:ref:`--add-attachment` and ``--``.
    Supply descriptive text for the attachment, displayed by some PDF
    viewers.
 
+.. qpdf:option:: --relationship=relationship
+
+   .. help: set /AFRelationship value
+
+      Specify the relationship of the attachment to the document as
+      one of /Data, /Source, /Alternative, /Supplement, or
+      /Unspecified. The default is /Supplement.
+
+   Specify the relationship of the attachment to the document. The
+   value must be one of ``/Data``, ``/Source``, ``/Alternative``,
+   ``/Supplement``, or ``/Unspecified``, and defaults to
+   ``/Supplement``. The attachment's file specification is added to
+   the ``/AF`` (associated files) array in the document catalog, and
+   the relationship is stored in its ``/AFRelationship`` key. This is
+   required for attachments in PDF/A-3 files.
+
 .. qpdf:option:: --replace
 
    .. help: replace attachment with same key

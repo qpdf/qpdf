@@ -2027,6 +2027,21 @@ maybe_set_pagemode(QPDF& pdf, std::string const& pagemode)
     }
 }
 
+// Add a file spec to the /AF (associated files) array of the document catalog.
+static void
+add_to_associated_files(QPDF& pdf, QPDFObjectHandle fs)
+{
+    auto catalog = pdf.getRoot();
+
+    const std::string af_key = "/AF";
+
+    if (!catalog.getKey(af_key).isArray()) {
+        catalog.replaceKey(af_key, QPDFObjectHandle::newArray());
+    }
+
+    catalog.getKey(af_key).appendItem(fs);
+}
+
 void
 QPDFJob::addAttachments(QPDF& pdf)
 {
@@ -2042,6 +2057,11 @@ QPDFJob::addAttachments(QPDF& pdf)
         auto fs = QPDFFileSpecObjectHelper::createFileSpec(pdf, to_add.filename, to_add.path);
         if (!to_add.description.empty()) {
             fs.setDescription(to_add.description);
+        }
+
+        if (!to_add.relationship.empty()) {
+            add_to_associated_files(pdf, fs.getObjectHandle());
+            fs.setRelationship(to_add.relationship);
         }
         auto efs = QPDFEFStreamObjectHelper(fs.getEmbeddedFileStream());
         efs.setCreationDate(to_add.creationdate).setModDate(to_add.moddate);
@@ -2091,6 +2111,10 @@ QPDFJob::copyAttachments(QPDF& pdf)
                 duplicates.push_back("file: " + to_copy.path + ", key: " + new_key);
             } else {
                 auto new_fs_oh = pdf.copyForeignObject(iter.second->getObjectHandle());
+                if (new_fs_oh.hasKey("/AFRelationship")) {
+                    // Keep a copied associated file associated with the document.
+                    add_to_associated_files(pdf, new_fs_oh);
+                }
                 efdh.replaceEmbeddedFile(new_key, QPDFFileSpecObjectHelper(new_fs_oh));
                 doIfVerbose([&](Pipeline& v, std::string const& prefix) {
                     v << "  " << iter.first << " -> " << new_key << "\n";

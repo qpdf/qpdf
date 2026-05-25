@@ -12,3 +12,4 @@ QPDF_DLL AttConfig* creationdate(std::string const& parameter);
 QPDF_DLL AttConfig* moddate(std::string const& parameter);
 QPDF_DLL AttConfig* mimetype(std::string const& parameter);
 QPDF_DLL AttConfig* description(std::string const& parameter);
+QPDF_DLL AttConfig* relationship(std::string const& parameter);

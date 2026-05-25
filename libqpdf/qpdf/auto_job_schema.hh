@@ -125,6 +125,7 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
       "key": "specify attachment key",
       "mimetype": "attachment mime type, e.g. application/pdf",
       "moddate": "set attachment's modification date",
+      "relationship": "set /AFRelationship value",
       "replace": "replace attachment with same key"
     }
   ],

@@ -1012,6 +1012,13 @@ application/pdf, image/png, etc.
 Supply descriptive text for the attachment, displayed by some
 PDF viewers.
 .TP
+.B --relationship \-\- set /AFRelationship value
+--relationship=relationship
+
+Specify the relationship of the attachment to the document as
+one of /Data, /Source, /Alternative, /Supplement, or
+/Unspecified. The default is /Supplement.
+.TP
 .B --replace \-\- replace attachment with same key
 Indicate that any existing attachment with the same key should
 be replaced by the new attachment. Otherwise, qpdf gives an

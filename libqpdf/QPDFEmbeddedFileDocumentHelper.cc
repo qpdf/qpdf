@@ -128,11 +128,43 @@ QPDFEmbeddedFileDocumentHelper::getEmbeddedFiles()
     return result;
 }
 
+// A file spec may also be referenced from the /AF (associated files) array of the document catalog.
+// When an attachment is removed or replaced, its file spec must be dropped from that array as well.
+// Otherwise the array keeps a reference to a null object, or keeps the old file spec (and its
+// embedded file stream) alive in the output file.
+static void
+remove_from_associated_files(QPDF& qpdf, QPDFObjectHandle const& fs)
+{
+    if (!fs.isIndirect()) {
+        return;
+    }
+    auto root = qpdf.getRoot();
+    auto af = root.getKey("/AF");
+    if (!af.isArray()) {
+        return;
+    }
+    for (int i = af.getArrayNItems() - 1; i >= 0; --i) {
+        auto item = af.getArrayItem(i);
+        if (item.isIndirect() && item.getObjGen() == fs.getObjGen()) {
+            af.eraseItem(i);
+        }
+    }
+    if (af.getArrayNItems() == 0) {
+        root.removeKey("/AF");
+    }
+}
+
 void
 QPDFEmbeddedFileDocumentHelper::replaceEmbeddedFile(
     std::string const& name, QPDFFileSpecObjectHelper const& fs)
 {
     initEmbeddedFiles();
+    auto iter = m->embedded_files->find(name);
+    if (iter != m->embedded_files->end() &&
+        !(iter->second.isIndirect() && fs.getObjectHandle().isIndirect() &&
+          iter->second.getObjGen() == fs.getObjectHandle().getObjGen())) {
+        remove_from_associated_files(qpdf, iter->second);
+    }
     m->embedded_files->insert(name, fs.getObjectHandle());
 }
 
@@ -147,6 +179,7 @@ QPDFEmbeddedFileDocumentHelper::removeEmbeddedFile(std::string const& name)
         return false;
     }
     if (iter->second.indirect()) {
+        remove_from_associated_files(qpdf, iter->second);
         qpdf.replaceObject(iter->second, Null());
     }
     iter.remove();

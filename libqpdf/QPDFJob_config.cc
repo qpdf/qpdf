@@ -962,6 +962,19 @@ QPDFJob::AttConfig::moddate(std::string const& parameter)
 }
 
 QPDFJob::AttConfig*
+QPDFJob::AttConfig::relationship(std::string const& parameter)
+{
+    if (parameter == "/Data" || parameter == "/Source" || parameter == "/Alternative" || parameter == "/Supplement" || parameter == "/Unspecified") {
+        this->att.relationship = parameter;
+    }
+    else {
+        usage(std::string(parameter) + " is not a valid PDF relationship for file attachment");
+    }
+
+    return this;
+}
+
+QPDFJob::AttConfig*
 QPDFJob::AttConfig::mimetype(std::string const& parameter)
 {
     if (parameter.find('/') == std::string::npos) {
@@ -1007,6 +1020,9 @@ QPDFJob::AttConfig::endAddAttachment()
     }
     if (att.moddate.empty()) {
         att.moddate = now;
+    }
+    if (this->att.relationship.empty()) {
+        this->att.relationship = "/Supplement";
     }
 
     config->o.m->attachments_to_add.push_back(att);

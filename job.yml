@@ -320,6 +320,7 @@ options:
       moddate: modification-date
       mimetype: mime/type
       description: description
+      relationship: relationship
   - table: copy-attachment
     triggers:
       - main.copy-attachments-from
@@ -475,6 +476,7 @@ json:
       key:
       mimetype:
       moddate:
+      relationship:
       replace:
   remove-attachment:
     - null

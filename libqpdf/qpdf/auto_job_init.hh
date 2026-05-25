@@ -194,6 +194,7 @@ this->ap.addRequiredParameter("creationdate", [this](std::string const& x){c_att
 this->ap.addRequiredParameter("moddate", [this](std::string const& x){c_att->moddate(x);}, "modification-date");
 this->ap.addRequiredParameter("mimetype", [this](std::string const& x){c_att->mimetype(x);}, "mime/type");
 this->ap.addRequiredParameter("description", [this](std::string const& x){c_att->description(x);}, "description");
+this->ap.addRequiredParameter("relationship", [this](std::string const& x){c_att->relationship(x);}, "relationship");
 this->ap.registerOptionTable("copy-attachment", b(&ArgParser::argEndCopyAttachment));
 this->ap.addPositional(p(&ArgParser::argCopyAttPositional));
 this->ap.addRequiredParameter("prefix", [this](std::string const& x){c_copy_att->prefix(x);}, "prefix");

@@ -1,15 +1,15 @@
-auto-1 -> 6,0
+auto-1 -> 5,0
   preferred name: auto-1
   all names:
     /F -> auto-1
     /UF -> auto-1
   all data streams:
-    /F -> 6,0
+    /F -> 5,0
       creation date: <date>
       modification date: <date>
       mime type: 
       checksum: a857d18d3fc23ad412122ef040733331
-    /UF -> 6,0
+    /UF -> 5,0
       creation date: <date>
       modification date: <date>
       mime type: 

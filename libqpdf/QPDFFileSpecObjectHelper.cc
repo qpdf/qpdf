@@ -115,6 +115,13 @@ QPDFFileSpecObjectHelper::setDescription(std::string const& desc)
 }
 
 QPDFFileSpecObjectHelper&
+QPDFFileSpecObjectHelper::setRelationship(std::string const& value)
+{
+    this->oh().replaceKey("/AFRelationship", QPDFObjectHandle::newName(value));
+    return *this;
+}
+
+QPDFFileSpecObjectHelper&
 QPDFFileSpecObjectHelper::setFilename(
     std::string const& unicode_name, std::string const& compat_name)
 {

@@ -846,6 +846,12 @@ ap.addOptionHelp("--description", "add-attachment", "set attachment's descriptio
 Supply descriptive text for the attachment, displayed by some
 PDF viewers.
 )");
+ap.addOptionHelp("--relationship", "add-attachment", "set /AFRelationship value", R"(--relationship=relationship
+
+Specify the relationship of the attachment to the document as
+one of /Data, /Source, /Alternative, /Supplement, or
+/Unspecified. The default is /Supplement.
+)");
 ap.addOptionHelp("--replace", "add-attachment", "replace attachment with same key", R"(Indicate that any existing attachment with the same key should
 be replaced by the new attachment. Otherwise, qpdf gives an
 error if an attachment with that key is already present.
@@ -926,12 +932,12 @@ standard output instead of the object's contents. See also
 ap.addOptionHelp("--show-npages", "inspection", "show number of pages", R"(Print the number of pages in the input file on a line by itself.
 Useful for scripts.
 )");
-ap.addOptionHelp("--show-pages", "inspection", "display page dictionary information", R"(Show the object and generation number for each page dictionary
-object and for each content stream associated with the page.
-)");
 }
 static void add_help_8(QPDFArgParser& ap)
 {
+ap.addOptionHelp("--show-pages", "inspection", "display page dictionary information", R"(Show the object and generation number for each page dictionary
+object and for each content stream associated with the page.
+)");
 ap.addOptionHelp("--with-images", "inspection", "include image details with --show-pages", R"(When used with --show-pages, also shows the object and
 generation numbers for the image objects on each page.
 )");
@@ -1031,6 +1037,9 @@ ap.addOptionHelp("--parser-max-errors", "global", "set the maximum number of err
 Set the maximum number of errors allowed while parsing an indirect object.
 A value of 0 means that no maximum is imposed. Defaults to 15.
 )");
+}
+static void add_help_9(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--parser-max-container-size", "global", "set the maximum container size while parsing", R"(--parser-max-container-size=n
 
 Set the maximum number of top-level objects allowed in a container while
@@ -1038,9 +1047,6 @@ parsing. The limit applies when the PDF document's xref table is undamaged
 and the object itself can be parsed without errors. The default limit
 is 4,294,967,295. See also --parser-max-container-size-damaged.
 )");
-}
-static void add_help_9(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--parser-max-container-size-damaged", "global", "set the maximum container size while parsing damaged files", R"(--parser-max-container-size-damaged=n
 
 Set the maximum number of top-level objects allowed in a container while

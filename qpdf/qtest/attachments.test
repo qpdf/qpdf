@@ -150,13 +150,16 @@ $td->runtest("copy attachments",
                   " --copy-attachments-from a.pdf --"},
              {$td->FILE => "copy-attachments-1.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
+# The copied attachments are the same as in add-attachments-1.pdf, but
+# they are added to /AF in key order rather than in command-line
+# order, so the objects are numbered differently.
 $td->runtest("list attachments",
              {$td->COMMAND => "qpdf --list-attachments b.pdf --verbose"},
-             {$td->FILE => "list-attachments-1.out", $td->EXIT_STATUS => 0},
+             {$td->FILE => "list-attachments-5.out", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("check output",
              {$td->FILE => "b.pdf"},
-             {$td->FILE => "add-attachments-1.pdf"},
+             {$td->FILE => "copy-attachments-1.pdf"},
              $td->NORMALIZE_NEWLINES);
 $td->runtest("copy attachments: duplicate",
              {$td->COMMAND =>
@@ -195,7 +198,7 @@ $td->runtest("list attachments",
              $td->NORMALIZE_NEWLINES);
 # The object to show here is the one in list-attachments-4.out
 $td->runtest("check dates",
-             {$td->COMMAND => "qpdf --show-object=6 a.pdf --password=u"},
+             {$td->COMMAND => "qpdf --show-object=5 a.pdf --password=u"},
              {$td->REGEXP => ".*CreationDate \\(D:\\d+.*ModDate \\(D:\\d+.*",
                   $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);

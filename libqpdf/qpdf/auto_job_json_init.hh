@@ -371,6 +371,9 @@ popHandler(); // key: mimetype
 pushKey("moddate");
 addParameter([this](std::string const& p) { c_att->moddate(p); });
 popHandler(); // key: moddate
+pushKey("relationship");
+addParameter([this](std::string const& p) { c_att->relationship(p); });
+popHandler(); // key: relationship
 pushKey("replace");
 addBare([this]() { c_att->replace(); });
 popHandler(); // key: replace
