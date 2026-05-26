@@ -142,19 +142,6 @@ Lin::optimize_internal(
         return;
     }
 
-    // PATCH: hoisted out of calculateLinearizationData. Vanilla qpdf built this
-    // set locally inside the categorisation pass and consulted it while iterating
-    // each object's user set. Because we now collapse the per-object user set into
-    // ObjUserStats at INSERTION time (see addUserToStats below), we need this
-    // information available throughout the page-traversal loop, not just at the
-    // end. Same five keys as the original.
-    open_document_keys_.clear();
-    open_document_keys_.insert("/ViewerPreferences");
-    open_document_keys_.insert("/PageMode");
-    open_document_keys_.insert("/Threads");
-    open_document_keys_.insert("/OpenAction");
-    open_document_keys_.insert("/AcroForm");
-
     // The PDF specification indicates that /Outlines is supposed to be an indirect reference. Force
     // it to be so if it exists and is direct.  (This has been seen in the wild.)
     QPDFObjectHandle root = qpdf.getRoot();
@@ -254,7 +241,8 @@ Lin::addUserToStats(ObjUserStats& stats, ObjUser const& ou)
         stats.is_root = true;
         break;
     case ObjUser::ou_root_key:
-        if (open_document_keys_.contains(ou.key)) {
+        if (ou.key == "/ViewerPreferences" || ou.key == "/PageMode" || ou.key == "/Threads" ||
+            ou.key == "/OpenAction" || ou.key == "/AcroForm") {
             stats.in_open_document = true;
         } else if (ou.key == "/Outlines") {
             stats.in_outlines = true;

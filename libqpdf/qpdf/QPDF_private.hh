@@ -1034,12 +1034,6 @@ class QPDF::Doc::Linearization: Common
     // long comment block above for the rationale and correctness argument.
     std::map<QPDFObjGen, ObjUserStats> object_to_obj_users_;
 
-    // Hoisted out of calculateLinearizationData so addUserToStats can recognise
-    // open-document root-keys at insertion time (where vanilla qpdf had a local
-    // std::set built up only when it reached the categorisation pass). Populated
-    // once at the top of optimize_internal.
-    std::set<std::string> open_document_keys_;
-
     // Linearization data
     bool linearization_warnings_{false}; // set by linearizationWarning, used by checkLinearization
 
