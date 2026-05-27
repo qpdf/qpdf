@@ -96,6 +96,12 @@ qpdf_get_qpdf_version()
     return QPDF::QPDFVersion().c_str();
 }
 
+int
+get_questpdf_version()
+{
+    return 2;
+}
+
 qpdf_data
 qpdf_init()
 {

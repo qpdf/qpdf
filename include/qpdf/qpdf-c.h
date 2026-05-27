@@ -155,6 +155,11 @@ extern "C" {
     QPDF_DLL
     char const* qpdf_get_qpdf_version();
 
+    /* Returns the compatibility version of the questpdf software.
+     */
+    QPDF_DLL
+    int get_questpdf_version();
+
     /* Returns dynamically allocated qpdf_data pointer; must be freed by calling qpdf_cleanup. You
      * must call qpdf_read, one of the other qpdf_read_* functions, or qpdf_empty_pdf before calling
      * any function that would need to operate on the PDF file.
