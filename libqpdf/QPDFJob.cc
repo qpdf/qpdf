@@ -5,6 +5,7 @@
 #include <iostream>
 #include <memory>
 #include <mutex>
+#include <system_error>
 #include <thread>
 
 #include <qpdf/AcroForm.hh>
@@ -3279,8 +3280,20 @@ QPDFJob::doMultiOutput(QPDF& pdf)
         }
     };
 
+    // std::thread's constructor throws std::system_error when the OS cannot
+    // create a thread (EAGAIN — RLIMIT_NPROC / cgroup pids.max exhausted). If
+    // that propagated here, the vector of already-spawned, still-joinable
+    // threads would be destroyed without being joined, which calls
+    // std::terminate() and aborts the process. The worker loop is a
+    // work-stealing queue (next_idx), so any number of workers — even just the
+    // main thread below — drains every output. On thread-creation failure we
+    // therefore stop spawning and let the workers we already have finish.
     for (int i = 1; i < n_threads; ++i) {
-        threads.emplace_back(worker);
+        try {
+            threads.emplace_back(worker);
+        } catch (std::system_error const&) {
+            break;
+        }
     }
     worker();
 
