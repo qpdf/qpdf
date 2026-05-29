@@ -1513,20 +1513,56 @@ Lin::calculateLinearizationData(T const& object_stream_data)
         } else if (in_open_document) {
             lc_open_document.insert(og);
         } else if (in_first_page && !has_others && !has_other_pages && !has_thumbs) {
+            // This is essentially in_first_page && !shared
             lc_first_page_private.insert(og);
         } else if (in_first_page) {
             lc_first_page_shared.insert(og);
         } else if (exactly_one_other_page && !has_others && !has_thumbs) {
+            // This is essentially has_other_pages && !shared
             lc_other_page_private.insert(og);
         } else if (many_other_pages) {
+            // This correctly reproduces qpdf's existing behavior, but is wrong. If the object
+            // passes '(exactly_one_other_page && (has_others || has_thumbs))' it is written to
+            // part 9, breaking linearization for this page. This should be 'has_other_pages'
             lc_other_page_shared.insert(og);
         } else if (exactly_one_thumb && !has_others) {
+            // This is essentially has_thumbs && !shared
             lc_thumbnail_private.insert(og);
         } else if (many_thumbs) {
+            // Similarly to other_pages, this should simply be has_thumbs
             lc_thumbnail_shared.insert(og);
         } else {
             lc_other.insert(og);
         }
+        // The above tests essentially establish a strict order
+        //   is_root > in_outlines > .. > has_thumbs > is_other > uninit
+        // and we only require the maximum of these values and shared. The only other information we
+        // require to decide whether an object is shared is the page number, but only if the maximum
+        // value is other_pages or has_thumbs, and therefore only one page number is required, and
+        // only until we have established that the page is shared.
+        //
+        // This allows us to reduce the stats record to <= the size of 2 ints.
+        //
+        // Using this knowledge, adding an ObjUser or merging a compressed object into an object
+        // stream simplifies too:
+        //
+        // if stats.group == uninit:
+        //   stats.group = other.group
+        //   stats.page = other.page
+        //   return
+        // if !shared:
+        //   if stats.group == other.group && stats.page == other.page && !other.shared:
+        //     return
+        //   else:
+        //     shared = true
+        // if stats.group < other.group:
+        //   stats.group = other.group
+        //   stats.page = other page
+        //
+        // Given that object_to_obj_users_ and the various lc_... sets are all indexed by og, this
+        // will allow us in due course to completely dispense with the lc_... sets, eliminating
+        // the overhead of creating and destroying these sets, and in some cases, destroying the
+        // sets by deleting one element at a time.
     }
 
     // Generate ordering for objects in the output file.  Sometimes we just dump right from a set
