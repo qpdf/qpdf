@@ -1097,8 +1097,12 @@ Lin::show_data()
     try {
         readLinearizationData();
         checkLinearizationInternal();
+    } catch (QPDFExc const& e) {
+        linearizationWarning(e.what());
+    }
+    try {
         dumpLinearizationDataInternal();
-    } catch (QPDFExc& e) {
+    } catch (QPDFExc const& e) {
         linearizationWarning(e.what());
     }
 }
