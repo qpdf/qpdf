@@ -46,7 +46,7 @@ my @to_linearize =
      );
 
 $n_tests += @linearized_files + 6;
-$n_tests += (3 * @to_linearize * 5) + 7;
+$n_tests += (3 * @to_linearize * 5) + 8;
 
 foreach my $base (@linearized_files)
 {
@@ -131,6 +131,12 @@ foreach my $base (@to_linearize)
 $td->runtest("suppress linearization warnings",
              {$td->COMMAND => "qpdf --no-warn --check lin3.pdf"},
              {$td->FILE => "lin3-check-nowarn.out", $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+
+# Show linearization data when --check-linearization fails.
+$td->runtest("show linearization data on failure",
+             {$td->COMMAND => "qpdf --show-linearization i3.pdf"},
+             {$td->FILE => "i3.out", $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
 
 cleanup();

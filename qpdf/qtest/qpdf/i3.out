@@ -1,0 +1,235 @@
+WARNING: i3.pdf: shared object 1 length mismatch: hint table = 346; computed = 64
+WARNING: i3.pdf: shared object 2 length mismatch: hint table = 354; computed = 346
+WARNING: i3.pdf: shared object 3 length mismatch: hint table = 32; computed = 354
+WARNING: i3.pdf: shared object 4 length mismatch: hint table = 37; computed = 32
+WARNING: i3.pdf: shared object 5 length mismatch: hint table = 225; computed = 37
+WARNING: i3.pdf: shared object 6 length mismatch: hint table = 151; computed = 225
+WARNING: i3.pdf: shared object 7 length mismatch: hint table = 360; computed = 151
+WARNING: i3.pdf: shared object 8 length mismatch: hint table = 34; computed = 360
+WARNING: i3.pdf: shared object 9 length mismatch: hint table = 38; computed = 34
+WARNING: i3.pdf: shared object 10 length mismatch: hint table = 232; computed = 38
+WARNING: i3.pdf: shared object 11 length mismatch: hint table = 151; computed = 232
+WARNING: i3.pdf: shared object 12 length mismatch: hint table = 360; computed = 151
+WARNING: i3.pdf: shared object 13 length mismatch: hint table = 34; computed = 360
+WARNING: i3.pdf: shared object 14 length mismatch: hint table = 38; computed = 34
+WARNING: i3.pdf: shared object 15 length mismatch: hint table = 85; computed = 38
+WARNING: i3.pdf: shared object 16 length mismatch: hint table = 233; computed = 85
+WARNING: i3.pdf: shared object 17 length mismatch: hint table = 151; computed = 233
+WARNING: i3.pdf: shared object 18 length mismatch: hint table = 52; computed = 151
+WARNING: i3.pdf: shared object 21 length mismatch: hint table = 38; computed = 52
+WARNING: i3.pdf: shared object 22 length mismatch: hint table = 33; computed = 38
+WARNING: i3.pdf: shared object 23 length mismatch: hint table = 40; computed = 33
+WARNING: i3.pdf: shared object 24 length mismatch: hint table = 38; computed = 40
+WARNING: i3.pdf: shared object 25 length mismatch: hint table = 33; computed = 38
+WARNING: i3.pdf: shared object 26 length mismatch: hint table = 40; computed = 33
+WARNING: i3.pdf: shared object 27 length mismatch: hint table = 38; computed = 40
+WARNING: i3.pdf: shared object 28 length mismatch: hint table = 355; computed = 38
+WARNING: i3.pdf: shared object 29 length mismatch: hint table = 34; computed = 355
+WARNING: i3.pdf: shared object 30 length mismatch: hint table = 33; computed = 34
+WARNING: i3.pdf: shared object 31 length mismatch: hint table = 56; computed = 33
+WARNING: i3.pdf: shared object 32 length mismatch: hint table = 84; computed = 56
+WARNING: i3.pdf: shared object 33 length mismatch: hint table = 265; computed = 84
+WARNING: i3.pdf: shared object 34 length mismatch: hint table = 253; computed = 265
+WARNING: i3.pdf: shared object 35 length mismatch: hint table = 301; computed = 253
+WARNING: i3.pdf: shared object 36 length mismatch: hint table = 58; computed = 301
+WARNING: i3.pdf: shared object 37 length mismatch: hint table = 55; computed = 58
+WARNING: i3.pdf: object count mismatch for page 0: hint table = 39; computed = 38
+WARNING: i3.pdf: page 0 has shared identifier entries
+WARNING: i3.pdf: i3.pdf (offset 1450): unable to get object for item in shared objects hint table
+i3.pdf: linearization data:
+
+file_size: 6731
+first_page_object: 5
+first_page_end: 6221
+npages: 1
+xref_zero_offset: 6629
+first_page: 0
+H_offset: 6221
+H_length: 167
+
+Page Offsets Hint Table
+
+min_nobjects: 39
+first_page_offset: 1170
+nbits_delta_nobjects: 0
+min_page_length: 5051
+nbits_delta_page_length: 0
+min_content_offset: 0
+nbits_delta_content_offset: 0
+min_content_length: 0
+nbits_delta_content_length: 0
+nbits_nshared_objects: 6
+nbits_shared_identifier: 6
+nbits_shared_numerator: 0
+shared_denominator: 1
+Page 0:
+  nobjects: 39
+  length: 5051
+  content_offset: 0
+  content_length: 0
+  nshared_objects: 39
+    identifier 0: 0
+    numerator 0: 0
+    identifier 1: 0
+    numerator 1: 0
+    identifier 2: 0
+    numerator 2: 0
+    identifier 3: 0
+    numerator 3: 0
+    identifier 4: 0
+    numerator 4: 0
+    identifier 5: 0
+    numerator 5: 0
+    identifier 6: 0
+    numerator 6: 0
+    identifier 7: 0
+    numerator 7: 0
+    identifier 8: 0
+    numerator 8: 0
+    identifier 9: 0
+    numerator 9: 0
+    identifier 10: 0
+    numerator 10: 0
+    identifier 11: 0
+    numerator 11: 0
+    identifier 12: 0
+    numerator 12: 0
+    identifier 13: 0
+    numerator 13: 0
+    identifier 14: 0
+    numerator 14: 0
+    identifier 15: 38
+    numerator 15: 0
+    identifier 16: 0
+    numerator 16: 0
+    identifier 17: 0
+    numerator 17: 0
+    identifier 18: 0
+    numerator 18: 0
+    identifier 19: 0
+    numerator 19: 0
+    identifier 20: 9
+    numerator 20: 0
+    identifier 21: 32
+    numerator 21: 0
+    identifier 22: 0
+    numerator 22: 0
+    identifier 23: 0
+    numerator 23: 0
+    identifier 24: 0
+    numerator 24: 0
+    identifier 25: 0
+    numerator 25: 0
+    identifier 26: 0
+    numerator 26: 0
+    identifier 27: 0
+    numerator 27: 0
+    identifier 28: 8
+    numerator 28: 0
+    identifier 29: 0
+    numerator 29: 0
+    identifier 30: 0
+    numerator 30: 0
+    identifier 31: 9
+    numerator 31: 0
+    identifier 32: 23
+    numerator 32: 0
+    identifier 33: 4
+    numerator 33: 0
+    identifier 34: 58
+    numerator 34: 0
+    identifier 35: 40
+    numerator 35: 0
+    identifier 36: 16
+    numerator 36: 0
+    identifier 37: 0
+    numerator 37: 0
+    identifier 38: 0
+    numerator 38: 0
+
+Shared Objects Hint Table
+
+first_shared_obj: 0
+first_shared_offset: 0
+nshared_first_page: 38
+nshared_total: 38
+nbits_nobjects: 0
+min_group_length: 32
+nbits_delta_group_length: 9
+Shared Object 0:
+  group length: 216
+Shared Object 1:
+  group length: 346
+Shared Object 2:
+  group length: 354
+Shared Object 3:
+  group length: 32
+Shared Object 4:
+  group length: 37
+Shared Object 5:
+  group length: 225
+Shared Object 6:
+  group length: 151
+Shared Object 7:
+  group length: 360
+Shared Object 8:
+  group length: 34
+Shared Object 9:
+  group length: 38
+Shared Object 10:
+  group length: 232
+Shared Object 11:
+  group length: 151
+Shared Object 12:
+  group length: 360
+Shared Object 13:
+  group length: 34
+Shared Object 14:
+  group length: 38
+Shared Object 15:
+  group length: 85
+Shared Object 16:
+  group length: 233
+Shared Object 17:
+  group length: 151
+Shared Object 18:
+  group length: 52
+Shared Object 19:
+  group length: 52
+Shared Object 20:
+  group length: 52
+Shared Object 21:
+  group length: 38
+Shared Object 22:
+  group length: 33
+Shared Object 23:
+  group length: 40
+Shared Object 24:
+  group length: 38
+Shared Object 25:
+  group length: 33
+Shared Object 26:
+  group length: 40
+Shared Object 27:
+  group length: 38
+Shared Object 28:
+  group length: 355
+Shared Object 29:
+  group length: 34
+Shared Object 30:
+  group length: 33
+Shared Object 31:
+  group length: 56
+Shared Object 32:
+  group length: 84
+Shared Object 33:
+  group length: 265
+Shared Object 34:
+  group length: 253
+Shared Object 35:
+  group length: 301
+Shared Object 36:
+  group length: 58
+Shared Object 37:
+  group length: 55
+qpdf: operation succeeded with warnings

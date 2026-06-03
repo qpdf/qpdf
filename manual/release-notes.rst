@@ -57,6 +57,10 @@ more detail.
       autogenerate the completion functions from the same metadata that is used
       to generate the command-line argument parsing code.
 
+    - :qpdf:ref:`--show-linearization` / ``QPDF::showLinearization`` now attempts to show
+      linearization data even if linearization checks throw an exception. This can be useful for
+      damaged/invalid files.
+
   - Build changes
 
     - The new ``REQUIRE_SHELLS`` CMake option causes completion tests to fail if
