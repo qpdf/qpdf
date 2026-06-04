@@ -465,6 +465,14 @@ Lin::filterCompressedObjects(QPDFWriter::ObjTable const& obj)
     //   * The data source is QPDFWriter::ObjTable (the writer's per-object state)
     //     instead of a plain int->int map. Per-og translation goes through
     //     obj[og].object_stream rather than a map lookup.
+
+    // The following comment is incorrect. The ObjTable will be populated with the result of the
+    // linearization step, and all objects returned in the parts vectors will be written. At this
+    // point the table contains empty slots for objects that we reasonably expect to write plus
+    // all compressed objects. If we find objects during linearization with unexpected object ids,
+    // they will be added later. (contains only tells us that there is a valid slot that can be
+    // queried)
+
     //   * Ogs that aren't present in the writer's ObjTable at all are dropped
     //     entirely (the writer doesn't intend to emit them). In the source
     //     vector this means compacting the live entries with an out-pointer
@@ -473,16 +481,11 @@ Lin::filterCompressedObjects(QPDFWriter::ObjTable const& obj)
 
     // Change (3): rewrite obj_user_to_objects_ vectors in place, compact-then-sort+unique.
     for (auto& [ou, ogs]: obj_user_to_objects_) {
-        size_t out = 0;
         for (auto& og: ogs) {
-            if (!obj.contains(og)) {
-                continue; // drop ogs not present in the writer's ObjTable
+            if (auto i2 = obj.contains(og) ? obj[og].object_stream : 0) {
+                og = QPDFObjGen(i2, 0);
             }
-            auto i2 = obj[og].object_stream;
-            QPDFObjGen new_og = (i2 <= 0) ? og : QPDFObjGen(i2, 0);
-            ogs[out++] = new_og;
         }
-        ogs.resize(out);
         std::sort(ogs.begin(), ogs.end());
         ogs.erase(std::unique(ogs.begin(), ogs.end()), ogs.end());
     }
@@ -490,10 +493,8 @@ Lin::filterCompressedObjects(QPDFWriter::ObjTable const& obj)
     // Change (4): collect (from, to) translations + the drop-list in one read-only
     // pass over the map, then apply them.
     std::vector<std::pair<QPDFObjGen, QPDFObjGen>> moves; // (from, to)
-    std::vector<QPDFObjGen> to_drop;
     for (auto const& [og, _]: object_to_obj_users_) {
         if (!obj.contains(og)) {
-            to_drop.push_back(og);
             continue;
         }
         auto i2 = obj[og].object_stream;
@@ -503,9 +504,6 @@ Lin::filterCompressedObjects(QPDFWriter::ObjTable const& obj)
                 moves.emplace_back(og, target);
             }
         }
-    }
-    for (auto const& og: to_drop) {
-        object_to_obj_users_.erase(og);
     }
     for (auto const& [from, to]: moves) {
         auto it = object_to_obj_users_.find(from);
