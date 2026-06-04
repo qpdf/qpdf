@@ -309,7 +309,11 @@ Lin::updateObjectMaps(
             //     fixed-size ObjUserStats slot. operator[] default-constructs
             //     a zero-initialised ObjUserStats if og is new to the map,
             //     which is the correct identity element for the merge.
-            obj_user_to_objects_[cur.ou].push_back(og);
+            if (cur.ou.ou_type == ObjUser::ou_page || cur.ou.ou_type == ObjUser::ou_thumb ||
+                (cur.ou.ou_type == ObjUser::ou_root_key &&
+                 (cur.ou.key == "/Pages" || cur.ou.key == "/Outlines"))) {
+                obj_user_to_objects_[cur.ou].push_back(og);
+            }
             object_to_obj_users_[og].add(cur.ou);
         }
 
