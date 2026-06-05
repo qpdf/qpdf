@@ -480,6 +480,23 @@ Objects::Foreign::Copier::copied(QPDFObjectHandle const& foreign)
     // Note that we explicitly allow use of copyForeignObject on page objects. It is a documented
     // use case to copy pages this way if the intention is to not update the pages tree.
 
+    // Ensure per-call scratch state (visiting, to_copy) is cleared on unwind so that an exception
+    // thrown inside reserve_objects or replace_indirect_object cannot leave the Copier in a state
+    // that trips the assertion below on the next call. Without this guard a first
+    // copyForeignObject that fails mid-walk (for example with QPDFExc "Too many warnings") makes
+    // every subsequent copyForeignObject on the same destination throw std::logic_error, which
+    // is outside the documented throw set and terminates the caller.
+    struct ScopeClear
+    {
+        QPDFObjGen::set& v;
+        std::vector<QPDFObjectHandle>& tc;
+        ~ScopeClear()
+        {
+            v.clear();
+            tc.clear();
+        }
+    } _guard{visiting, to_copy};
+
     util::assertion(
         visiting.empty(), "obj_copier.visiting is not empty at the beginning of copyForeignObject");
 
