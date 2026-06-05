@@ -78,6 +78,13 @@ more detail.
       - The script ``./vcpkg-setup-win`` is available for Windows users who want
         to use qpdf's vcpkg integration.
 
+   - New features
+
+      - New method `QPDF::deduplicateImageXobjects` which identifies and merges
+        image XObject streams with identical content. This reduces file size for
+        PDFs containing repeated image stream resources. Exposed as
+        `--deduplicate-image-xobjects` in the CLI.
+
 12.3.2: January 24, 2026
   - Bug fixes
 
