@@ -15,13 +15,13 @@
 #include <qpdf/QTC.hh>
 #include <qpdf/Util.hh>
 
+#include <algorithm>
 #include <array>
 #include <cctype>
 #include <climits>
 #include <cstdlib>
 #include <cstring>
 #include <stdexcept>
-#include <unordered_set>
 #include <vector>
 
 using namespace std::literals;
@@ -725,8 +725,10 @@ BaseHandle::check_insertion(QPDFObjectHandle const& item) const
     // `item`. Only containers are recorded; scalars are never pushed, so the set stays small for
     // typical objects.
 
-    std::unordered_set<QPDFObject*> seen;
+    std::vector<QPDFObject*> seen;
     std::vector<std::pair<QPDFObjectHandle const&, size_t>> stack;
+    // Most containers contain only scalars and references. Don't reserve.
+
     auto push = [&stack](QPDFObjectHandle const& oh, size_t depth) {
         // Indirect children break the cycle, so they are not traversed. Scalars have no children,
         // and streams are always indirect so are never pushed.
@@ -745,11 +747,13 @@ BaseHandle::check_insertion(QPDFObjectHandle const& item) const
                 "may not contain itself, directly or indirectly. Make one of the objects indirect "
                 "with QPDF::makeIndirectObject to create a reference cycle.");
         }
-        if (!seen.insert(node.obj.get()).second) {
+        auto it = std::find(seen.begin(), seen.end(), node.obj.get());
+        if (it != seen.end()) {
             // This direct container is shared by more than one parent; it and its descendants
             // have already been checked.
             continue;
         }
+        seen.push_back(node.obj.get());
 
         if (node.raw_type_code() == ::ot_array) {
             auto& a = std::get<QPDF_Array>(node.obj->value);
