@@ -146,6 +146,7 @@ BaseHandle::replace(std::string const& key, QPDFObjectHandle value)
             d->items.erase(key);
         } else {
             // add or replace value
+            check_insertion(value);
             d->items[key] = value;
         }
         return true;
@@ -189,18 +190,6 @@ Dictionary
 Dictionary::empty()
 {
     return Dictionary(std::map<std::string, QPDFObjectHandle>());
-}
-
-void
-QPDFObjectHandle::checkOwnership(QPDFObjectHandle const& item) const
-{
-    auto qpdf = getOwningQPDF();
-    auto item_qpdf = item.getOwningQPDF();
-    if (qpdf && item_qpdf && qpdf != item_qpdf) {
-        throw std::logic_error(
-            "Attempting to add an object from a different QPDF. Use "
-            "QPDF::copyForeignObject to add objects from another file.");
-    }
 }
 
 bool
@@ -261,12 +250,9 @@ QPDFObjectHandle::getDictAsMap() const
 void
 QPDFObjectHandle::replaceKey(std::string const& key, QPDFObjectHandle const& value)
 {
-    if (auto dict = as_dictionary(strict)) {
-        checkOwnership(value);
-        dict.replace(key, value);
-        return;
+    if (!replace(key, value)) {
+        typeWarning("dictionary", "ignoring key replacement request");
     }
-    typeWarning("dictionary", "ignoring key replacement request");
 }
 
 QPDFObjectHandle
