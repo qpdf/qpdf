@@ -43,6 +43,14 @@ more detail.
     - To reduce the risk of excessive recursion and stack overflows when processing damaged or
       malicious PDF files, qpdf now enforces conservative limits on the depth of the pages tree.
 
+    - The container mutators (``QPDFObjectHandle::replaceKey``, ``appendItem``, ``insertItem``,
+      ``setArrayItem``, and ``setArrayFromVector``) now throw ``std::logic_error`` if the
+      requested change would create a cycle among direct (non-indirect) objects. Such a structure
+      cannot occur in a PDF file, since every backward reference in a file is indirect, but it
+      could previously be constructed in memory through the API, after which ``unparse``,
+      ``writeJSON``, or ``disconnect`` would recurse without bound and crash. Reference cycles
+      built from indirect objects are unaffected and remain supported.
+
     - Detect some duplicate entries in the AcroForm field hierarchy earlier in order to avoid very
       large runtimes in specially constructed invalid PDF files.
 

@@ -15,12 +15,14 @@
 #include <qpdf/QTC.hh>
 #include <qpdf/Util.hh>
 
+#include <algorithm>
 #include <array>
 #include <cctype>
 #include <climits>
 #include <cstdlib>
 #include <cstring>
 #include <stdexcept>
+#include <vector>
 
 using namespace std::literals;
 using namespace qpdf;
@@ -675,6 +677,102 @@ BaseHandle::write_json(int json_version, JSON::Writer& p) const
         break;
     default:
         throw std::logic_error("attempted to write an unsuitable object as JSON");
+    }
+}
+
+/// @brief Validate whether an object may be inserted into this container.
+///
+/// This method performs several checks before permitting insertion of `item` as a child of this
+/// container:
+///
+/// - Ensures `item` is initialized.
+/// - If both this container and `item` are associated with a `QPDF` instance, they must refer to
+///   the same `QPDF` object.
+/// - Scans the direct (non-indirect) array and dictionary children of `item` to detect whether
+///   inserting `item` would create a cycle of direct objects. The traversal is bounded by a depth
+///   limit and deduplicates shared containers, so it runs in time linear in the number of distinct
+///   direct containers reachable from `item`. Indirect objects terminate the scan because they
+///   serialize as object references and cannot be part of a direct cycle.
+///
+/// @param item The object proposed for insertion.
+/// @throws std::logic_error If `item` is uninitialized, belongs to a different `QPDF`, or inserting
+///                          it would create a cycle of direct objects.
+void
+BaseHandle::check_insertion(QPDFObjectHandle const& item) const
+{
+    if (!item) {
+        throw std::logic_error("Attempting to add an uninitialized object to a QPDF_Array.");
+    }
+    if (qpdf() && item.qpdf() && qpdf() != item.qpdf()) {
+        throw std::logic_error(
+            "Attempting to add an object from a different QPDF. Use QPDF::copyForeignObject to add "
+            "objects from another file.");
+    }
+
+    // After inserting `item` as a child of this container, a cycle among direct objects exists if
+    // and only if this container is reachable from `item` by following direct (non-indirect)
+    // array and dictionary children. Indirect objects serialize as "N 0 R" and terminate the
+    // recursion in unparse(), write_json() and disconnect(), so they can never be part of a
+    // direct cycle: the scan stops at them. Because every object read from a PDF is indirect,
+    // this costs nothing for parsed documents and is bounded by the size of any in-memory direct
+    // subgraph being inserted. The container is always a valid array or dictionary, so its
+    // underlying object pointer is the target we look for while traversing.
+    //
+    // The depth limit alone is enough to terminate on a cycle, but a direct object may be shared
+    // by many parents without forming a cycle (a DAG). Re-walking such shared sub-graphs along
+    // every path would be exponential, so already-visited containers are recorded and skipped.
+    // This keeps the scan linear in the number of distinct direct containers reachable from
+    // `item`. Only containers are recorded; scalars are never pushed, so the set stays small for
+    // typical objects.
+
+    std::vector<QPDFObject*> seen;
+    std::vector<std::pair<QPDFObjectHandle const&, size_t>> stack;
+    // Most containers contain only scalars and references. Don't reserve.
+
+    auto push = [&stack](QPDFObjectHandle const& oh, size_t depth) {
+        // Indirect children break the cycle, so they are not traversed. Scalars have no children,
+        // and streams are always indirect so are never pushed.
+        if ((oh.raw_type_code() == ::ot_array || oh.raw_type_code() == ::ot_dictionary) &&
+            !oh.indirect()) {
+            stack.emplace_back(oh, depth - 1);
+        }
+    };
+    push(item, Limits::parser_max_nesting() + 3);
+    while (!stack.empty()) {
+        auto const [node, depth] = stack.back();
+        stack.pop_back();
+        if (depth == 0 || node.obj == obj) {
+            throw std::logic_error(
+                "Attempting to create a cycle of direct objects. A direct (non-indirect) object "
+                "may not contain itself, directly or indirectly. Make one of the objects indirect "
+                "with QPDF::makeIndirectObject to create a reference cycle.");
+        }
+        auto it = std::find(seen.begin(), seen.end(), node.obj.get());
+        if (it != seen.end()) {
+            // This direct container is shared by more than one parent; it and its descendants
+            // have already been checked.
+            continue;
+        }
+        seen.push_back(node.obj.get());
+
+        if (node.raw_type_code() == ::ot_array) {
+            auto& a = std::get<QPDF_Array>(node.obj->value);
+            if (a.sp) {
+                for (auto& entry: a.sp->elements) {
+                    push(entry.second, depth);
+                }
+            } else {
+                for (auto& oh: a.elements) {
+                    push(oh, depth);
+                }
+            }
+            continue;
+        }
+
+        qpdf_assert_debug(node.raw_type_code() == ::ot_dictionary);
+        for (auto& iter: std::get<QPDF_Dictionary>(node.obj->value).items) {
+            push(iter.second, depth);
+        }
     }
 }
 
