@@ -7,6 +7,10 @@ if "%1" == "x64-windows-static" (
 ) else if "%1" == "x86-windows-static" (
     set VCVARS_SCRIPT=vcvars32.bat
 )
+if not "%1" == "x64-windows-static" if not "%1" == "x86-windows-static" if not "%1" == "x64-mingw-static" if not "%1" == "x86-mingw-static" (
+    echo Usage: run-vcpkg.bat {x64-windows-static^|x64-mingw-static^|x86-windows-static^|x86-mingw-static}
+    exit /b 2
+)
 if defined VCVARS_SCRIPT (
     set VSWHERE=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe
     set VSINSTALL=
