@@ -9,9 +9,9 @@ if %2 == msvc (
         for /f "usebackq delims=" %%I in (`"%VSWHERE%" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath`) do set VSINSTALL=%%I
         if defined VSINSTALL (
             if %1 == 64 (
-                set VCVARS=%VSINSTALL%\VC\Auxiliary\Build\vcvars64.bat
+                set VCVARS=!VSINSTALL!\VC\Auxiliary\Build\vcvars64.bat
             ) else (
-                set VCVARS=%VSINSTALL%\VC\Auxiliary\Build\vcvars32.bat
+                set VCVARS=!VSINSTALL!\VC\Auxiliary\Build\vcvars32.bat
             )
         )
     )
@@ -19,10 +19,10 @@ if %2 == msvc (
         echo Could not locate a Visual Studio installation with C++ build tools.
         exit /b 1
     )
-    call "%VCVARS%"
+    call "!VCVARS!"
     if errorlevel 1 (
         echo Failed to initialize MSVC build environment.
-        exit /b %errorlevel%
+        exit /b !errorlevel!
     )
     choco install zip
     choco install nsis
