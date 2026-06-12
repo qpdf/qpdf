@@ -1,8 +1,8 @@
 @echo on
 @rem Usage: build-windows {32|64} {msvc|mingw}
 setlocal ENABLEDELAYEDEXPANSION
+set VSWHERE=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe
 if %2 == msvc (
-    set VSWHERE=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe
     set VSINSTALL=
     set VCVARS=
     if exist "%VSWHERE%" (
