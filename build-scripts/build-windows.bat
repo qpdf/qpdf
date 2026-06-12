@@ -3,6 +3,7 @@
 setlocal ENABLEDELAYEDEXPANSION
 if %2 == msvc (
     set VSWHERE=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe
+    set VSINSTALL=
     set VCVARS=
     if exist "%VSWHERE%" (
         for /f "usebackq delims=" %%I in (`"%VSWHERE%" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath`) do set VSINSTALL=%%I
@@ -15,14 +16,14 @@ if %2 == msvc (
         )
     )
     if not defined VCVARS (
-        if %1 == 64 (
-           set VCVARS=C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat
-        ) else (
-           set VCVARS=C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars32.bat
-        )
+        echo Could not locate a Visual Studio installation with C++ build tools.
+        exit /b 1
     )
     call "%VCVARS%"
-    if errorlevel 1 exit /b %errorlevel%
+    if errorlevel 1 (
+        echo Failed to initialize MSVC build environment.
+        exit /b %errorlevel%
+    )
     choco install zip
     choco install nsis
     bash ./build-scripts/build-windows %1 %2
