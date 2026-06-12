@@ -2,11 +2,27 @@
 @rem Usage: build-windows {32|64} {msvc|mingw}
 setlocal ENABLEDELAYEDEXPANSION
 if %2 == msvc (
-    if %1 == 64 (
-       call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-    ) else (
-       call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars32.bat"
+    set VSWHERE=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe
+    set VCVARS=
+    if exist "%VSWHERE%" (
+        for /f "usebackq delims=" %%I in (`"%VSWHERE%" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath`) do set VSINSTALL=%%I
+        if defined VSINSTALL (
+            if %1 == 64 (
+                set VCVARS=%VSINSTALL%\VC\Auxiliary\Build\vcvars64.bat
+            ) else (
+                set VCVARS=%VSINSTALL%\VC\Auxiliary\Build\vcvars32.bat
+            )
+        )
     )
+    if not defined VCVARS (
+        if %1 == 64 (
+           set VCVARS=C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat
+        ) else (
+           set VCVARS=C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars32.bat
+        )
+    )
+    call "%VCVARS%"
+    if errorlevel 1 exit /b %errorlevel%
     choco install zip
     choco install nsis
     bash ./build-scripts/build-windows %1 %2
