@@ -1,0 +1,157 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+use File::Compare;
+
+unshift(@INC, '.');
+require qpdf_test_helpers;
+
+chdir("qpdf") or die "chdir testdir failed: $!\n";
+
+require TestDriver;
+
+sub mo_cleanup
+{
+    cleanup();
+    system("rm -f mo-*.pdf pad-*.pdf th-*.pdf seq-*.pdf out-*.pdf out.pdf");
+}
+
+mo_cleanup();
+
+my $td = new TestDriver('multi-output');
+
+# Count updated at the bottom of the file.
+my $n_tests = 0;
+
+# ── Argument / configuration errors ──
+
+$td->runtest("threads without --multi-output",
+             {$td->COMMAND =>
+                  "qpdf --multi-output-threads=2 11-pages.pdf out.pdf"},
+             {$td->REGEXP => ".*--multi-output-threads requires --multi-output.*",
+              $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$n_tests += 1;
+
+$td->runtest("negative thread count",
+             {$td->COMMAND =>
+                  "qpdf --multi-output=1-3 --multi-output-threads=-1" .
+                  " 11-pages.pdf out.pdf"},
+             {$td->REGEXP => ".*invalid --multi-output-threads.*",
+              $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$n_tests += 1;
+
+$td->runtest("progress with threads != 1",
+             {$td->COMMAND =>
+                  "qpdf --progress '--multi-output=1-3;4-6'" .
+                  " --multi-output-threads=2 11-pages.pdf out-%d.pdf"},
+             {$td->REGEXP => ".*--progress may not be used with --multi-output-threads.*",
+              $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$n_tests += 1;
+
+$td->runtest("empty argument",
+             {$td->COMMAND =>
+                  "qpdf --multi-output= 11-pages.pdf out-%d.pdf"},
+             {$td->REGEXP => ".*--multi-output requires page range groups.*",
+              $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$n_tests += 1;
+
+$td->runtest("split-pages mutex",
+             {$td->COMMAND =>
+                  "qpdf --split-pages --multi-output=1-3" .
+                  " 11-pages.pdf out-%d.pdf"},
+             {$td->REGEXP => ".*--split-pages may not be used with --multi-output.*",
+              $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$n_tests += 1;
+
+$td->runtest("stdout mutex",
+             {$td->COMMAND =>
+                  "qpdf --multi-output=1-3 11-pages.pdf -"},
+             {$td->REGEXP => ".*--multi-output may not be used when writing to standard output.*",
+              $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$n_tests += 1;
+
+$td->runtest("json-output mutex",
+             {$td->COMMAND =>
+                  "qpdf --json=latest --multi-output=1-3 11-pages.pdf out-%d.pdf"},
+             {$td->REGEXP => ".*JSON output may not be used with --multi-output.*",
+              $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+$n_tests += 1;
+
+# ── Successful runs + filename conventions ──
+
+# %d substitution
+$td->runtest("multi-output %d substitution",
+             {$td->COMMAND =>
+                  "qpdf --static-id --multi-output='1-3;4-6;7-9'" .
+                  " 11-pages.pdf mo-%d-out.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$n_tests += 1;
+for my $i (1, 2, 3) {
+    $td->runtest("mo-%d file $i exists",
+                 {$td->STRING => (-f "mo-$i-out.pdf") ? "yes" : "no"},
+                 {$td->STRING => "yes"});
+    $n_tests += 1;
+}
+
+# .pdf fallback (no %d, ends in .pdf)
+$td->runtest("multi-output .pdf fallback",
+             {$td->COMMAND =>
+                  "qpdf --static-id --multi-output='1-4;5-8'" .
+                  " 11-pages.pdf mo-fallback.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$n_tests += 1;
+for my $i (1, 2) {
+    $td->runtest("mo-fallback-$i.pdf exists",
+                 {$td->STRING => (-f "mo-fallback-$i.pdf") ? "yes" : "no"},
+                 {$td->STRING => "yes"});
+    $n_tests += 1;
+}
+
+# Zero-padding width derived from output count (11 outputs → width 2)
+$td->runtest("multi-output padding width",
+             {$td->COMMAND =>
+                  "qpdf --static-id --multi-output='1;2;3;4;5;6;7;8;9;10;11'" .
+                  " 11-pages.pdf pad-%d-out.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$n_tests += 1;
+$td->runtest("pad-01-out.pdf exists",
+             {$td->STRING => (-f "pad-01-out.pdf") ? "yes" : "no"},
+             {$td->STRING => "yes"});
+$td->runtest("pad-11-out.pdf exists",
+             {$td->STRING => (-f "pad-11-out.pdf") ? "yes" : "no"},
+             {$td->STRING => "yes"});
+$n_tests += 2;
+
+# ── Parity: sequential vs threaded ──
+# With --deterministic-id (content hashed) the two modes must be byte-identical
+# when threading produces the same output bundles as sequential.
+$td->runtest("threaded multi-output run",
+             {$td->COMMAND =>
+                  "qpdf --deterministic-id --multi-output='1-3;4-6;7-9'" .
+                  " --multi-output-threads=3 11-pages.pdf th-%d-out.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$n_tests += 1;
+$td->runtest("sequential multi-output run",
+             {$td->COMMAND =>
+                  "qpdf --deterministic-id --multi-output='1-3;4-6;7-9'" .
+                  " --multi-output-threads=1 11-pages.pdf seq-%d-out.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$n_tests += 1;
+for my $i (1, 2, 3) {
+    my $match = (compare("th-$i-out.pdf", "seq-$i-out.pdf") == 0) ? "match" : "differ";
+    $td->runtest("threaded vs sequential parity $i",
+                 {$td->STRING => $match},
+                 {$td->STRING => "match"});
+    $n_tests += 1;
+}
+
+mo_cleanup();
+$td->report($n_tests);

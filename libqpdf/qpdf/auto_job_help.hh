@@ -368,6 +368,18 @@ File names are generated from the specified output file as follows:
 Page ranges are single page numbers for single-page groups or first-last
 for multi-page groups.
 )");
+ap.addOptionHelp("--multi-output", "modification", "write page groups to separate output files", R"(--multi-output page-ranges
+
+Write semicolon-separated page groups to separate output files in
+a single invocation. See the full option description for file
+naming rules and compatibility.
+)");
+ap.addOptionHelp("--multi-output-threads", "modification", "set thread count for multi-output writing", R"(--multi-output-threads count
+
+Set the number of threads used for writing multi-output files.
+Default is 1 (sequential). Use 0 for automatic detection based
+on available CPU cores. Requires --multi-output.
+)");
 ap.addOptionHelp("--overlay", "modification", "begin overlay options", R"(--overlay file [options] --
 
 Overlay pages from another PDF file on the output.
@@ -421,15 +433,15 @@ ap.addOptionHelp("--oi-min-height", "modification", "minimum height for --optimi
 
 Don't optimize images whose height is below the specified value.
 )");
+}
+static void add_help_5(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--oi-min-area", "modification", "minimum area for --optimize-images", R"(--oi-min-area=area-in-pixels
 
 Don't optimize images whose area in pixels is below the specified value.
 )");
 ap.addOptionHelp("--keep-inline-images", "modification", "exclude inline images from optimization", R"(Prevent inline images from being considered by --optimize-images.
 )");
-}
-static void add_help_5(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--remove-acroform", "modification", "remove the interactive form dictionary", R"(Exclude the interactive form dictionary from the output file. This
 option only removes the interactive form dictionary from the
 document catalog. It does not remove form field dictionaries or
@@ -632,6 +644,9 @@ form: --modify-other=n --annotate=n
 assembly: --modify-other=n --annotate=n --form=n
 none: --modify-other=n --annotate=n --form=n --assemble=n
 )");
+}
+static void add_help_6(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--print", "encryption", "restrict printing", R"(--print=print-opt
 
 Control what kind of printing is allowed. For 40-bit encryption,
@@ -647,9 +662,6 @@ ap.addOptionHelp("--cleartext-metadata", "encryption", "don't encrypt metadata",
 encrypting the rest of the document. This option is not
 available with 40-bit encryption.
 )");
-}
-static void add_help_6(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--use-aes", "encryption", "use AES with 128-bit encryption", R"(--use-aes=[y|n]
 
 Enables/disables use of the more secure AES encryption with
@@ -821,6 +833,9 @@ is usually displayed to the user and is the name most graphical
 PDF viewers will use when saving a file. It defaults to the last
 element (basename) of the attached file's filename.
 )");
+}
+static void add_help_7(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--creationdate", "add-attachment", "set attachment's creation date", R"(--creationdate=date
 
 Specify the attachment's creation date in PDF format; defaults
@@ -833,9 +848,6 @@ Specify the attachment's modification date in PDF format;
 defaults to the current time. Run qpdf --help=pdf-dates for
 information about the date format.
 )");
-}
-static void add_help_7(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--mimetype", "add-attachment", "attachment mime type, e.g. application/pdf", R"(--mimetype=type/subtype
 
 Specify the mime type for the attachment, such as text/plain,
@@ -923,15 +935,15 @@ the filtered (uncompressed, potentially binary) stream data to
 standard output instead of the object's contents. See also
 --raw-stream-data.
 )");
+}
+static void add_help_8(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--show-npages", "inspection", "show number of pages", R"(Print the number of pages in the input file on a line by itself.
 Useful for scripts.
 )");
 ap.addOptionHelp("--show-pages", "inspection", "display page dictionary information", R"(Show the object and generation number for each page dictionary
 object and for each content stream associated with the page.
 )");
-}
-static void add_help_8(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--with-images", "inspection", "include image details with --show-pages", R"(When used with --show-pages, also shows the object and
 generation numbers for the image objects on each page.
 )");
@@ -1026,6 +1038,9 @@ ap.addOptionHelp("--parser-max-nesting", "global", "set the maximum nesting leve
 Set the maximum nesting level while parsing objects. The maximum nesting level
 is not disabled by --no-default-limits. Defaults to 499.
 )");
+}
+static void add_help_9(QPDFArgParser& ap)
+{
 ap.addOptionHelp("--parser-max-errors", "global", "set the maximum number of errors while parsing", R"(--parser-max-errors=n
 
 Set the maximum number of errors allowed while parsing an indirect object.
@@ -1038,9 +1053,6 @@ parsing. The limit applies when the PDF document's xref table is undamaged
 and the object itself can be parsed without errors. The default limit
 is 4,294,967,295. See also --parser-max-container-size-damaged.
 )");
-}
-static void add_help_9(QPDFArgParser& ap)
-{
 ap.addOptionHelp("--parser-max-container-size-damaged", "global", "set the maximum container size while parsing damaged files", R"(--parser-max-container-size-damaged=n
 
 Set the maximum number of top-level objects allowed in a container while
