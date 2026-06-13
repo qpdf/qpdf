@@ -20,6 +20,9 @@ if not defined VALID_TRIPLET (
 )
 if defined VCVARS_SCRIPT (
     set VSWHERE=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe
+    if not exist "!VSWHERE!" (
+        set VSWHERE=%ProgramFiles%\Microsoft Visual Studio\Installer\vswhere.exe
+    )
     set VSINSTALL=
     set VCVARS=
     if exist "!VSWHERE!" (
