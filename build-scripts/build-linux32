@@ -2,6 +2,10 @@
 set -ex
 
 sudo dpkg --add-architecture i386
+# These runner image feeds are unrelated to qpdf and may return 403.
+sudo rm -f \
+    /etc/apt/sources.list.d/azure-cli.sources \
+    /etc/apt/sources.list.d/microsoft-prod.list
 sudo apt-get update
 sudo apt-get -y install \
      build-essential cmake libc6-i386 libgcc-s1:i386 \
