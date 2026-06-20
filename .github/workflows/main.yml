@@ -1,6 +1,12 @@
 name: QPDF Build
 env:
   QTEST_COLOR: 1
+
+# Restrict default token permissions to read-only; individual jobs that
+# need write access must declare it explicitly.
+permissions:
+  contents: read
+
 on:
   push:
     branches:
@@ -20,34 +26,34 @@ jobs:
     # build on Linux. Also create the documentation distribution.
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
       - name: 'Run pre-build steps'
         run: build-scripts/prebuild
         env:
           GH_TOKEN: ${{ github.token }}
       - name: 'Upload documentation for later build steps'
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: doc
           path: doc.zip
       - name: 'Upload external libs'
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: distribution-vcpkg
           path: vcpkg.zip
       - name: 'Upload doc distribution'
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: distribution-prebuild
           path: distribution
   Linux:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
       - name: 'Generate, build, and test'
         run: build-scripts/build-linux
       - name: Upload distribution
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: distribution-linux
           path: distribution
@@ -64,22 +70,25 @@ jobs:
       - name: 'Disable git autocrlf'
         shell: bash
         run: git config --global core.autocrlf input
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
       - name: 'Download documentation'
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           name: doc
           path: .
       - name: 'Download vcpkg cache'
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
           name: distribution-vcpkg
           path: .
       - name: 'Build, test, generate binary distributions'
+        env:
+          WORDSIZE: ${{ matrix.wordsize }}
+          TOOL: ${{ matrix.tool }}
         shell: cmd
-        run: build-scripts/build-windows.bat ${{ matrix.wordsize }} ${{ matrix.tool }}
+        run: build-scripts/build-windows.bat %WORDSIZE% %TOOL%
       - name: 'Upload binary distributions'
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: distribution-windows-${{ matrix.wordsize }}-${{ matrix.tool }}
           path: distribution
@@ -87,18 +96,18 @@ jobs:
     runs-on: macos-latest
     needs: Prebuild
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
       - name: 'Mac build and test'
         run: build-scripts/build-mac
   AppImage:
     runs-on: ubuntu-latest
     needs: Prebuild
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
       - name: 'Build AppImage'
         run: build-scripts/build-appimage
       - name: 'Upload AppImage'
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: distribution-appimage
           path: distribution
@@ -111,39 +120,43 @@ jobs:
     runs-on: ubuntu-latest
     needs: Prebuild
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
       - name: 'pikepdf'
-        run: build-scripts/test-pikepdf ${{ matrix.future }}
+        env:
+          FUTURE: ${{ matrix.future }}
+        run: build-scripts/test-pikepdf $FUTURE
   Sanitizers:
     runs-on: ubuntu-latest
     needs: Prebuild
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
       - name: 'Sanitizer Tests'
         run: build-scripts/test-sanitizers
   Zopfli:
     runs-on: ubuntu-latest
     needs: Prebuild
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
       - name: 'Zopfli Tests'
         run: build-scripts/test-zopfli
   CodeCov:
     runs-on: ubuntu-latest
     needs: Prebuild
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
       - name: 'Code Coverage'
         run: build-scripts/test-coverage
       - id: set_branch
+        env:
+          EVENT_NAME: ${{ github.event_name }}
         run: |
-          if [ "${{ github.event_name }}" = "push" ]; then
+          if [ "$EVENT_NAME" = "push" ]; then
             echo "override_branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
           else
             echo "override_branch=" >> $GITHUB_OUTPUT
           fi
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v7
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           override_branch: ${{ steps.set_branch.outputs.override_branch }}
@@ -163,9 +176,11 @@ jobs:
           - test-c++-next
           - build-android-ndk
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
       - name: ${{ matrix.script }}
-        run: build-scripts/${{ matrix.script }}
+        env:
+          SCRIPT: ${{ matrix.script }}
+        run: build-scripts/$SCRIPT
   MergeArtifacts:
      runs-on: ubuntu-latest
      needs:
@@ -175,7 +190,7 @@ jobs:
        - AppImage
      steps:
        - name: Merge Artifacts
-         uses: actions/upload-artifact/merge@v7
+         uses: actions/upload-artifact/merge@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
          with:
            name: distribution
            pattern: distribution-*
