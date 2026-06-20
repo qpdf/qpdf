@@ -1,0 +1,33 @@
+name: zizmor
+on:
+  push:
+    branches:
+      - main
+      - build
+      - build/*
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  zizmor:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write  # required to upload SARIF to GitHub Security tab
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+
+      - name: Install zizmor
+        run: pip install zizmor==1.25.2
+
+      - name: Run zizmor
+        run: zizmor --format sarif .github/workflows/ > zizmor.sarif
+
+      - name: Upload SARIF results
+        if: always()
+        uses: github/codeql-action/upload-sarif@dd903d2e4f5405488e5ef1422510ee31c8b32357 # v3
+        with:
+          sarif_file: zizmor.sarif
+          category: zizmor
