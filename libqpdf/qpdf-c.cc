@@ -97,9 +97,16 @@ qpdf_get_qpdf_version()
 }
 
 int
-get_questpdf_version()
+questpdf_get_compatibility_version()
 {
     return 3;
+}
+
+// obsolete
+int
+get_questpdf_version()
+{
+    return questpdf_get_compatibility_version();
 }
 
 int

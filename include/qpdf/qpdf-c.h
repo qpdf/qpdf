@@ -160,6 +160,10 @@ extern "C" {
     QPDF_DLL
     int questpdf_get_compatibility_version();
 
+    // obsolete
+    QPDF_DLL
+    int get_questpdf_version();
+
     /* Checks the compatibility by calculating the sum of two integers.
      */
     QPDF_DLL
