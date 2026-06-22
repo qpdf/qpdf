@@ -99,7 +99,12 @@ qpdf_get_qpdf_version()
 int
 get_questpdf_version()
 {
-    return 2;
+    return 3;
+}
+
+int
+questpdf_check_compatibility_by_calculating_sum(int a, int b) {
+    return a + b;
 }
 
 qpdf_data

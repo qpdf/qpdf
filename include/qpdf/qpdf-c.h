@@ -158,7 +158,12 @@ extern "C" {
     /* Returns the compatibility version of the questpdf software.
      */
     QPDF_DLL
-    int get_questpdf_version();
+    int questpdf_get_compatibility_version();
+
+    /* Checks the compatibility by calculating the sum of two integers.
+     */
+    QPDF_DLL
+    int questpdf_check_compatibility_by_calculating_sum(int a, int b);
 
     /* Returns dynamically allocated qpdf_data pointer; must be freed by calling qpdf_cleanup. You
      * must call qpdf_read, one of the other qpdf_read_* functions, or qpdf_empty_pdf before calling
