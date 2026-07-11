@@ -21,7 +21,7 @@ jobs:
       - name: 'Disable git autocrlf'
         shell: bash
         run: git config --global core.autocrlf input
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: 'Build libraries'
         shell: cmd
         run: build-scripts/run-vcpkg.bat ${{ matrix.triplet }}
@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: Build
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: 'Download x64-windows-static stage'
         uses: actions/download-artifact@v8
         with:
