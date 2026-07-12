@@ -475,6 +475,20 @@ preceded by a dash.
 Page ranges are single page numbers for single-page groups or first-last
 for multi-page groups.
 .TP
+.B --multi-output \-\- write page groups to separate output files
+--multi-output page-ranges
+
+Write semicolon-separated page groups to separate output files in
+a single invocation. See the full option description for file
+naming rules and compatibility.
+.TP
+.B --multi-output-threads \-\- set thread count for multi-output writing
+--multi-output-threads count
+
+Set the number of threads used for writing multi-output files.
+Default is 1 (sequential). Use 0 for automatic detection based
+on available CPU cores. Requires --multi-output.
+.TP
 .B --overlay \-\- begin overlay options
 --overlay file [options] --
 

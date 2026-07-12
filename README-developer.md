@@ -931,4 +931,59 @@ that clang-format produces several results. (In git this is commit
 The commits that have the bulk of automatic or mechanical reformatting are
 listed in .git-blame-ignore-revs. Any new bulk updates should be added there.
 
+
+## Fork-Specific Features
+
+This fork (IvanMicai/qpdf) includes features beyond upstream qpdf. Each fork
+feature should be documented here with implementation notes for future maintainers.
+
+### --multi-output
+
+User-facing documentation: see [docs/USAGE_MULTI_OUTPUT.md](docs/USAGE_MULTI_OUTPUT.md).
+
+Implementation notes:
+
+- `QPDFJob::doMultiOutput` (`libqpdf/QPDFJob.cc`) — main logic, with two
+  execution paths:
+  1. **Sequential** (`--multi-output-threads=1`, default): for each page
+     group, build the output QPDF (add pages from the source and let qpdf
+     copy foreign objects internally, fix AcroForm annotations, copy page
+     labels), write it, and release it. Peak memory is independent of the
+     number of output groups.
+  2. **Threaded** (`--multi-output-threads > 1` or `0` for auto): prepare
+     every output QPDF up front (single-threaded), then a worker pool
+     writes them concurrently. Each worker owns its own `QPDFWriter`
+     instance; work distribution uses an atomic counter.
+
+- `QPDFJob::setWriterOptionsThreadSafe` (`libqpdf/QPDFJob.cc`) — a subset
+  of `setWriterOptions` that omits global state modifications, because
+  `Pl_Flate::setCompressionLevel` is process-global and is set once before
+  spawning threads. It also assumes encryption passwords have already been
+  normalized via `QPDFJob::normalizeEncryptionPasswords`, which runs once
+  in the single-threaded phase so workers never mutate shared password
+  state.
+
+- Thread safety strategy: when threads > 1, `QPDF::setImmediateCopyFrom(true)`
+  is called on the source QPDF. This copies stream data to RAM during the
+  preparation phase so each output QPDF is fully independent of the source.
+  Without this, `QPDFWriter::write()` could read stream data from the source
+  file lazily, which is not safe across threads.
+
+- Constraints (validated in `checkConfiguration`): mutually exclusive with
+  `--split-pages`, `--replace-input`, `--copy-encryption`, writing to stdout
+  (`-`), and `--json` output. Compatible with `--pages`, `--encrypt`, and all
+  transformation options.
+
+- Data structures: `QPDFJob::OutputSpec` struct in `QPDFJob_private.hh` stores
+  filename + page range per output. `Members::output_specs` holds the vector
+  of specs. `Members::multi_output_threads` holds the thread count.
+
+- Config API: `Config::multiOutput(string)` parses the semicolon-separated
+  ranges and populates `output_specs`. `Config::multiOutputThreads(string)`
+  parses the thread count.
+
+- JSON job: `multiOutput` and `multiOutputThreads` keys are registered via
+  `job.yml` (simple string parameters — the auto-generated handlers just
+  forward to the Config methods).
+
 [//]: # (cSpell:ignore pikepdfs readthedocsorg dgenerate .)

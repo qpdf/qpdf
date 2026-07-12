@@ -1,0 +1,12 @@
+FROM ubuntu:22.04
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get -y install \
+    build-essential pkg-config cmake \
+    zlib1g-dev libjpeg-dev libgnutls28-dev \
+    python3 python3-pip \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN pip3 install pyyaml
+WORKDIR /src
+COPY . .
+RUN rm -rf build && cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo -DGENERATE_AUTO_JOB=0
+RUN cmake --build build -j$(nproc)

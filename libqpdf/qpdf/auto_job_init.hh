@@ -110,6 +110,8 @@ this->ap.addRequiredParameter("ii-min-bytes", [this](std::string const& x){c_mai
 this->ap.addRequiredParameter("json-object", [this](std::string const& x){c_main->jsonObject(x);}, "trailer");
 this->ap.addRequiredParameter("keep-files-open-threshold", [this](std::string const& x){c_main->keepFilesOpenThreshold(x);}, "count");
 this->ap.addRequiredParameter("min-version", [this](std::string const& x){c_main->minVersion(x);}, "version");
+this->ap.addRequiredParameter("multi-output", [this](std::string const& x){c_main->multiOutput(x);}, "page-ranges");
+this->ap.addRequiredParameter("multi-output-threads", [this](std::string const& x){c_main->multiOutputThreads(x);}, "count");
 this->ap.addRequiredParameter("oi-min-area", [this](std::string const& x){c_main->oiMinArea(x);}, "minimum");
 this->ap.addRequiredParameter("oi-min-height", [this](std::string const& x){c_main->oiMinHeight(x);}, "minimum");
 this->ap.addRequiredParameter("oi-min-width", [this](std::string const& x){c_main->oiMinWidth(x);}, "minimum");

@@ -28,6 +28,8 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
   "forceVersion": "set output PDF version",
   "progress": "show progress when writing",
   "splitPages": "write pages to separate files",
+  "multiOutput": "write page groups to separate output files",
+  "multiOutputThreads": "set thread count for multi-output writing",
   "jsonOutput": "apply defaults for JSON serialization",
   "removeRestrictions": "remove security restrictions from input file",
   "encrypt": {

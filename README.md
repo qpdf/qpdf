@@ -234,3 +234,47 @@ If none of these conditions are true, the build will fail with an error. This be
 The qpdf project has a JetBrains license through
 their [Open Source Program](https://www.jetbrains.com/community/opensource/#support). We are grateful for this program
 and have been enjoying the benefits of their high-quality products.
+
+# Fork Features
+
+This fork ([IvanMicai/qpdf](https://github.com/IvanMicai/qpdf)) includes additional features beyond upstream qpdf.
+
+## Multi-Output with Threading
+
+Write multiple page groups to separate output files in a single qpdf invocation, with optional multi-threaded writing
+for parallel I/O. This avoids the overhead of spawning multiple qpdf processes when you need to produce several outputs
+from the same input PDF.
+
+### CLI Usage
+
+```bash
+# Write 3 output files from one input, sequentially
+qpdf input.pdf --multi-output="1-3;4-6;7-9" output-%d.pdf
+
+# Auto-detect threads (based on hardware_concurrency)
+qpdf input.pdf --multi-output="1-3;4-6;7-9" --multi-output-threads=0 output-%d.pdf
+
+# Explicit 4 threads
+qpdf input.pdf --multi-output="1-3;4-6;7-9" --multi-output-threads=4 output-%d.pdf
+```
+
+### JSON Job Usage
+
+```json
+{
+  "inputFile": "input.pdf",
+  "multiOutput": "1-3;4-6;7-9",
+  "multiOutputThreads": "0",
+  "outputFile": "output-%d.pdf"
+}
+```
+
+Run with: `qpdf --job-json-file=job.json`
+
+### Why
+
+For applications that need to produce N outputs from a single input PDF (e.g. extracting multiple page ranges into
+separate files), spawning N separate qpdf processes is wasteful — each process re-parses the entire PDF. With
+`--multi-output`, the input is parsed once and all outputs are generated in a single invocation, optionally in parallel.
+
+See [docs/USAGE_MULTI_OUTPUT.md](docs/USAGE_MULTI_OUTPUT.md) for the full usage guide with Node.js integration examples.
