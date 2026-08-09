@@ -13,7 +13,7 @@ more detail.
 
 .. x.y.z: not yet released
 
-12.4.0: not yet released
+12.4.0: August 9, 2026
   - Bug fixes
 
     - Fix error message when :qpdf:ref:`--check` encounters a file without any pages.
@@ -32,7 +32,6 @@ more detail.
 
     - In ``QPDFPageObjectHelper::getMatrixForTransformations`` handle ``/Rotation`` entries
       that are less than 0 or greater than 360 correctly. Previously they were treated as 0.
-
 
   - Security and robustness
 
