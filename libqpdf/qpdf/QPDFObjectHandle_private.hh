@@ -114,7 +114,6 @@ namespace qpdf
 
       private:
         QPDF_Array* array() const;
-        void checkOwnership(QPDFObjectHandle const& item) const;
         QPDFObjectHandle null() const;
 
         std::unique_ptr<std::vector<QPDFObjectHandle>> sp_elements{};
