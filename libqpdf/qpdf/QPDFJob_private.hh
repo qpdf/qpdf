@@ -171,6 +171,7 @@ class QPDFJob::Members
     bool verbose{false};
     std::string password;
     bool decrypt{false};
+    bool deduplicate_image_xobjects{false};
     bool remove_restrictions{false};
     int split_pages{0};
     bool progress{false};

@@ -979,6 +979,8 @@ class QPDF::Doc::Objects: Common
 
         //        bool immediate_copy_from() const;
 
+        void deduplicateImageXobjects(int64_t threshold = 0);
+
       private:
         std::shared_ptr<Copier> copier_;
     }; // class QPDF::Doc::Objects::Streams

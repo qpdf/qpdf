@@ -257,6 +257,12 @@ QPDF::emptyPDF()
 }
 
 void
+QPDF::deduplicateImageXobjects(int64_t threshold)
+{
+    m->objects.streams().deduplicateImageXobjects(threshold);
+}
+
+void
 QPDF::registerStreamFilter(
     std::string const& filter_name, std::function<std::shared_ptr<QPDFStreamFilter>()> factory)
 {

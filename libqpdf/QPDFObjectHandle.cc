@@ -449,7 +449,12 @@ BaseHandle::equivalent_to(BaseHandle const& other, int depth) const
             if (!s1.m->stream_dict.equivalent_to(s2.m->stream_dict, depth - 1)) {
                 return false;
             }
-            return s1.m->stream_data->view() == s2.m->stream_data->view();
+            // stream_data is only populated for replaceStreamData() streams;
+            // file-backed streams must be read via getRawStreamData().
+            if (s1.m->stream_data && s2.m->stream_data) {
+                return s1.m->stream_data->view() == s2.m->stream_data->view();
+            }
+            return Stream{obj}.getRawStreamData() == Stream{other.obj}.getRawStreamData();
         }
     case ::ot_operator:
         throw std::logic_error("Internal error in BaseHandle::equivalent_to: found ot_operator");
