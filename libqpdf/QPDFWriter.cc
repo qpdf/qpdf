@@ -1389,16 +1389,27 @@ void
 impl::Writer::enqueue(QPDFObjectHandle const& object)
 {
     if (object.indirect()) {
-        util::assertion(
-            // This owner check can only be done for indirect objects. It is possible for a direct
-            // object to have an owning QPDF that is from another file if a direct QPDFObjectHandle
-            // from one file was insert into another file without copying. Doing that is safe even
-            // if the original QPDF gets destroyed, which just disconnects the QPDFObjectHandle from
-            // its owner.
-            object.qpdf() == &qpdf,
-            "QPDFObjectHandle from different QPDF found while writing.  "
-            "Use QPDF::copyForeignObject to add objects from another file." //
-        );
+        // This owner check can only be done for indirect objects. It is possible for a direct
+        // object to have an owning QPDF that is from another file if a direct QPDFObjectHandle
+        // from one file was insert into another file without copying. Doing that is safe even
+        // if the original QPDF gets destroyed, which just disconnects the QPDFObjectHandle from
+        // its owner.
+        //
+        // This used to be a util::assertion which throws std::logic_error. Damaged input
+        // combined with helpers like QPDFAcroFormDocumentHelper::fixCopiedAnnotations can leave
+        // stray foreign indirect handles in the graph; since logic_error is outside the
+        // documented throw set (QPDFExc / std::runtime_error), consumers that catch QPDFExc
+        // would crash via std::terminate. Surface the condition as a QPDFExc instead so the
+        // catch-and-continue pattern used by tools like pikepdf / PDFArranger works.
+        if (object.qpdf() != &qpdf) {
+            throw QPDFExc(
+                qpdf_e_internal,
+                qpdf.getFilename(),
+                "",
+                0,
+                "QPDFObjectHandle from different QPDF found while writing.  "
+                "Use QPDF::copyForeignObject to add objects from another file.");
+        }
 
         if (cfg.qdf() && object.isStreamOfType("/XRef")) {
             // As a special case, do not output any extraneous XRef streams in QDF mode. Doing so
