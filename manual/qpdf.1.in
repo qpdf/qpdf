@@ -14,3 +14,10 @@ useful primarily to PDF developers.
 .PP
 For a summary of qpdf's options, please run \fBqpdf \-\-help\fR. A
 complete manual can be found at https://qpdf.readthedocs.io.
+.PP
+In some distributions, you can find offline versions of the qpdf
+manual in /usr/share/doc/qpdf. This may require installing an
+additional package, such as \fBqpdf-doc\fR in Debian-based Linux
+distributions. You can also download offline documentation from
+https://qpdf.readthedocs.io. For more information, see README-doc.txt
+in the source distribution.

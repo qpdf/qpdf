@@ -3,10 +3,15 @@ WHERE TO FIND THE qpdf DOCUMENTATION
 Complete documentation for qpdf can be found online here:
 https://qpdf.readthedocs.io
 
+You can read the docs there online, or you can download offline
+versions in several formats.
+
 Some distributions include offline documentation typically in a
-location such as /usr/share/doc/qpdf. If it isn't there, you can find
-a zip file containing the documentation in the qpdf release area:
-https://github.com/qpdf/qpdf/releases
+location such as /usr/share/doc/qpdf. This may require installing a
+different package, such as qpdf-doc in Debian-based Linux
+distributions. If the documentation isn't on the system or available
+for installation, you can find a zip file containing the documentation
+in the qpdf release area: https://github.com/qpdf/qpdf/releases
 
 Offline documentation contains the following:
 
