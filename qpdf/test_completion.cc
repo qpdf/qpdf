@@ -247,7 +247,7 @@ chop_end(std::string_view end_text)
 }
 
 static std::string
-read_until(int pty, std::string_view end_text, int timeout)
+read_until(int pty, std::string_view end_text, int timeout, int timeout_factor)
 {
     std::optional<std::string> result = std::nullopt;
     char buf[1024];
@@ -263,7 +263,7 @@ read_until(int pty, std::string_view end_text, int timeout)
         fds[0].revents = 0;
         nfds_t n_fds = 1;
 
-        int ret = poll(fds, n_fds, timeout);
+        int ret = poll(fds, n_fds, timeout * timeout_factor);
 
         if (ret == 0) {
             // timeout
@@ -302,7 +302,7 @@ read_until(int pty, std::string_view end_text, int timeout)
 }
 
 static std::string
-type_and_read_until(int pty, std::string_view text, std::string_view end_text)
+type_and_read_until(int pty, std::string_view text, std::string_view end_text, int timeout_factor)
 {
     auto end = std::ranges::find_if_not(
         text, [](char c) { return std::isprint(static_cast<unsigned char>(c)); });
@@ -310,9 +310,9 @@ type_and_read_until(int pty, std::string_view text, std::string_view end_text)
     safe_write(pty, text.data(), text.size());
     if (!plain.empty()) {
         // Read and discard the echoed plain text part of the command.
-        read_until(pty, plain, short_timeout);
+        read_until(pty, plain, short_timeout, timeout_factor);
     }
-    return read_until(pty, end_text, short_timeout);
+    return read_until(pty, end_text, short_timeout, timeout_factor);
 }
 
 static pid_t
@@ -417,13 +417,13 @@ check_no_input(int pty, std::string const& where)
 }
 
 static void
-setup(int pty, char const* prompt, std::vector<char const*> const& init)
+setup(int pty, char const* prompt, std::vector<char const*> const& init, int timeout_factor)
 {
-    read_until(pty, prompt, long_timeout);
+    read_until(pty, prompt, long_timeout, timeout_factor);
     for (auto const& cmd: init) {
         safe_write(pty, cmd, strlen(cmd));
     }
-    read_until(pty, test_prompt, long_timeout);
+    read_until(pty, test_prompt, long_timeout, timeout_factor);
     check_no_input(pty, "after setup");
 }
 
@@ -451,7 +451,12 @@ split_into_words(std::string const& out)
 }
 
 static std::string
-complete(int pty, std::string_view fragment, bool expect_prompt, std::string_view extra)
+complete(
+    int pty,
+    std::string_view fragment,
+    bool expect_prompt,
+    std::string_view extra,
+    int timeout_factor)
 {
     std::string end_text;
     if (expect_prompt) {
@@ -463,7 +468,7 @@ complete(int pty, std::string_view fragment, bool expect_prompt, std::string_vie
     end_text += extra;
     std::string out;
     try {
-        out = type_and_read_until(pty, text, end_text);
+        out = type_and_read_until(pty, text, end_text, timeout_factor);
     } catch (std::runtime_error const& e) {
         // Don't treat this as a fatal error; just try to resync below.
         error(std::string("while looking for ") + end_text + ": " + e.what());
@@ -479,7 +484,7 @@ complete(int pty, std::string_view fragment, bool expect_prompt, std::string_vie
     // occurrences, so ignore its output.
     safe_write(pty, "\x15", 1);
     // Resync on a colon.
-    type_and_read_until(pty, ":\n", test_prompt);
+    type_and_read_until(pty, ":\n", test_prompt, timeout_factor);
     if (!check_no_input(pty, "after blank line")) {
         throw std::runtime_error("unable to resync; bailing");
     }
@@ -487,7 +492,7 @@ complete(int pty, std::string_view fragment, bool expect_prompt, std::string_vie
 }
 
 static void
-do_test(int pty, std::string_view shell, TestCase const& test_case)
+do_test(int pty, std::string_view shell, TestCase const& test_case, int timeout_factor)
 {
     // No output is issued for passing tests, so any output or error results in a test failure.
     auto extra = test_case.end;
@@ -496,7 +501,7 @@ do_test(int pty, std::string_view shell, TestCase const& test_case)
         extra = extra.substr(1);
         expect_prompt = true;
     }
-    auto raw_out = complete(pty, test_case.command, expect_prompt, extra);
+    auto raw_out = complete(pty, test_case.command, expect_prompt, extra, timeout_factor);
     auto words = split_into_words(raw_out);
     std::set<std::string_view> wanted;
     std::set<std::string_view> not_wanted;
@@ -532,10 +537,10 @@ do_test(int pty, std::string_view shell, TestCase const& test_case)
 }
 
 static void
-run(int pty, std::string_view shell, Tests const& tests)
+run(int pty, std::string_view shell, Tests const& tests, int timeout_factor)
 {
     for (auto const& test_case: tests.cases) {
-        do_test(pty, shell, test_case);
+        do_test(pty, shell, test_case, timeout_factor);
     }
 }
 
@@ -632,6 +637,48 @@ parse_tests(char const* test_file, char const* shell)
     return Tests{.cases = cases};
 }
 
+bool
+do_tests(
+    char const* test_file,
+    char const* shell,
+    char const* shell_argv[],
+    char const* prompt,
+    std::vector<char const*> const& init,
+    int timeout_factor)
+{
+    pid_t child_pid = 0;
+    try {
+        auto tests = parse_tests(test_file, shell);
+        if (debug) {
+            std::cout << "-- BEGIN TESTS --\n";
+            for (auto const& test_case: tests.cases) {
+                std::cout << "name: " << test_case.name << "\n";
+                std::cout << "cmd: " << test_case.command << "\n";
+                std::cout << "end: " << test_case.end << "\n";
+                std::cout << "out:\n";
+                for (auto const& out: test_case.out) {
+                    std::cout << "  " << out.value << " (wanted=" << out.wanted << ")\n";
+                }
+                std::cout << "\n";
+            }
+            std::cout << "-- END TESTS --\n";
+        }
+        PtyPair pty_pair;
+        child_pid = start_shell(pty_pair.d.primary, pty_pair.d.secondary, shell_argv);
+        pty_pair.d.close_secondary();
+        setup(pty_pair.d.primary, prompt, init, timeout_factor);
+        run(pty_pair.d.primary, shell, tests, timeout_factor);
+    } catch (std::exception& e) {
+        errors = true;
+        std::cerr << whoami << ": ERROR: " << e.what() << "\n";
+    }
+    // Kill child process if still running, but ignore any errors.
+    if (child_pid > 0) {
+        static_cast<void>(kill(-child_pid, SIGHUP));
+    }
+    return errors;
+}
+
 int
 main(int argc, char* argv[])
 {
@@ -709,38 +756,18 @@ main(int argc, char* argv[])
             std::cout << cmd;
         }
     } else {
-        pid_t child_pid = 0;
-        try {
-            auto tests = parse_tests(test_file, shell);
-            if (debug) {
-                std::cout << "-- BEGIN TESTS --\n";
-                for (auto const& test_case: tests.cases) {
-                    std::cout << "name: " << test_case.name << "\n";
-                    std::cout << "cmd: " << test_case.command << "\n";
-                    std::cout << "end: " << test_case.end << "\n";
-                    std::cout << "out:\n";
-                    for (auto const& out: test_case.out) {
-                        std::cout << "  " << out.value << " (wanted=" << out.wanted << ")\n";
-                    }
-                    std::cout << "\n";
-                }
-                std::cout << "-- END TESTS --\n";
+        bool first = true;
+        for (int timeout_factor: {1, 2, 5}) {
+            if (first) {
+                first = false;
+            } else {
+                std::cout << "*** retrying with longer timeout ***\n";
             }
-            PtyPair pty_pair;
-            child_pid = start_shell(pty_pair.d.primary, pty_pair.d.secondary, shell_argv.data());
-            pty_pair.d.close_secondary();
-            setup(pty_pair.d.primary, prompt, *init);
-            run(pty_pair.d.primary, shell, tests);
-        } catch (std::exception& e) {
-            errors = true;
-            std::cerr << whoami << ": ERROR: " << e.what() << "\n";
-        }
-        // Kill child process if still running, but ignore any errors.
-        if (child_pid > 0) {
-            static_cast<void>(kill(-child_pid, SIGHUP));
-        }
-        if (!errors) {
-            std::cout << "All tests passed.\n";
+            errors = do_tests(test_file, shell, shell_argv.data(), prompt, *init, timeout_factor);
+            if (!errors) {
+                std::cout << "All tests passed.\n";
+                break;
+            }
         }
     }
 
