@@ -758,6 +758,7 @@ main(int argc, char* argv[])
     } else {
         bool first = true;
         for (int timeout_factor: {1, 2, 5}) {
+            errors = false;
             if (first) {
                 first = false;
             } else {

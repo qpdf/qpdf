@@ -46,7 +46,7 @@ if (exists $ENV{'REQUIRE_SHELLS'}) {
 if ($bash_ok) {
     $td->runtest("bash completion",
                  {$td->COMMAND => "test_completion --shell bash --tests completion-tests"},
-                 {$td->STRING => "All tests passed.\n", $td->EXIT_STATUS => 0},
+                 {$td->REGEXP => '.*All tests passed.\n$', $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
 } else {
     $td->emphasize("a new enough bash is not present; skipping bash");
@@ -58,7 +58,7 @@ if ($bash_ok) {
 if ($zsh_ok) {
     $td->runtest("zsh completion",
                  {$td->COMMAND => "test_completion --shell zsh --tests completion-tests"},
-                 {$td->STRING => "All tests passed.\n", $td->EXIT_STATUS => 0},
+                 {$td->REGEXP => '.*All tests passed.\n$', $td->EXIT_STATUS => 0},
                  $td->NORMALIZE_NEWLINES);
 } else {
     $td->emphasize("a new enough zsh is not present; skipping zsh");
