@@ -801,18 +801,21 @@ Lin::maxEnd(ObjUser const& ou)
 }
 
 qpdf_offset_t
-Lin::getLinearizationOffset(QPDFObjGen og)
+Lin::getLinearizationOffset(QPDFObjGen og, bool require_type_1)
 {
     QPDFXRefEntry const& entry = m->xref_table[og];
     auto typ = entry.getType();
     if (typ == 1) {
         return entry.getOffset();
     }
-    no_ci_stop_if(
-        typ != 2, "getLinearizationOffset called for xref entry not of type 1 or 2" //
-    );
+    no_ci_stop_if(typ != 2, "getLinearizationOffset called for xref entry not of type 1 or 2");
+    if (require_type_1) {
+        stopOnError(
+            "the object stream containing an object is itself contained in an object stream");
+    }
+
     // For compressed objects, return the offset of the object stream that contains them.
-    return getLinearizationOffset({entry.getObjStreamNumber(), 0});
+    return getLinearizationOffset({entry.getObjStreamNumber(), 0}, true);
 }
 
 QPDFObjectHandle
