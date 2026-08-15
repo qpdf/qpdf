@@ -112,6 +112,8 @@ test_main()
         check(QPDFObjectHandle::newReal("-0.56").getJSON(i), "-0.56");
         check(QPDFObjectHandle::newReal("-.78").getJSON(i), "-0.78");
         check(QPDFObjectHandle::newReal("-78.").getJSON(i), "-78.0");
+        check(QPDFObjectHandle::newReal("0000612.00").getJSON(i), "612.00");
+        check(QPDFObjectHandle::newReal("000000").getJSON(i), "0");
     }
     JSON jmap2 = JSON::parse(R"({"a": 1, "b": "two", "c": [true]})");
     std::map<std::string, std::string> dvalue;
