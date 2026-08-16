@@ -2433,15 +2433,7 @@ impl::Writer::write()
 
     // Set up progress reporting. For linearized files, we write two passes. events_expected is an
     // approximation, but it's good enough for progress reporting, which is mostly a guess anyway.
-    // PATCH: vanilla qpdf used getObjectCount() here, but objects packed inside object streams
-    // (IC) never trigger a per-object indicateProgress increment — they're written bundled inside
-    // their container's stream body in writeObjectStream's inner pass 2. Their containers (CO)
-    // also early-return out of writeObject without an increment. So events_seen structurally only
-    // ever reaches 2 * (N - CO - IC) for linearized writes (and N - CO - IC for standard). On
-    // object-stream-heavy PDFs (tagged-PDF documents typical of Microsoft Word-365 PDF exports)
-    // roughly 40% of objects can live in object streams, which made the progress bar cap at ~58%
-    // before the finished=true call jumped it to 100%. Counting only writable objects keeps the
-    // ratio close to 1 across file types.
+    // Count only objects that, when written, trigger an indicateProgress increment.
     size_t in_stream_objs = 0;
     for (auto const& kv: object_stream_to_objects) {
         in_stream_objs += kv.second.size();
