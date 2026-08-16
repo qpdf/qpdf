@@ -238,23 +238,23 @@ Lin::ObjUserStats::add(ObjUser const& ou)
         add_thumb(static_cast<int>(ou.pageno));
         break;
     case ObjUser::ou_root:
-        is_root = true;
+        is_root_ = true;
         break;
     case ObjUser::ou_root_key:
         if (ou.key == "/ViewerPreferences" || ou.key == "/PageMode" || ou.key == "/Threads" ||
             ou.key == "/OpenAction" || ou.key == "/AcroForm") {
-            in_open_document = true;
+            in_open_document_ = true;
         } else if (ou.key == "/Outlines") {
-            in_outlines = true;
+            in_outlines_ = true;
         } else {
-            in_others = true;
+            in_others_ = true;
         }
         break;
     case ObjUser::ou_trailer_key:
         if (ou.key == "/Encrypt") {
-            in_open_document = true;
+            in_open_document_ = true;
         } else {
-            in_others = true;
+            in_others_ = true;
         }
         break;
     }
@@ -1494,17 +1494,17 @@ Lin::calculateLinearizationData(T const& object_stream_data)
     // The categorisation branches that consume these locals are unchanged from
     // upstream — the conditions are expressed identically.
     for (auto& [og, stats]: object_to_obj_users_) {
-        bool const in_open_document = stats.in_open_document;
-        bool const in_first_page = stats.in_first_page;
-        bool const in_outlines = stats.in_outlines;
-        bool const is_root = stats.is_root;
-        bool const has_other_pages = stats.first_other_pageno != -1;
-        bool const exactly_one_other_page = has_other_pages && !stats.more_than_one_other_page;
-        bool const many_other_pages = stats.more_than_one_other_page;
-        bool const has_thumbs = stats.first_thumb_pageno != -1;
-        bool const exactly_one_thumb = has_thumbs && !stats.more_than_one_thumb;
-        bool const many_thumbs = stats.more_than_one_thumb;
-        bool const has_others = stats.in_others;
+        bool const in_open_document = stats.in_open_document_;
+        bool const in_first_page = stats.in_first_page_;
+        bool const in_outlines = stats.in_outlines_;
+        bool const is_root = stats.is_root_;
+        bool const has_other_pages = stats.first_other_pageno_ != -1;
+        bool const exactly_one_other_page = has_other_pages && !stats.more_than_one_other_page_;
+        bool const many_other_pages = stats.more_than_one_other_page_;
+        bool const has_thumbs = stats.first_thumb_pageno_ != -1;
+        bool const exactly_one_thumb = has_thumbs && !stats.more_than_one_thumb_;
+        bool const many_thumbs = stats.more_than_one_thumb_;
+        bool const has_others = stats.in_others_;
 
         if (is_root) {
             lc_root.insert(og);
