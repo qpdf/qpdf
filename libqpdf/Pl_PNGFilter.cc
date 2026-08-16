@@ -41,6 +41,9 @@ Pl_PNGFilter::Pl_PNGFilter(
     util::no_ci_rt_error_if(
         !util::fits<uint32_t>(bits_per_pixel + 7),
         "PNGFilter created with bits_per_sample and samples_per_pixel values that cause overflow");
+    util::no_ci_rt_error_if(
+        !util::fits<uint32_t>(columns),
+        "PNGFilter created with columns value that causes overflow");
     bytes_per_pixel = static_cast<uint32_t>((bits_per_pixel + 7) / 8);
     auto bpr = ((columns * bits_per_pixel) + 7) / 8;
     util::no_ci_rt_error_if(

@@ -1,0 +1,10 @@
+WARNING: xref-compressed-in-compressed.pdf, object 59 0 at offset 10629: kid 27 (from 0) appears more than once in the pages tree; creating a new page object as a copy
+WARNING: xref-compressed-in-compressed.pdf (object 26 0, offset 6681): expected endstream
+WARNING: xref-compressed-in-compressed.pdf (object 26 0, offset 6634): attempting to recover stream length
+WARNING: xref-compressed-in-compressed.pdf (object 26 0, offset 6634): recovered stream length: 57
+WARNING: xref-compressed-in-compressed.pdf (offset 1361): loop detected resolving object 69 0
+WARNING: xref-compressed-in-compressed.pdf (object 69 0, offset 1361): supposed object stream 69 is not a stream
+WARNING: xref-compressed-in-compressed.pdf (object 81 0, offset 1361): supposed object stream 81 is not a stream
+WARNING: xref-compressed-in-compressed.pdf: end of first page section (/E) mismatch: /E = 3535; computed = 1360..1361
+WARNING: xref-compressed-in-compressed.pdf: error encountered while checking linearization data: xref-compressed-in-compressed.pdf (offset 10878): the object stream containing an object is itself contained in an object stream
+qpdf: operation succeeded with warnings

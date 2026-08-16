@@ -46,7 +46,7 @@ my @to_linearize =
      );
 
 $n_tests += @linearized_files + 6;
-$n_tests += (3 * @to_linearize * 5) + 8;
+$n_tests += (3 * @to_linearize * 5) + 9;
 
 foreach my $base (@linearized_files)
 {
@@ -137,6 +137,14 @@ $td->runtest("suppress linearization warnings",
 $td->runtest("show linearization data on failure",
              {$td->COMMAND => "qpdf --show-linearization i3.pdf"},
              {$td->FILE => "i3.out", $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+
+# Detect when the xref table reports that the object containing a
+# compressed object (object in object stream) is itself in an object
+# stream. This was bug #1750.
+$td->runtest("compressed in compressed",
+             {$td->COMMAND => "qpdf --check-linearization xref-compressed-in-compressed.pdf"},
+             {$td->FILE => "xref-compressed-in-compressed.out", $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
 
 cleanup();

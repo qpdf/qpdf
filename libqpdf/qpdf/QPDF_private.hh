@@ -808,7 +808,7 @@ class QPDF::Doc::Linearization: Common
     void readHSharedObject(BitStream);
     void readHGeneric(BitStream, HGeneric&);
     qpdf_offset_t maxEnd(ObjUser const& ou);
-    qpdf_offset_t getLinearizationOffset(QPDFObjGen);
+    qpdf_offset_t getLinearizationOffset(QPDFObjGen, bool require_type_1 = false);
     QPDFObjectHandle
     getUncompressedObject(QPDFObjectHandle&, std::map<int, int> const& object_stream_data);
     QPDFObjectHandle getUncompressedObject(QPDFObjectHandle&, QPDFWriter::ObjTable const& obj);

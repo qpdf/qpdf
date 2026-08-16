@@ -574,6 +574,15 @@ BaseHandle::write_json(int json_version, JSON::Writer& p) const
                 p << "0" << val;
             } else if (val.length() >= 2 && val.at(0) == '-' && val.at(1) == '.') {
                 p << "-0." << val.substr(2);
+            } else if (val.at(0) == '0') {
+                auto i = val.find_first_not_of('0');
+                if (i == std::string::npos) {
+                    p << "0";
+                } else if (val.at(i) == '.') {
+                    p << "0" << val.substr(i);
+                } else {
+                    p << val.substr(i);
+                }
             } else {
                 p << val;
             }

@@ -13,6 +13,14 @@ more detail.
 
 .. x.y.z: not yet released
 
+12.4.1: not yet released
+  - Bug fixes
+
+    - Avoid generating JSON with leading zeroes when converting real numbers.
+
+    - Detect and warn in check linearization when the xref stream reports the object containing a
+      compressed object to itself be a compressed object.
+
 12.4.0: August 9, 2026
   - Bug fixes
 
