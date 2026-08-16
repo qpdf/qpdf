@@ -682,12 +682,9 @@ class QPDF
         bool allow_changes = true,
         std::function<int(QPDFObjectHandle&)> skip_stream_parameters = nullptr);
 
-    // PATCH: callback fired during the linearization analysis phase (the page-loop walk
-    // in QPDF_linearization.cc). Used by QPDFWriter to bridge analysis progress to the
-    // existing QPDFJob progress reporter so that --progress events fire smoothly across the
-    // whole linearize pipeline, not just the write phase. The callback receives an int 0..100
-    // representing analysis-phase progress; QPDFWriter rescales that to the front half of its
-    // 0..100 progress range. Set to nullptr / default-constructed std::function to disable.
+    // This is called by QPDFWriter to enable linearization to supply its progress so the overall
+    // QPDFWriter progress reporting can update during linearization. The callback is called with an
+    // int value from 0..100. Passing nullptr disables.
     QPDF_DLL
     void setLinearizationProgressCallback(std::function<void(int)> cb);
 

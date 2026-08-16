@@ -3165,11 +3165,13 @@ impl::Writer::indicateProgress(bool decrement, bool finished)
                  : next_progress_report == 0
                  ? 0
                  : std::min(99, 1 + ((100 * events_seen) / events_expected)));
-        // PATCH: when linearizing, the analysis phase reports 0..50 ahead of us via the
-        // callback installed in QPDFWriter::registerProgressReporter, so squeeze write-phase
-        // events into 50..100 to keep the bar moving monotonically across the whole pipeline.
-        // Non-linearized writes keep the original 0..100 behaviour.
         if (cfg.linearize()) {
+            // When linearizing, we register a separate progress reporter with the linearization
+            // engine and scale its progress to the first half of overall progress. This logic moves
+            // the writer's internal progress to the second half. The division is not really 50%,
+            // but this still results in a meaningful and relatively steady advancement of progress.
+            // Otherwise, progress reporting doesn't start until after the linearization
+            // computations are done.
             percentage = 50 + percentage / 2;
         }
         progress_reporter->reportProgress(percentage);
@@ -3184,11 +3186,10 @@ void
 QPDFWriter::registerProgressReporter(std::shared_ptr<ProgressReporter> pr)
 {
     m->progress_reporter = pr;
-    // PATCH: also bridge the linearization-analysis phase into the same reporter.
-    // The analysis loop in QPDF_linearization.cc emits 0..100 already throttled to one event
-    // per integer percent; we map that to 0..50 of the overall progress range and dedupe
-    // post-division so we never invoke the downstream callback twice with the same value.
-    // Write-phase events are scaled to 50..100 in Writer::indicateProgress above.
+    // When writing linearized files, linearization accounts for a significant fraction of the total
+    // time. Register a linearization progress callback, and then normalize its output to the first
+    // half of the overall progress. This is only used when we linearize. When linearizing,
+    // Writer::indicateProgress scales remaining progress to the second half.
     m->qpdf.setLinearizationProgressCallback([pr, last_reported = -1](int analysis_pct) mutable {
         int p = analysis_pct / 2;
         if (p != last_reported) {
