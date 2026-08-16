@@ -124,6 +124,12 @@ QPDF::optimize(
 }
 
 void
+QPDF::setLinearizationProgressCallback(std::function<void(int)> cb)
+{
+    m->lin_progress_cb = std::move(cb);
+}
+
+void
 Lin::optimize(
     QPDFWriter::ObjTable const& obj, std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
 {
@@ -155,12 +161,24 @@ Lin::optimize_internal(
     // Traverse pages tree pushing all inherited resources down to the page level.  This also
     // initializes m->all_pages.
     m->pages.pushInheritedAttributesToPage(allow_changes, false);
-    // Traverse pages
 
+    // Traverse pages to create mappings between objects and the objects that use them. This
+    // operation dominates the time spent linearizing. To support more accurate progress reporting,
+    // we report progress through this operation when a callback is registered. Throttle to one
+    // event per integer-percent change to minimize overhead.
+    size_t const total = m->pages.size();
+    int last_pct = -1;
     size_t n = 0;
     for (auto const& page: m->pages) {
         updateObjectMaps(ObjUser(ObjUser::ou_page, n), page, skip_stream_parameters);
         ++n;
+        if (m->lin_progress_cb && total > 0) {
+            int pct = static_cast<int>((100ULL * n) / total);
+            if (pct != last_pct) {
+                m->lin_progress_cb(pct);
+                last_pct = pct;
+            }
+        }
     }
 
     // Traverse document-level items

@@ -1264,6 +1264,7 @@ class QPDF::Members: Doc
     bool in_parse{false};
     bool parsed{false};
     std::set<int> resolved_object_streams;
+    std::function<void(int)> lin_progress_cb;
 };
 
 // The Resolver class is restricted to QPDFObject and BaseHandle so that only it can resolve
