@@ -22,19 +22,6 @@ to_i(size_t n)
     return static_cast<int>(n);
 }
 
-inline void
-Array::checkOwnership(QPDFObjectHandle const& item) const
-{
-    if (!item) {
-        throw std::logic_error("Attempting to add an uninitialized object to a QPDF_Array.");
-    }
-    if (qpdf() && item.qpdf() && qpdf() != item.qpdf()) {
-        throw std::logic_error(
-            "Attempting to add an object from a different QPDF. Use "
-            "QPDF::copyForeignObject to add objects from another file.");
-    }
-}
-
 QPDF_Array::QPDF_Array(std::vector<QPDFObjectHandle>&& v, bool sparse)
 {
     if (sparse) {
@@ -255,7 +242,7 @@ Array::set(size_t at, QPDFObjectHandle const& oh)
         return false;
     }
     auto a = array();
-    checkOwnership(oh);
+    check_insertion(oh);
     if (a->sp) {
         a->sp->elements[at] = oh;
     } else {
@@ -280,7 +267,7 @@ Array::setFromVector(std::vector<QPDFObjectHandle> const& v)
     a->elements.resize(0);
     a->elements.reserve(v.size());
     for (auto const& item: v) {
-        checkOwnership(item);
+        check_insertion(item);
         a->elements.emplace_back(item);
     }
 }
@@ -293,7 +280,7 @@ Array::insert(size_t at, QPDFObjectHandle const& item)
     if (at > sz) {
         return false;
     }
-    checkOwnership(item);
+    check_insertion(item);
     if (at == sz) {
         // As special case, also allow insert beyond the end
         push_back(item);
@@ -332,7 +319,7 @@ void
 Array::push_back(QPDFObjectHandle const& item)
 {
     auto a = array();
-    checkOwnership(item);
+    check_insertion(item);
     if (a->sp) {
         a->sp->elements[(a->sp->size)++] = item;
     } else {
