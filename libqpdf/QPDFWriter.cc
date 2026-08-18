@@ -3200,7 +3200,7 @@ QPDFWriter::registerProgressReporter(std::shared_ptr<ProgressReporter> pr)
     // time. Register a linearization progress callback, and then normalize its output to the first
     // half of the overall progress. This is only used when we linearize. When linearizing,
     // Writer::indicateProgress scales remaining progress to the second half.
-    m->qpdf.setLinearizationProgressCallback([pr, last_reported = -1](int analysis_pct) mutable {
+    m->lin.progress_callback([pr, last_reported = -1](int analysis_pct) mutable {
         int p = analysis_pct / 2;
         if (p != last_reported) {
             pr->reportProgress(p);

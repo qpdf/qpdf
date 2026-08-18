@@ -682,12 +682,6 @@ class QPDF
         bool allow_changes = true,
         std::function<int(QPDFObjectHandle&)> skip_stream_parameters = nullptr);
 
-    // This is called by QPDFWriter to enable linearization to supply its progress so the overall
-    // QPDFWriter progress reporting can update during linearization. The callback is called with an
-    // int value from 0..100. Passing nullptr disables.
-    QPDF_DLL
-    void setLinearizationProgressCallback(std::function<void(int)> cb);
-
     // Traverse page tree return all /Page objects. It also detects and resolves cases in which the
     // same /Page object is duplicated. For efficiency, this method returns a const reference to an
     // internal vector of pages. Calls to addPage, addPageAt, and removePage safely update this, but

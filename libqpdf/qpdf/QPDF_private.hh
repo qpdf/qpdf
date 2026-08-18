@@ -635,6 +635,15 @@ class QPDF::Doc::Linearization: Common
         int& O,
         bool compressed);
 
+    // This is called by QPDFWriter to enable linearization to supply its progress so the overall
+    // QPDFWriter progress reporting can update during linearization. The callback is called with an
+    // int value from 0..100. Passing nullptr disables.
+    void
+    progress_callback(std::function<void(int)> cb)
+    {
+        progress_callback_ = std::move(cb);
+    }
+
   private:
     // Data structures to support optimization -- implemented in QPDF_optimization.cc
 
@@ -881,6 +890,8 @@ class QPDF::Doc::Linearization: Common
     std::vector<QPDFObjectHandle> part7_;
     std::vector<QPDFObjectHandle> part8_;
     std::vector<QPDFObjectHandle> part9_;
+
+    std::function<void(int)> progress_callback_;
 };
 
 class QPDF::Doc::Objects: Common
@@ -1264,7 +1275,6 @@ class QPDF::Members: Doc
     bool in_parse{false};
     bool parsed{false};
     std::set<int> resolved_object_streams;
-    std::function<void(int)> lin_progress_cb;
 };
 
 // The Resolver class is restricted to QPDFObject and BaseHandle so that only it can resolve
