@@ -1309,6 +1309,18 @@ class QPDFObjectHandle: public qpdf::BaseHandle
     QPDF_DLL
     bool isImage(bool exclude_imagemask = true) const;
 
+    // Structural equivalence check with a recursion depth limit.
+    //
+    // Implements ISO 32000-2 Annex J recursive object equality with a
+    // bounded recursion depth.
+    //
+    // If the maximum depth is reached during comparison, the objects are
+    // considered not equivalent.
+    //
+    // Default depth is 10.
+    QPDF_DLL
+    bool equivalent_to(QPDFObjectHandle const& other, int depth = 10) const;
+
     // The following methods do not form part of the public API and are for internal use only.
 
     QPDFObjectHandle(std::shared_ptr<QPDFObject> const& obj) :
