@@ -2438,12 +2438,12 @@ impl::Writer::write()
     for (auto const& kv: object_stream_to_objects) {
         in_stream_objs += kv.second.size();
     }
-    int writable_objects = QIntC::to_int(qpdf.getObjectCount()) -
-        QIntC::to_int(object_stream_to_objects.size()) - QIntC::to_int(in_stream_objs);
-    if (writable_objects < 1) {
-        writable_objects = 1; // guard against degenerate files; avoids divide-by-zero downstream
-    }
-    events_expected = writable_objects * (cfg.linearize() ? 2 : 1);
+    const size_t expected =
+        (qpdf.getObjectCount() - object_stream_to_objects.size() - in_stream_objs) *
+        (cfg.linearize() ? 2 : 1);
+    events_expected = std::max(
+        1,
+        util::fits<int>(expected) ? static_cast<int>(expected) : std::numeric_limits<int>::max());
 
     prepareFileForWrite();
 
