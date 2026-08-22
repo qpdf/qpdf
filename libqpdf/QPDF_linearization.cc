@@ -124,12 +124,6 @@ QPDF::optimize(
 }
 
 void
-QPDF::setLinearizationProgressCallback(std::function<void(int)> cb)
-{
-    m->lin_progress_cb = std::move(cb);
-}
-
-void
 Lin::optimize(
     QPDFWriter::ObjTable const& obj, std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
 {
@@ -172,10 +166,10 @@ Lin::optimize_internal(
     for (auto const& page: m->pages) {
         updateObjectMaps(ObjUser(ObjUser::ou_page, n), page, skip_stream_parameters);
         ++n;
-        if (m->lin_progress_cb && total > 0) {
+        if (progress_callback_ && total > 0) {
             int pct = static_cast<int>((100ULL * n) / total);
             if (pct != last_pct) {
-                m->lin_progress_cb(pct);
+                progress_callback_(pct);
                 last_pct = pct;
             }
         }
