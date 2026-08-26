@@ -15,6 +15,7 @@ fi
 
 multiarch=$(dpkg-architecture -qDEB_HOST_MULTIARCH)
 export PKG_CONFIG_LIBDIR=$PWD/build.arm64/empty-pkgconfig
+export PKG_CONFIG_PATH=
 mkdir -p "$PKG_CONFIG_LIBDIR"
 
 cmake -S . -B build.arm64 -DCI_MODE=1 -DCMAKE_BUILD_TYPE=Release \

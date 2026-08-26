@@ -51,6 +51,9 @@ cmake --build "$zlib_build" --target install \
       -j"$job_count"
 
 export PKG_CONFIG_LIBDIR=$PWD/$build_dir/empty-pkgconfig
+export PKG_CONFIG_PATH=
+# Keep compiler-default include directories from overriding the pinned headers.
+export CPATH=$jpeg_prefix/include:$zlib_prefix/include
 mkdir -p "$PKG_CONFIG_LIBDIR"
 
 cmake -S . -B "$build_dir" -DCI_MODE=1 -DCMAKE_BUILD_TYPE=Release \
