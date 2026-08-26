@@ -9,7 +9,6 @@ if [ -n "$1" ] && [ "$architecture" != "$1" ]; then
     exit 2
 fi
 
-sdk_path=$(xcrun --show-sdk-path)
 build_dir=build.release-macos
 dependency_dir=build.release-macos-deps
 jpeg_version=3.2.0
@@ -19,18 +18,36 @@ jpeg_build=$PWD/$dependency_dir/libjpeg-turbo-$jpeg_version-build
 jpeg_prefix=$PWD/$dependency_dir/libjpeg-turbo-$jpeg_version-install
 jpeg_url=https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/$jpeg_version
 jpeg_url=$jpeg_url/libjpeg-turbo-$jpeg_version.tar.gz
+zlib_version=1.3.2
+zlib_archive=$PWD/$dependency_dir/zlib-$zlib_version.tar.gz
+zlib_source=$PWD/$dependency_dir/zlib-$zlib_version
+zlib_build=$PWD/$dependency_dir/zlib-$zlib_version-build
+zlib_prefix=$PWD/$dependency_dir/zlib-$zlib_version-install
+zlib_url=https://github.com/madler/zlib/releases/download/v$zlib_version
+zlib_url=$zlib_url/zlib-$zlib_version.tar.gz
 mkdir -p "$dependency_dir"
 curl --fail --location --retry 3 "$jpeg_url" --output "$jpeg_archive"
+curl --fail --location --retry 3 "$zlib_url" --output "$zlib_archive"
 echo "6f30092cef9fb839779646608f4ee14ae3cbac989c47fa05e841b0841f09878e  $jpeg_archive" | \
     shasum -a 256 --check
-rm -rf "$jpeg_source"
+echo "bb329a0a2cd0274d05519d61c667c062e06990d72e125ee2dfa8de64f0119d16  $zlib_archive" | \
+    shasum -a 256 --check
+rm -rf "$jpeg_source" "$zlib_source"
 tar xzf "$jpeg_archive" -C "$dependency_dir"
+tar xzf "$zlib_archive" -C "$dependency_dir"
 cmake -S "$jpeg_source" -B "$jpeg_build" \
       -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 \
       -DCMAKE_INSTALL_PREFIX="$jpeg_prefix" \
       -DENABLE_SHARED=OFF -DENABLE_STATIC=ON -DWITH_SIMD=OFF \
       -DWITH_TESTS=OFF -DWITH_TOOLS=OFF -DWITH_TURBOJPEG=OFF
 cmake --build "$jpeg_build" --target install \
+      -j"$job_count"
+cmake -S "$zlib_source" -B "$zlib_build" \
+      -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 \
+      -DCMAKE_INSTALL_PREFIX="$zlib_prefix" \
+      -DZLIB_BUILD_SHARED=OFF -DZLIB_BUILD_STATIC=ON \
+      -DZLIB_BUILD_TESTING=OFF
+cmake --build "$zlib_build" --target install \
       -j"$job_count"
 
 export PKG_CONFIG_LIBDIR=$PWD/$build_dir/empty-pkgconfig
@@ -40,8 +57,8 @@ cmake -S . -B "$build_dir" -DCI_MODE=1 -DCMAKE_BUILD_TYPE=Release \
       -DBUILD_SHARED_LIBS=OFF -DBUILD_STATIC_LIBS=ON \
       -DUSE_IMPLICIT_CRYPTO=OFF -DREQUIRE_CRYPTO_NATIVE=ON \
       -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 \
-      -DZLIB_H_PATH="$sdk_path/usr/include" \
-      -DZLIB_LIB_PATH="$sdk_path/usr/lib/libz.tbd" \
+      -DZLIB_H_PATH="$zlib_prefix/include" \
+      -DZLIB_LIB_PATH="$zlib_prefix/lib/libz.a" \
       -DLIBJPEG_H_PATH="$jpeg_prefix/include" \
       -DLIBJPEG_LIB_PATH="$jpeg_prefix/lib/libjpeg.a"
 cmake --build "$build_dir" --verbose -j"$job_count" -- -k
