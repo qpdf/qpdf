@@ -1,0 +1,62 @@
+#!/bin/bash
+set -ex
+cd "$(dirname "$0")/.."
+
+sudo apt-get update
+sudo apt-get -y install \
+    build-essential cmake file libjpeg-dev unzip zlib1g-dev zip zsh
+
+architecture=$(uname -m)
+job_count=$(nproc)
+if [ "$architecture" != "aarch64" ]; then
+    echo "Expected aarch64 runner, but runner architecture is $architecture"
+    exit 2
+fi
+
+multiarch=$(dpkg-architecture -qDEB_HOST_MULTIARCH)
+export PKG_CONFIG_LIBDIR=$PWD/build.arm64/empty-pkgconfig
+mkdir -p "$PKG_CONFIG_LIBDIR"
+
+cmake -S . -B build.arm64 -DCI_MODE=1 -DCMAKE_BUILD_TYPE=Release \
+      -DBUILD_SHARED_LIBS=OFF -DBUILD_STATIC_LIBS=ON \
+      -DUSE_IMPLICIT_CRYPTO=OFF -DREQUIRE_CRYPTO_NATIVE=ON \
+      -DREQUIRE_SHELLS=1 \
+      -DCMAKE_EXE_LINKER_FLAGS="-static-libgcc -static-libstdc++" \
+      -DZLIB_H_PATH=/usr/include \
+      "-DZLIB_LIB_PATH=/usr/lib/$multiarch/libz.a" \
+      -DLIBJPEG_H_PATH=/usr/include \
+      "-DLIBJPEG_LIB_PATH=/usr/lib/$multiarch/libjpeg.a"
+cmake --build build.arm64 --verbose -j"$job_count" -- -k
+(cd build.arm64; ctest --verbose)
+
+version=$(build.arm64/qpdf/qpdf --version | awk 'NR == 1 {print $3}')
+package_name=qpdf-$version-bin-linux-arm64
+stage=$PWD/build.arm64/$package_name
+archive=$PWD/distribution/$package_name-ci.zip
+rm -rf "$stage" distribution
+mkdir -p "$stage" distribution
+cmake --install build.arm64 --prefix "$stage" --component cli
+
+for executable in qpdf fix-qdf zlib-flate; do
+    executable_path=$stage/bin/$executable
+    file "$executable_path" | grep -F 'ELF 64-bit LSB pie executable, ARM aarch64'
+    if readelf -d "$executable_path" | grep -E '(RPATH|RUNPATH)'; then
+        echo "Unexpected runtime search path in $executable_path"
+        exit 2
+    fi
+    if readelf -d "$executable_path" | grep NEEDED | \
+           grep -E 'lib(qpdf|jpeg|z|stdc\+\+|gcc_s)'; then
+        echo "Unexpected bundled-library dependency in $executable_path"
+        exit 2
+    fi
+done
+
+(cd "$stage"; zip -9 -r "$archive" bin)
+smoke_test=$PWD/build.arm64/package-smoke-test
+rm -rf "$smoke_test"
+mkdir -p "$smoke_test"
+unzip -q "$archive" -d "$smoke_test"
+"$smoke_test/bin/qpdf" --version | grep -E "^qpdf version $version$"
+"$smoke_test/bin/fix-qdf" --version | grep -E "^fix-qdf from qpdf version $version$"
+"$smoke_test/bin/zlib-flate" --version | grep -E "^zlib-flate from qpdf version $version$"
+sha256sum "$archive"

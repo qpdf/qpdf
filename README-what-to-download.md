@@ -46,6 +46,18 @@ Ubuntu. However, there are some downloads available for Linux as well.
   and was initially created for that purpose. The executables have their runpath set to looks for the qpdf library
   in `../lib` relative to the location of the executables, which makes this distribution relocatable.
 
+* `qpdf-<version>-bin-linux-arm64.zip` - This is the ARM64 equivalent of the Linux binary distribution. The qpdf,
+  libjpeg, zlib, and C++ runtime libraries are statically linked, leaving only standard system-library dependencies.
+
+macOS Binaries
+
+The macOS binary distributions contain qpdf command-line tools that depend only on system libraries supplied with
+macOS 11 or newer. Choose the archive that matches your Mac's processor:
+
+* `qpdf-<version>-bin-macos-arm64.zip` - Use this for Apple Silicon Macs.
+
+* `qpdf-<version>-bin-macos-x86_64.zip` - Use this for Intel Macs.
+
 Windows Build Support
 
 If you are building on Windows and want to use pre-built external static libraries, you should obtain current versions

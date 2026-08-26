@@ -84,12 +84,36 @@ jobs:
           name: distribution-windows-${{ matrix.wordsize }}-${{ matrix.tool }}
           path: distribution
   macOS:
-    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15-intel
+            architecture: x86_64
+          - runner: macos-15
+            architecture: arm64
+    runs-on: ${{ matrix.runner }}
     needs: Prebuild
     steps:
       - uses: actions/checkout@v7
-      - name: 'Mac build and test'
-        run: build-scripts/build-mac
+      - name: 'Mac build, test, and package'
+        run: build-scripts/build-mac ${{ matrix.architecture }}
+      - name: 'Upload binary distribution'
+        uses: actions/upload-artifact@v7
+        with:
+          name: distribution-macos-${{ matrix.architecture }}
+          path: distribution
+  LinuxArm64:
+    runs-on: ubuntu-22.04-arm
+    steps:
+      - uses: actions/checkout@v7
+      - name: 'Linux ARM64 build, test, and package'
+        run: build-scripts/build-linux-arm64
+      - name: 'Upload binary distribution'
+        uses: actions/upload-artifact@v7
+        with:
+          name: distribution-linux-arm64
+          path: distribution
   AppImage:
     runs-on: ubuntu-latest
     needs: Prebuild
@@ -171,7 +195,9 @@ jobs:
      needs:
        - Prebuild
        - Linux
+       - LinuxArm64
        - Windows
+       - macOS
        - AppImage
      steps:
        - name: Merge Artifacts
