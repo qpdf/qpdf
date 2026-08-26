@@ -35,11 +35,13 @@ echo "bb329a0a2cd0274d05519d61c667c062e06990d72e125ee2dfa8de64f0119d16  $zlib_ar
 rm -rf "$jpeg_source" "$zlib_source"
 tar xzf "$jpeg_archive" -C "$dependency_dir"
 tar xzf "$zlib_archive" -C "$dependency_dir"
+# Match the libjpeg v8-compatible headers on GitHub's macOS runners.
 cmake -S "$jpeg_source" -B "$jpeg_build" \
       -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 \
       -DCMAKE_INSTALL_PREFIX="$jpeg_prefix" \
       -DENABLE_SHARED=OFF -DENABLE_STATIC=ON -DWITH_SIMD=OFF \
-      -DWITH_TESTS=OFF -DWITH_TOOLS=OFF -DWITH_TURBOJPEG=OFF
+      -DWITH_JPEG8=ON -DWITH_TESTS=OFF -DWITH_TOOLS=OFF \
+      -DWITH_TURBOJPEG=OFF
 cmake --build "$jpeg_build" --target install \
       -j"$job_count"
 cmake -S "$zlib_source" -B "$zlib_build" \
@@ -52,8 +54,6 @@ cmake --build "$zlib_build" --target install \
 
 export PKG_CONFIG_LIBDIR=$PWD/$build_dir/empty-pkgconfig
 export PKG_CONFIG_PATH=
-# Keep compiler-default include directories from overriding the pinned headers.
-export CPATH=$jpeg_prefix/include:$zlib_prefix/include
 mkdir -p "$PKG_CONFIG_LIBDIR"
 
 cmake -S . -B "$build_dir" -DCI_MODE=1 -DCMAKE_BUILD_TYPE=Release \
