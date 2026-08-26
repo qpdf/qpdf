@@ -76,7 +76,7 @@ more detail.
   - Build changes
 
     - Add precompiled command-line distributions for Linux ARM64 and for macOS on Intel and Apple
-      Silicon. Fixes :issue:`1588`.
+      Silicon. Fixes GitHub issue #1588.
 
     - The new ``REQUIRE_SHELLS`` CMake option causes completion tests to fail if
       a new enough bash and zsh are not installed. This option is enabled by
