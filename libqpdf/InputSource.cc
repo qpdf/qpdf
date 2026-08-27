@@ -35,7 +35,7 @@ InputSource::read_line(std::string& str, size_t count, qpdf_offset_t at)
     if (eol != std::string::npos) {
         auto next_line = str.find_first_not_of("\n\r"sv, eol);
         str.resize(eol);
-        if (eol != std::string::npos) {
+        if (next_line != std::string::npos) {
             seek(last_offset + static_cast<qpdf_offset_t>(next_line), SEEK_SET);
             return eol;
         }
