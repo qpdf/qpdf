@@ -13,7 +13,7 @@ more detail.
 
 .. x.y.z: not yet released
 
-12.4.1: not yet released
+12.4.1: August 27, 2026
   - Bug fixes
 
     - Avoid generating JSON with leading zeroes when converting real numbers.
