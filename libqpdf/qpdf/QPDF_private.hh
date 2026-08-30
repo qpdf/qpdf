@@ -811,6 +811,7 @@ class QPDF::Doc::Linearization: Common
     void readLinearizationData();
     void checkLinearizationInternal();
     void dumpLinearizationDataInternal();
+    void dumpPart(std::string_view, std::vector<QPDFObjectHandle> const&);
     void linearizationWarning(std::string_view);
     qpdf::Dictionary readHintStream(Pipeline&, qpdf_offset_t offset, size_t length);
     void readHPageOffset(BitStream);

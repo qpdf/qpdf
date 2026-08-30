@@ -19,6 +19,11 @@ more detail.
     - Improve validation of object ids and generation numbers when reading special objects (such as
       xref or hint streams) and during reconstruction of damaged files.
 
+    - In --show-linearization, including a listing of all the object numbers that qpdf would assign
+      to each part. Implementation of linearization is inconsistent across tools, so unless qpdf
+      linearized the file, the computed part assignments are not likely to match what's actually in
+      the file.
+
 12.4.1: August 27, 2026
   - Bug fixes
 
