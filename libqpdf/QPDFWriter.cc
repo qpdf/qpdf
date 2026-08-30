@@ -2776,7 +2776,7 @@ impl::Writer::writeLinearized()
         }
     };
 
-    lin.optimize(obj, skip_stream_parameters);
+    lin.prepare(obj, skip_stream_parameters);
 
     std::vector<QPDFObjectHandle> part4;
     std::vector<QPDFObjectHandle> part6;

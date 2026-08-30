@@ -147,25 +147,25 @@ QPDF::optimize(
     bool allow_changes,
     std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
 {
-    m->lin.optimize_internal(object_stream_data, allow_changes, skip_stream_parameters);
+    m->lin.prepareInternal(object_stream_data, allow_changes, skip_stream_parameters);
 }
 
 void
-Lin::optimize(
+Lin::prepare(
     QPDFWriter::ObjTable const& obj, std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
 {
-    optimize_internal(obj, true, skip_stream_parameters);
+    prepareInternal(obj, true, skip_stream_parameters);
 }
 
 template <typename T>
 void
-Lin::optimize_internal(
+Lin::prepareInternal(
     T const& object_stream_data,
     bool allow_changes,
     std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
 {
     if (!obj_categories_.empty()) {
-        // already optimized
+        // already prepared
         return;
     }
 
@@ -797,7 +797,7 @@ Lin::checkLinearizationInternal()
             "one in a cross-reference stream");
     }
 
-    // Further checking requires optimization and order calculation. Don't allow optimization to
+    // Further checking requires preparation and order calculation. Don't allow preparation to
     // make changes.  If it has to, then the file is not properly linearized.  We use the xref table
     // to figure out which objects are compressed and which are uncompressed.
     { // local scope
@@ -807,7 +807,7 @@ Lin::checkLinearizationInternal()
                 object_stream_data[og.getObj()] = entry.getObjStreamNumber();
             }
         }
-        optimize_internal(object_stream_data, false, nullptr);
+        prepareInternal(object_stream_data, false, nullptr);
         calculateLinearizationData(object_stream_data);
     }
 
@@ -1315,14 +1315,14 @@ Lin::calculateLinearizationData(T const& object_stream_data)
 {
     // This function calculates the ordering of objects, divides them into the appropriate parts,
     // and computes some values for the linearization parameter dictionary and hint tables.  The
-    // file must be optimized (via calling optimize()) prior to calling this function.  Note that
+    // file must be prepared (via calling prepare()) prior to calling this function.  Note that
     // actual offsets and lengths are not computed here, but anything related to object ordering is.
 
     util::assertion(
         !obj_categories_.empty(),
-        "INTERNAL ERROR: QPDF::calculateLinearizationData called before optimize()" //
+        "INTERNAL ERROR: QPDF::calculateLinearizationData called before prepare()" //
     );
-    // Note that we can't call optimize here because we don't know whether it should be called
+    // Note that we can't call prepare here because we don't know whether it should be called
     // with or without allow changes.
 
     // Separate objects into the categories sufficient for us to determine which part of the

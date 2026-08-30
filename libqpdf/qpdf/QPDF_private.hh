@@ -609,11 +609,11 @@ class QPDF::Doc::Linearization: Common
     // For QPDFWriter:
 
     template <typename T>
-    void optimize_internal(
+    void prepareInternal(
         T const& object_stream_data,
         bool allow_changes = true,
         std::function<int(QPDFObjectHandle&)> skip_stream_parameters = nullptr);
-    void optimize(
+    void prepare(
         QPDFWriter::ObjTable const& obj,
         std::function<int(QPDFObjectHandle&)> skip_stream_parameters);
 
@@ -645,7 +645,7 @@ class QPDF::Doc::Linearization: Common
     }
 
   private:
-    // Data structures to support optimization -- implemented in QPDF_linearization.cc
+    // Data structures to support linearization -- implemented in QPDF_linearization.cc
 
     // The order of items in obj_category_e is strategic with lower values generally taking
     // precedence over higher values. ObjCategory::update has the relevant logic.
@@ -911,7 +911,7 @@ class QPDF::Doc::Linearization: Common
     void writeHSharedObject(BitWriter&);
     void writeHGeneric(BitWriter&, HGeneric&);
 
-    // Methods to support optimization
+    // Methods to support linearization
 
     template <typename T>
     void updateObjectMaps(
