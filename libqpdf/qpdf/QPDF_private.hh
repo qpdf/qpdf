@@ -645,7 +645,26 @@ class QPDF::Doc::Linearization: Common
     }
 
   private:
-    // Data structures to support optimization -- implemented in QPDF_optimization.cc
+    // Data structures to support optimization -- implemented in QPDF_linearization.cc
+
+    // The order of items in obj_category_e is strategic with lower values generally taking
+    // precedence over higher values. ObjCategory::update has the relevant logic.
+    enum obj_category_e {
+        c_root,
+        c_open_document,
+        c_first_page_shared,
+        c_first_page_private,
+        c_other_page_shared,
+        c_other_page_private,
+        c_thumbnail_shared,
+        c_thumbnail_private,
+        c_pages_obj,
+        c_outlines_obj,
+        c_outlines,
+        c_other,
+    };
+
+    class ObjCategory;
 
     class ObjUser
     {
@@ -663,10 +682,12 @@ class QPDF::Doc::Linearization: Common
         // type must be one of ou_trailer_key or ou_root_key
         ObjUser(user_e type, std::string const& key);
 
-        bool operator<(ObjUser const&) const;
+        /// @brief Return the linearization category this object would have if it were only
+        /// referenced in one place.
+        ObjCategory obj_category(bool top) const;
 
         user_e ou_type;
-        size_t pageno{0}; // if ou_page;
+        size_t pageno{0}; // if ou_page or ou_thumb
         std::string key;  // if ou_trailer_key or ou_root_key
     };
 
@@ -677,6 +698,48 @@ class QPDF::Doc::Linearization: Common
         ObjUser const& ou;
         QPDFObjectHandle oh;
         bool top;
+    };
+
+    /// @brief An object's linearization category, updated incrementally as the object is
+    /// reached from each of its users.
+    ///
+    /// In a linearized PDF, objects belong to one of several parts, and within the parts, objects
+    /// are ordered in a particular way. This type allows us to determine exactly where an object
+    /// will end up such that, within each category, we just have to sort by object number.
+    class ObjCategory
+    {
+      public:
+        /// @brief Fold in the category implied by one additional reference to the object.
+        ///
+        /// @param other_ou  The ObjUser whose traversal reached the object.
+        /// @param top       Whether the object is the direct value of that user's key.
+        void update(ObjUser const& other_ou, bool top);
+        ObjCategory() = default;
+        ObjCategory(obj_category_e category, int pageno) :
+            lin_category_(category),
+            pageno_(pageno)
+        {
+        }
+
+        inline obj_category_e
+        category() const
+        {
+            return lin_category_;
+        }
+        inline int
+        pageno() const
+        {
+            return pageno_;
+        }
+
+      private:
+        obj_category_e lin_category_{c_other};
+        // pageno_ is -1 until a page or thumbnail references the object, after which it is the
+        // number of the lowest-numbered such page. Retaining one page number lets us detect a
+        // reference from a second page, which is what makes an object shared, and it tells us
+        // which page's group a private object belongs to. Once an object is known to be shared,
+        // the value is the number of the first page that contains the object.
+        int pageno_{-1};
     };
 
     // PDF 1.4: Table F.4
@@ -817,7 +880,7 @@ class QPDF::Doc::Linearization: Common
     void readHPageOffset(BitStream);
     void readHSharedObject(BitStream);
     void readHGeneric(BitStream, HGeneric&);
-    qpdf_offset_t maxEnd(ObjUser const& ou);
+    qpdf_offset_t objectEnd(QPDFObjGen) const;
     qpdf_offset_t getLinearizationOffset(QPDFObjGen, bool require_type_1 = false);
     QPDFObjectHandle
     getUncompressedObject(QPDFObjectHandle&, std::map<int, int> const& object_stream_data);
@@ -834,11 +897,6 @@ class QPDF::Doc::Linearization: Common
     qpdf_offset_t adjusted_offset(qpdf_offset_t offset);
     template <typename T>
     void calculateLinearizationData(T const& object_stream_data);
-    template <typename T>
-    void pushOutlinesToPart(
-        std::vector<QPDFObjectHandle>& part,
-        std::set<QPDFObjGen>& lc_outlines,
-        T const& object_stream_data);
     int outputLengthNextN(
         int in_object,
         int n,
@@ -855,16 +913,20 @@ class QPDF::Doc::Linearization: Common
 
     // Methods to support optimization
 
+    template <typename T>
     void updateObjectMaps(
         ObjUser const& ou,
         QPDFObjectHandle oh,
+        T const& object_stream_data,
         std::function<int(QPDFObjectHandle&)> skip_stream_parameters);
-    void filterCompressedObjects(std::map<int, int> const& object_stream_data);
-    void filterCompressedObjects(QPDFWriter::ObjTable const& object_stream_data);
+    static void
+    resolveCompressedObject(QPDFObjGen& og, std::map<int, int> const& object_stream_data);
+    static void
+    resolveCompressedObject(QPDFObjGen& og, QPDFWriter::ObjTable const& object_stream_data);
 
-    // Optimization data
-    std::map<ObjUser, std::set<QPDFObjGen>> obj_user_to_objects_;
-    std::map<QPDFObjGen, std::set<ObjUser>> object_to_obj_users_;
+    qpdf_offset_t outlines_max_end_{0};
+    std::map<QPDFObjGen, ObjCategory> obj_categories_;
+    std::vector<std::vector<int>> page_objs_;
 
     // Linearization data
     bool linearization_warnings_{false}; // set by linearizationWarning, used by checkLinearization

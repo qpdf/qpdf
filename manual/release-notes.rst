@@ -24,6 +24,31 @@ more detail.
       linearized the file, the computed part assignments are not likely to match what's actually in
       the file.
 
+    - Radically decrease memory usage and improve performance when linearizing certain types of
+      files.
+
+  - Bug fixes
+
+    - Fix some very old, latent linearization bugs. **These will change linearization output for
+      some files**.
+
+      - Previous versions of qpdf incorrectly determined whether an object was *shared*. The correct
+        behavior based on the specification and for correct performance is that an object is shared
+        if it is accessed by more than one *page*. qpdf was treating it as shared if it was reachable
+        from more than one starting point including non-page objects. This would cause objects that
+        were referenced by both page and non-page objects to be placed in part 9, at the end of the
+        file, rather than in the appropriate part based on which pages accessed the object. In
+        practice, it is rare for objects to be accessed by both page and non-page objects, so this
+        won't affect the output of most files.
+
+      - In some cases, the ``Pages`` tree was treated as a shared object and placed earlier in the
+        file than necessary. This was harmless, but incorrect, and it was fixed as a side effect of
+        the performance improvements.
+
+      - If items in the ``Outlines`` dictionary are referenced by pages, the outlines hint table will
+        be absent, and the outlines will appear in the groups of page objects, regardless of the
+        document's page mode.
+
 12.4.1: August 27, 2026
   - Bug fixes
 

@@ -348,13 +348,6 @@ class QPDFWriter::ObjTable: public ::ObjTable<QPDFWriter::Object>
 {
     friend class qpdf::impl::Writer;
 
-  public:
-    bool
-    getStreamsEmpty() const noexcept
-    {
-        return streams_empty;
-    }
-
   private:
     // For performance, set by QPDFWriter rather than tracked by ObjTable.
     bool streams_empty{false};
