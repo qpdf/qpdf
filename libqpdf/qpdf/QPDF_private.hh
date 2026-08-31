@@ -662,41 +662,8 @@ class QPDF::Doc::Linearization: Common
         c_other,
     };
 
-    class ObjCategory;
-
-    class ObjUser
-    {
-      public:
-        enum user_e { ou_page = 1, ou_thumb, ou_trailer_key, ou_root_key, ou_root };
-
-        ObjUser() = delete;
-
-        // type must be ou_root
-        ObjUser(user_e type);
-
-        // type must be one of ou_page or ou_thumb
-        ObjUser(user_e type, size_t pageno);
-
-        // type must be one of ou_trailer_key or ou_root_key
-        ObjUser(user_e type, std::string const& key);
-
-        /// @brief Return the linearization category this object would have if it were only
-        /// referenced in one place.
-        ObjCategory obj_category(bool top) const;
-
-        user_e ou_type;
-        size_t pageno{0}; // if ou_page or ou_thumb
-        std::string key;  // if ou_trailer_key or ou_root_key
-    };
-
-    struct UpdateObjectMapsFrame
-    {
-        UpdateObjectMapsFrame(ObjUser const& ou, QPDFObjectHandle oh, bool top);
-
-        ObjUser const& ou;
-        QPDFObjectHandle oh;
-        bool top;
-    };
+    class ObjUser;
+    struct UpdateObjectMapsFrame;
 
     /// @brief An object's linearization category, updated incrementally as the object is
     /// reached from each of its users.

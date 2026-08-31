@@ -76,70 +76,98 @@ append_vec(std::vector<T>& v1, std::vector<T>&& v2)
     v1.insert(v1.end(), std::make_move_iterator(v2.begin()), std::make_move_iterator(v2.end()));
 }
 
-Lin::ObjUser::ObjUser(user_e type) :
-    ou_type(type)
+class Lin::ObjUser
 {
-    qpdf_expect(type == ou_root);
-}
+  public:
+    enum user_e { ou_page = 1, ou_thumb, ou_trailer_key, ou_root_key, ou_root };
 
-Lin::ObjUser::ObjUser(user_e type, size_t pageno) :
-    ou_type(type),
-    pageno(pageno)
-{
-    qpdf_expect(type == ou_page || type == ou_thumb);
-}
+    ObjUser() = delete;
 
-Lin::ObjUser::ObjUser(user_e type, std::string const& key) :
-    ou_type(type),
-    key(key)
-{
-    qpdf_expect(type == ou_trailer_key || type == ou_root_key);
-}
-
-Lin::ObjCategory
-Lin::ObjUser::obj_category(bool top) const
-{
-    switch (ou_type) {
-    case ObjUser::ou_page:
-        if (pageno == 0) {
-            return {c_first_page_private, util::to<int>(pageno)};
-        }
-        return {c_other_page_private, util::to<int>(pageno)};
-    case ObjUser::ou_thumb:
-        return {c_thumbnail_private, util::to<int>(pageno)};
-    case ObjUser::ou_root:
-        return {c_root, -1};
-    case ObjUser::ou_root_key:
-        if (key == "/ViewerPreferences" || key == "/PageMode" || key == "/Threads" ||
-            key == "/OpenAction" || key == "/AcroForm") {
-            return {c_open_document, -1};
-        }
-        if (key == "/Outlines") {
-            if (top) {
-                return {c_outlines_obj, -1};
-            }
-            return {c_outlines, -1};
-        }
-        if (key == "/Pages") {
-            return {c_pages_obj, -1};
-        }
-        return {c_other, -1};
-    case ObjUser::ou_trailer_key:
-        if (key == "/Encrypt") {
-            return {c_open_document, -1};
-        }
-        return {c_other, -1};
+    // type must be ou_root
+    ObjUser(user_e type) :
+        // ou_type(type),
+        category(c_root)
+    {
+        qpdf_expect(type == ou_root);
     }
-    return {c_other, -1};
-}
 
-Lin::UpdateObjectMapsFrame::UpdateObjectMapsFrame(
-    ObjUser const& ou, QPDFObjectHandle oh, bool top) :
-    ou(ou),
-    oh(oh),
-    top(top)
+    // type must be one of ou_page or ou_thumb
+    ObjUser(user_e type, size_t pageno) :
+        category(
+            type == ou_page ? (pageno == 0 ? c_first_page_private : c_other_page_private)
+                            : c_thumbnail_private),
+        pageno(pageno)
+    {
+        qpdf_expect(type == ou_page || type == ou_thumb);
+    }
+
+    // type must be one of ou_trailer_key or ou_root_key
+    ObjUser(user_e type, std::string const& key) :
+        category(category_from_key(type, key))
+    {
+    }
+
+    bool
+    page() const
+    {
+        return category == c_first_page_private || category == c_other_page_private;
+    }
+
+    /// @brief Return the linearization category this object would have if it were only referenced
+    /// in one place.
+    ObjCategory
+    obj_category(bool top) const
+    {
+        if (page() || category == c_thumbnail_private) {
+            return {category, util::to<int>(pageno)};
+        }
+        if (top && category == c_outlines) {
+            return {c_outlines_obj, -1};
+        }
+        return {category, -1};
+    }
+
+    const obj_category_e category;
+    const size_t pageno{0}; // if ou_page or ou_thumb
+
+  private:
+    static obj_category_e
+    category_from_key(user_e type, std::string const& key)
+    {
+        qpdf_expect(type == ou_trailer_key || type == ou_root_key);
+        if (type == ou_root_key) {
+            if (key == "/ViewerPreferences" || key == "/PageMode" || key == "/Threads" ||
+                key == "/OpenAction" || key == "/AcroForm") {
+                return c_open_document;
+            }
+            if (key == "/Outlines") {
+                return c_outlines;
+            }
+            if (key == "/Pages") {
+                return c_pages_obj;
+            }
+            return c_other;
+        }
+        if (key == "/Encrypt") {
+            return c_open_document;
+        }
+        return c_other;
+    }
+};
+
+struct Lin::UpdateObjectMapsFrame
 {
-}
+    UpdateObjectMapsFrame(ObjUser const& ou, QPDFObjectHandle oh, bool top) :
+        ou(ou),
+        oh(oh),
+        top(top)
+    {
+    }
+
+    ObjUser const& ou;
+    QPDFObjectHandle oh;
+    bool top;
+};
 
 void
 QPDF::optimize(
@@ -332,7 +360,7 @@ Lin::updateObjectMaps(
                 if (!cur.top) {
                     continue;
                 }
-            } else if (first_ou.ou_type == ObjUser::ou_page && type.isNameAndEquals("/Pages")) {
+            } else if (first_ou.page() && type.isNameAndEquals("/Pages")) {
                 continue;
             }
         }
@@ -345,7 +373,7 @@ Lin::updateObjectMaps(
             }
             resolveCompressedObject(og, object_stream_data);
             obj_categories_[og].update(cur.ou, cur.top);
-            if (cur.ou.ou_type == ObjUser::ou_page) {
+            if (cur.ou.page()) {
                 page_objs_.at(cur.ou.pageno).push_back(og.getObj());
             }
         }
