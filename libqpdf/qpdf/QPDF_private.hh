@@ -609,18 +609,16 @@ class QPDF::Doc::Linearization: Common
     // For QPDFWriter:
 
     template <typename T>
-    void prepareInternal(
+    void prepare(
         T const& object_stream_data,
         bool allow_changes = true,
         std::function<int(QPDFObjectHandle&)> skip_stream_parameters = nullptr);
-    void prepare(
-        QPDFWriter::ObjTable const& obj,
-        std::function<int(QPDFObjectHandle&)> skip_stream_parameters);
 
     // Get lists of all objects in order according to the part of a linearized file that they
     // belong to.
     void parts(
         QPDFWriter::ObjTable const& obj,
+        std::function<int(QPDFObjectHandle&)> skip_stream_parameters,
         std::vector<QPDFObjectHandle>& part4,
         std::vector<QPDFObjectHandle>& part6,
         std::vector<QPDFObjectHandle>& part7,

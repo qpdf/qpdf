@@ -147,19 +147,12 @@ QPDF::optimize(
     bool allow_changes,
     std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
 {
-    m->lin.prepareInternal(object_stream_data, allow_changes, skip_stream_parameters);
-}
-
-void
-Lin::prepare(
-    QPDFWriter::ObjTable const& obj, std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
-{
-    prepareInternal(obj, true, skip_stream_parameters);
+    m->lin.prepare(object_stream_data, allow_changes, skip_stream_parameters);
 }
 
 template <typename T>
 void
-Lin::prepareInternal(
+Lin::prepare(
     T const& object_stream_data,
     bool allow_changes,
     std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
@@ -807,7 +800,7 @@ Lin::checkLinearizationInternal()
                 object_stream_data[og.getObj()] = entry.getObjStreamNumber();
             }
         }
-        prepareInternal(object_stream_data, false, nullptr);
+        prepare(object_stream_data, false, nullptr);
         calculateLinearizationData(object_stream_data);
     }
 
@@ -1657,12 +1650,14 @@ Lin::calculateLinearizationData(T const& object_stream_data)
 void
 Lin::parts(
     QPDFWriter::ObjTable const& obj,
+    std::function<int(QPDFObjectHandle&)> skip_stream_parameters,
     std::vector<QPDFObjectHandle>& part4,
     std::vector<QPDFObjectHandle>& part6,
     std::vector<QPDFObjectHandle>& part7,
     std::vector<QPDFObjectHandle>& part8,
     std::vector<QPDFObjectHandle>& part9)
 {
+    prepare(obj, true, skip_stream_parameters);
     calculateLinearizationData(obj);
     part4 = part4_;
     part6 = part6_;
