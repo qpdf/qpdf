@@ -1006,7 +1006,11 @@ Lin::checkHPageOffset(
             int idx = he.shared_identifiers.at(i);
             no_ci_stop_if(
                 !shared_idx_to_obj.contains(idx),
-                "unable to get object for item in shared objects hint table");
+                "unable to get object " + std::to_string(idx) +
+                    " for item in shared objects hint table",
+                "",
+                false //
+            );
 
             hint_shared.insert(shared_idx_to_obj[idx]);
         }

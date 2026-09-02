@@ -298,10 +298,16 @@ class QPDF::Doc
 
         void
         no_ci_stop_if(
-            bool condition, std::string const& message, std::string const& context = {}) const
+            bool condition,
+            std::string const& message,
+            std::string const& context = {},
+            bool offset = true) const
         {
             if (condition) {
-                throw damagedPDF(context, message);
+                if (offset) {
+                    throw damagedPDF(context, message);
+                }
+                throw damagedPDF(context, -1, message);
             }
         }
 

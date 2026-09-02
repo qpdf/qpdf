@@ -35,7 +35,7 @@ WARNING: i3.pdf: shared object 36 length mismatch: hint table = 58; computed = 3
 WARNING: i3.pdf: shared object 37 length mismatch: hint table = 55; computed = 58
 WARNING: i3.pdf: object count mismatch for page 0: hint table = 39; computed = 38
 WARNING: i3.pdf: page 0 has shared identifier entries
-WARNING: i3.pdf: i3.pdf (offset 1450): unable to get object for item in shared objects hint table
+WARNING: i3.pdf: i3.pdf: unable to get object 38 for item in shared objects hint table
 i3.pdf: linearization data:
 
 file_size: 6731
