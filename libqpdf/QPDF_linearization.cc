@@ -190,6 +190,10 @@ Lin::prepare(
         return;
     }
 
+    // includes some extra for objects that have incorrectly been excluded from xref table, such as
+    // xref streams, lin dictionaries, int streams etc.
+    max_obj_ = qpdf.getObjectCount() + 10;
+
     // The PDF specification indicates that /Outlines is supposed to be an indirect reference. Force
     // it to be so if it exists and is direct.  (This has been seen in the wild.)
     QPDFObjectHandle root = qpdf.getRoot();
@@ -342,7 +346,9 @@ Lin::updateObjectMaps(
     T const& object_stream_data,
     std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
 {
-    std::set<QPDFObjGen> visited;
+    visited_.clear();
+    visited_.resize(max_obj_, false);
+
     std::vector<UpdateObjectMapsFrame> pending;
     pending.emplace_back(first_ou, first_oh, true);
     // Traverse the object tree from this point taking care to avoid crossing page boundaries.
@@ -366,11 +372,18 @@ Lin::updateObjectMaps(
         }
 
         if (cur.oh.indirect()) {
-            QPDFObjGen og(cur.oh.getObjGen());
-            if (!visited.insert(og).second) {
+            auto og = cur.oh.id_gen();
+            const int int_id = og.getObj();
+            if (int_id <= 0 || std::cmp_greater_equal(int_id, visited_.size())) {
+                no_ci_lin_warn_if(!cur.oh.null(), "ignoring unexpected object " + og.unparse(' '));
+                continue;
+            }
+            const size_t id = static_cast<size_t>(int_id);
+            if (visited_[id]) {
                 QTC::TC("qpdf", "QPDF opt loop detected");
                 continue;
             }
+            visited_[id] = true;
             resolveCompressedObject(og, object_stream_data);
             obj_categories_[og].update(cur.ou, cur.top);
             if (cur.ou.page()) {
@@ -439,6 +452,14 @@ Lin::linearizationWarning(std::string_view msg)
 {
     linearization_warnings_ = true;
     warn(qpdf_e_linearization, "", 0, std::string(msg));
+}
+
+void
+Lin::no_ci_lin_warn_if(bool condition, std::string_view msg)
+{
+    if (condition) {
+        linearizationWarning(msg);
+    }
 }
 
 bool

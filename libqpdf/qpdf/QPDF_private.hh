@@ -847,6 +847,7 @@ class QPDF::Doc::Linearization: Common
     void dumpLinearizationDataInternal();
     void dumpPart(std::string_view, std::vector<QPDFObjectHandle> const&);
     void linearizationWarning(std::string_view);
+    void no_ci_lin_warn_if(bool condition, std::string_view message);
     qpdf::Dictionary readHintStream(Pipeline&, qpdf_offset_t offset, size_t length);
     void readHPageOffset(BitStream);
     void readHSharedObject(BitStream);
@@ -926,6 +927,9 @@ class QPDF::Doc::Linearization: Common
     std::vector<QPDFObjectHandle> part9_;
 
     std::function<void(int)> progress_callback_;
+
+    size_t max_obj_{0};
+    std::vector<bool> visited_;
 };
 
 class QPDF::Doc::Objects: Common
