@@ -358,18 +358,8 @@ Lin::updateObjectMaps(
         pending.pop_back();
 
         bool is_page_node = false;
-
-        if (cur.oh.isDictionary()) {
-            auto const& type = cur.oh["/Type"];
-            if (type.isNameAndEquals("/Page")) {
-                is_page_node = true;
-                if (!cur.top) {
-                    continue;
-                }
-            } else if (first_ou.page() && type.isNameAndEquals("/Pages")) {
-                continue;
-            }
-        }
+        bool is_stream = false;
+        int ssp = 0;
 
         if (cur.oh.indirect()) {
             auto og = cur.oh.id_gen();
@@ -384,7 +374,29 @@ Lin::updateObjectMaps(
                 continue;
             }
             visited_[id] = true;
-            resolveCompressedObject(og, object_stream_data);
+
+            if (cur.oh.isStream()) {
+                is_stream = true;
+                if (skip_stream_parameters) {
+                    ssp = skip_stream_parameters(cur.oh);
+                }
+            } else {
+                if (Name type = cur.oh["/Type"]) {
+                    // In prepare we called pushInheritedAttributesToPage which ensures that all
+                    // genuine page tree nodes are indirect.  We therefore don't need to test direct
+                    // objects.
+                    if (type == "/Page") {
+                        is_page_node = true;
+                        if (!cur.top) {
+                            continue;
+                        }
+                    } else if (first_ou.page() && type == "/Pages") {
+                        continue;
+                    }
+                }
+
+                resolveCompressedObject(og, object_stream_data);
+            }
             obj_categories_[og].update(cur.ou, cur.top);
             if (cur.ou.page()) {
                 page_objs_.at(cur.ou.pageno).push_back(og.getObj());
@@ -395,32 +407,23 @@ Lin::updateObjectMaps(
             for (auto const& item: cur.oh.as_array()) {
                 pending.emplace_back(cur.ou, item, false);
             }
-        } else if (cur.oh.isDictionary() || cur.oh.isStream()) {
-            QPDFObjectHandle dict = cur.oh;
-            bool is_stream = cur.oh.isStream();
-            int ssp = 0;
-            if (is_stream) {
-                dict = cur.oh.getDict();
-                if (skip_stream_parameters) {
-                    ssp = skip_stream_parameters(cur.oh);
-                }
-            }
-
-            for (auto& [key, value]: dict.as_dictionary()) {
+        } else if (Dictionary dict = is_stream ? cur.oh.getDict() : cur.oh) {
+            for (auto& [key, value]: dict) {
                 if (value.null()) {
                     continue;
                 }
 
-                if (is_page_node && (key == "/Thumb")) {
+                if (is_page_node && key == "/Thumb") {
                     // Traverse page thumbnail dictionaries as a special case. There can only ever
                     // be one /Thumb key on a page, and we see at most one page node per call.
                     thumb_ou = std::make_unique<ObjUser>(ObjUser::ou_thumb, cur.ou.pageno);
-                    pending.emplace_back(*thumb_ou, dict.getKey(key), false);
+                    pending.emplace_back(*thumb_ou, value, false);
                 } else if (is_page_node && (key == "/Parent")) {
                     // Don't traverse back up the page tree
                 } else if (
-                    ((ssp >= 1) && (key == "/Length")) ||
-                    ((ssp >= 2) && ((key == "/Filter") || (key == "/DecodeParms")))) {
+                    ssp >= 1 &&
+                    (key == "/Length" ||
+                     (ssp >= 2 && (key == "/Filter" || key == "/DecodeParms")))) {
                     // Don't traverse into stream parameters that we are not going to write.
                 } else {
                     pending.emplace_back(cur.ou, value, false);
