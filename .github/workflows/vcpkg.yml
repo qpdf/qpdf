@@ -17,6 +17,7 @@ jobs:
           - x64-mingw-static
           - x86-windows-static
           - x86-mingw-static
+          - arm64-windows-static
     steps:
       - name: 'Disable git autocrlf'
         shell: bash
@@ -57,6 +58,11 @@ jobs:
         with:
           name: vcpkg-x86-mingw-static
           path: vcpkg/installed/x86-mingw-static
+      - name: 'Download arm64-windows-static stage'
+        uses: actions/download-artifact@v8
+        with:
+          name: vcpkg-arm64-windows-static
+          path: vcpkg/installed/arm64-windows-static
       - name: 'Package'
         run: build-scripts/package-vcpkg
         env:
