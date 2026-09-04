@@ -13,6 +13,12 @@ more detail.
 
 .. x.y.z: not yet released
 
+12.4.2: not yet released
+  - Enhancements
+
+    - Improve validation of object ids and generation numbers when reading special objects (such as
+      xref or hint streams) and during reconstruction of damaged files.
+
 12.4.1: August 27, 2026
   - Bug fixes
 

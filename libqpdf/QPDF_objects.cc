@@ -363,12 +363,18 @@ Objects::reconstruct_xref(QPDFExc& e, bool found_startxref)
             auto t2 = m->objects.readToken(*m->file, MAX_LEN);
             if (t2.isInteger() && m->objects.readToken(*m->file, MAX_LEN).isWord("obj")) {
                 int obj = QUtil::string_to_int(t1.getValue().c_str());
-                int gen = QUtil::string_to_int(t2.getValue().c_str());
-                if (obj <= m->xref_table_max_id) {
-                    found_objects.emplace_back(obj, gen, token_start);
-                } else {
-                    warn(damagedPDF(
-                        "", -1, "ignoring object with impossibly large id " + std::to_string(obj)));
+                if (obj > 0) {
+                    int gen = QUtil::string_to_int(t2.getValue().c_str());
+                    if (0 <= gen && gen < 65535) {
+                        if (obj <= m->xref_table_max_id) {
+                            found_objects.emplace_back(obj, gen, token_start);
+                        } else {
+                            warn(damagedPDF(
+                                "",
+                                -1,
+                                "ignoring object with impossibly large id " + std::to_string(obj)));
+                        }
+                    }
                 }
             }
             m->file->seek(pos, SEEK_SET);
@@ -1513,8 +1519,11 @@ Objects::read_object_start(qpdf_offset_t offset)
     }
     int objid = QUtil::string_to_int(tobjid.getValue().c_str());
     int generation = QUtil::string_to_int(tgen.getValue().c_str());
-    if (objid == 0) {
-        throw damagedPDF(offset, "object with ID 0");
+    if (objid <= 0 || objid >= m->xref_table_max_id || generation < 0 || generation >= 65535) {
+        throw damagedPDF(
+            offset,
+            "object " + std::to_string(objid) + " " + std::to_string(generation) +
+                " has an invalid or impossibly large ID or generation");
     }
     return {objid, generation};
 }
