@@ -1528,11 +1528,17 @@ Lin::calculateLinearizationData(T const& object_stream_data)
             break;
         case c_outlines_obj:
             part_outlines_obj.emplace_back(oh);
-            outlines_max_end_ = std::max(outlines_max_end_, objectEnd(og));
+            if constexpr (std::is_same_v<T, std::map<int, int>>) {
+                // Only used for linearization checks.
+                outlines_max_end_ = std::max(outlines_max_end_, objectEnd(og));
+            }
             break;
         case c_outlines:
             part_outlines.emplace_back(oh);
-            outlines_max_end_ = std::max(outlines_max_end_, objectEnd(og));
+            if constexpr (std::is_same_v<T, std::map<int, int>>) {
+                // Only used for linearization checks.
+                outlines_max_end_ = std::max(outlines_max_end_, objectEnd(og));
+            }
             break;
         case c_pages_obj:
             part9_.emplace_back(oh);
