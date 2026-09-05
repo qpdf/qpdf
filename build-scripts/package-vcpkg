@@ -33,7 +33,7 @@ EOF
 fi
 
 if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" || "$GITHUB_EVENT_NAME" == "schedule" ]] && \
-       [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
+       [[ "$GITHUB_REF" == "refs/heads/main" || "$GITHUB_REF" == "refs/heads/vcpkg-release" ]]; then
     tag=vcpkg-cache-v1
     gh release upload $tag $zip_file
     declare -a old
