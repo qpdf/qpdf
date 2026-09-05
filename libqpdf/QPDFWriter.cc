@@ -2776,14 +2776,12 @@ impl::Writer::writeLinearized()
         }
     };
 
-    lin.optimize(obj, skip_stream_parameters);
-
     std::vector<QPDFObjectHandle> part4;
     std::vector<QPDFObjectHandle> part6;
     std::vector<QPDFObjectHandle> part7;
     std::vector<QPDFObjectHandle> part8;
     std::vector<QPDFObjectHandle> part9;
-    lin.parts(obj, part4, part6, part7, part8, part9);
+    lin.parts(obj, skip_stream_parameters, part4, part6, part7, part8, part9);
 
     // Object number sequence:
     //

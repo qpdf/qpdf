@@ -42,11 +42,19 @@ my @to_linearize =
      'gen1',                    # has objects with generation > 0 and dangling references
      'gen1-no-dangling',        # has objects with generation > 0
      'direct-outlines',         # /Outlines is a direct object
+     'page-outlines',           # /Outlines is an indirect object referenced by a page
      @linearized_files,         # we should be able to relinearize
      );
 
+# Which of the above should be compared with stored output files
+my @to_compare = (
+    'lin-special',
+    'object-stream',
+    'page-outlines',
+    );
+
 $n_tests += @linearized_files + 6;
-$n_tests += (3 * @to_linearize * 5) + 9;
+$n_tests += (3 * @to_linearize * 5) + (3 * @to_compare) + 3;
 
 foreach my $base (@linearized_files)
 {
@@ -86,8 +94,7 @@ foreach my $base (@to_linearize)
     {
         my $oarg = "-object-streams=$omode";
         my $sdarg = "";
-        if (($base eq 'lin-special') || ($base eq 'object-stream'))
-        {
+        if (grep { $_ eq $base } @to_compare) {
             $sdarg = "--stream-data=uncompress";
         }
         unlink "a.pdf", "b.pdf", "c.pdf";
@@ -119,8 +126,8 @@ foreach my $base (@to_linearize)
         $td->runtest("compare files ($omode)",
                      {$td->FILE => "b.pdf"},
                      {$td->FILE => "c.pdf"});
-        if (($base eq 'lin-special') || ($base eq 'object-stream'))
-        {
+
+        if (grep { $_ eq $base } @to_compare) {
             $td->runtest("check $base ($omode)",
                          {$td->FILE => "a.pdf"},
                          {$td->FILE => "$base.$omode.exp"});

@@ -566,4 +566,21 @@ first_object: 89
 first_object_offset: 20067
 nobjects: 12
 group_length: 2069
+
+Computed Linearization Part Assignments
+
+part 4 (root, document open):
+ 104
+part 6 (first page):
+ 105-108
+part 7 (other pages, private):
+ 1-2, 4-5, 7-8, 10-11, 13-14, 16-17, 19-20, 22-23, 25-26, 28-29
+ 31-32, 34-35, 37-38, 40-41, 43-44, 46-47, 49-50, 52-53, 55-56, 58-59
+ 61-62, 64-65, 67-68, 70-71, 73-74, 76-77, 79-80, 82-83, 85-86
+part 8 (other pages, shared): none
+part 9 (everything else):
+ 88, 109, 3, 6, 9, 12, 15, 18, 21, 24
+ 27, 30, 33, 36, 39, 42, 45, 48, 51, 54
+ 57, 60, 63, 66, 69, 72, 75, 78, 81, 84
+ 87, 110-111, 89-102
 qpdf: operation succeeded with warnings

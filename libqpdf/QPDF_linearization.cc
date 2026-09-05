@@ -69,50 +69,105 @@ load_vector_vector(
     bit_stream.skipToNextByte();
 }
 
-Lin::ObjUser::ObjUser(user_e type) :
-    ou_type(type)
+template <class T>
+static void
+append_vec(std::vector<T>& v1, std::vector<T>&& v2)
 {
-    qpdf_expect(type == ou_root);
+    v1.insert(v1.end(), std::make_move_iterator(v2.begin()), std::make_move_iterator(v2.end()));
 }
 
-Lin::ObjUser::ObjUser(user_e type, size_t pageno) :
-    ou_type(type),
-    pageno(pageno)
+class Lin::ObjUser
 {
-    qpdf_expect(type == ou_page || type == ou_thumb);
-}
+  public:
+    enum user_e { ou_page = 1, ou_thumb, ou_trailer_key, ou_root_key, ou_root };
 
-Lin::ObjUser::ObjUser(user_e type, std::string const& key) :
-    ou_type(type),
-    key(key)
-{
-    qpdf_expect(type == ou_trailer_key || type == ou_root_key);
-}
+    ObjUser() = delete;
 
-bool
-Lin::ObjUser::operator<(ObjUser const& rhs) const
-{
-    if (ou_type < rhs.ou_type) {
-        return true;
+    // type must be ou_root
+    ObjUser(user_e type) :
+        // ou_type(type),
+        category(c_root)
+    {
+        qpdf_expect(type == ou_root);
     }
-    if (ou_type == rhs.ou_type) {
-        if (pageno < rhs.pageno) {
-            return true;
-        }
-        if (pageno == rhs.pageno) {
-            return key < rhs.key;
-        }
-    }
-    return false;
-}
 
-Lin::UpdateObjectMapsFrame::UpdateObjectMapsFrame(
-    ObjUser const& ou, QPDFObjectHandle oh, bool top) :
-    ou(ou),
-    oh(oh),
-    top(top)
+    // type must be one of ou_page or ou_thumb
+    ObjUser(user_e type, size_t pageno) :
+        category(
+            type == ou_page ? (pageno == 0 ? c_first_page_private : c_other_page_private)
+                            : c_thumbnail_private),
+        pageno(pageno)
+    {
+        qpdf_expect(type == ou_page || type == ou_thumb);
+    }
+
+    // type must be one of ou_trailer_key or ou_root_key
+    ObjUser(user_e type, std::string const& key) :
+        category(category_from_key(type, key))
+    {
+    }
+
+    bool
+    page() const
+    {
+        return category == c_first_page_private || category == c_other_page_private;
+    }
+
+    /// @brief Return the linearization category this object would have if it were only referenced
+    /// in one place.
+    ObjCategory
+    obj_category(bool top) const
+    {
+        if (page() || category == c_thumbnail_private) {
+            return {category, util::to<int>(pageno)};
+        }
+        if (top && category == c_outlines) {
+            return {c_outlines_obj, -1};
+        }
+        return {category, -1};
+    }
+
+    const obj_category_e category;
+    const size_t pageno{0}; // if ou_page or ou_thumb
+
+  private:
+    static obj_category_e
+    category_from_key(user_e type, std::string const& key)
+    {
+        qpdf_expect(type == ou_trailer_key || type == ou_root_key);
+        if (type == ou_root_key) {
+            if (key == "/ViewerPreferences" || key == "/PageMode" || key == "/Threads" ||
+                key == "/OpenAction" || key == "/AcroForm") {
+                return c_open_document;
+            }
+            if (key == "/Outlines") {
+                return c_outlines;
+            }
+            if (key == "/Pages") {
+                return c_pages_obj;
+            }
+            return c_other;
+        }
+        if (key == "/Encrypt") {
+            return c_open_document;
+        }
+        return c_other;
+    }
+};
+
+struct Lin::UpdateObjectMapsFrame
 {
-}
+    UpdateObjectMapsFrame(ObjUser const& ou, QPDFObjectHandle oh, bool top) :
+        ou(ou),
+        oh(oh),
+        top(top)
+    {
+    }
+
+    ObjUser const& ou;
+    QPDFObjectHandle oh;
+    bool top;
+};
 
 void
 QPDF::optimize(
@@ -120,27 +175,24 @@ QPDF::optimize(
     bool allow_changes,
     std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
 {
-    m->lin.optimize_internal(object_stream_data, allow_changes, skip_stream_parameters);
-}
-
-void
-Lin::optimize(
-    QPDFWriter::ObjTable const& obj, std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
-{
-    optimize_internal(obj, true, skip_stream_parameters);
+    m->lin.prepare(object_stream_data, allow_changes, skip_stream_parameters);
 }
 
 template <typename T>
 void
-Lin::optimize_internal(
+Lin::prepare(
     T const& object_stream_data,
     bool allow_changes,
     std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
 {
-    if (!obj_user_to_objects_.empty()) {
-        // already optimized
+    if (!obj_categories_.empty()) {
+        // already prepared
         return;
     }
+
+    // includes some extra for objects that have incorrectly been excluded from xref table, such as
+    // xref streams, lin dictionaries, int streams etc.
+    max_obj_ = qpdf.getObjectCount() + 10;
 
     // The PDF specification indicates that /Outlines is supposed to be an indirect reference. Force
     // it to be so if it exists and is direct.  (This has been seen in the wild.)
@@ -156,15 +208,18 @@ Lin::optimize_internal(
     // initializes m->all_pages.
     m->pages.pushInheritedAttributesToPage(allow_changes, false);
 
-    // Traverse pages to create mappings between objects and the objects that use them. This
-    // operation dominates the time spent linearizing. To support more accurate progress reporting,
-    // we report progress through this operation when a callback is registered. Throttle to one
-    // event per integer-percent change to minimize overhead.
+    // Traverse pages to assign each object to a linearization category and to record which
+    // objects each page references. This operation dominates the time spent linearizing. To
+    // support more accurate progress reporting, we report progress through this operation when a
+    // callback is registered. Throttle to one event per integer-percent change to minimize
+    // overhead.
     size_t const total = m->pages.size();
+    page_objs_.resize(total);
     int last_pct = -1;
     size_t n = 0;
     for (auto const& page: m->pages) {
-        updateObjectMaps(ObjUser(ObjUser::ou_page, n), page, skip_stream_parameters);
+        updateObjectMaps(
+            ObjUser(ObjUser::ou_page, n), page, object_stream_data, skip_stream_parameters);
         ++n;
         if (progress_callback_ && total > 0) {
             int pct = static_cast<int>((100ULL * n) / total);
@@ -182,7 +237,10 @@ Lin::optimize_internal(
         } else {
             if (!value.null()) {
                 updateObjectMaps(
-                    ObjUser(ObjUser::ou_trailer_key, key), value, skip_stream_parameters);
+                    ObjUser(ObjUser::ou_trailer_key, key),
+                    value,
+                    object_stream_data,
+                    skip_stream_parameters);
             }
         }
     }
@@ -193,25 +251,104 @@ Lin::optimize_internal(
         // pdlin and Acrobat both disregard things like this from time to time, so this is almost
         // certain not to cause any problems.
         if (!value.null()) {
-            updateObjectMaps(ObjUser(ObjUser::ou_root_key, key), value, skip_stream_parameters);
+            updateObjectMaps(
+                ObjUser(ObjUser::ou_root_key, key),
+                value,
+                object_stream_data,
+                skip_stream_parameters);
         }
     }
 
     ObjUser root_ou = ObjUser(ObjUser::ou_root);
     auto root_og = root.id_gen();
-    obj_user_to_objects_[root_ou].insert(root_og);
-    object_to_obj_users_[root_og].insert(root_ou);
+    resolveCompressedObject(root_og, object_stream_data);
+    obj_categories_[root_og].update(root_ou, true);
 
-    filterCompressedObjects(object_stream_data);
+    for (auto& objs: page_objs_) {
+        std::sort(objs.begin(), objs.end());
+        objs.erase(std::unique(objs.begin(), objs.end()), objs.end());
+    }
 }
 
+void
+Lin::ObjCategory::update(ObjUser const& other_ou, bool top)
+{
+    auto other = other_ou.obj_category(top);
+    // Figure out what category this should be when combined with `other`. Earlier parts take
+    // precedence over later parts. This logic is non-trivial for objects that are referenced from
+    // more than one category. For example, if an object is referenced by the first page and the
+    // root, it goes in the root category. If it's accessed from a non-first page and a first page,
+    // it belongs in a first page category. This is only part of the logic. See remaining comments.
+    auto min_category = std::min(lin_category_, other.lin_category_);
+    auto max_category = std::max(lin_category_, other.lin_category_);
+    auto this_pageno = pageno_;
+    if (this_pageno <= 0 || other.pageno_ <= 0) {
+        pageno_ = std::max(this_pageno, other.pageno_);
+    } else {
+        // If an object is referenced by more than one page, count it as being on the first one
+        // for purposes of placement.
+        pageno_ = std::min(this_pageno, other.pageno_);
+    }
+    if (min_category <= c_first_page_shared) {
+        // The object is in part 4, or is already known to be referenced from the first page and at
+        // least one other page. Nothing we can learn later changes this, so keep the highest
+        // priority of the two values.
+        lin_category_ = min_category;
+        return;
+    }
+    if (min_category == c_first_page_private) {
+        if (max_category == c_other_page_private || max_category == c_other_page_shared) {
+            // We know this is referenced by the first page and at least one other page.
+            lin_category_ = c_first_page_shared;
+            return;
+        }
+        // Whatever the max category is, if the object is referenced by the first page, we need to
+        // ensure it ends up in part 6 (unless it was already placed in part 4).
+        lin_category_ = c_first_page_private;
+        return;
+    }
+    if (min_category == c_other_page_shared) {
+        // This is already known to be accessed by multiple non-first pages.
+        lin_category_ = c_other_page_shared;
+        return;
+    }
+    if (min_category == c_other_page_private) {
+        if (max_category == c_other_page_private && this_pageno != other.pageno_) {
+            // This is now known to be referenced from multiple pages.
+            lin_category_ = c_other_page_shared;
+        } else {
+            lin_category_ = c_other_page_private;
+        }
+        return;
+    }
+    // Thumbnail logic mirrors page logic
+    if (min_category == c_thumbnail_shared) {
+        lin_category_ = c_thumbnail_shared;
+        return;
+    }
+    if (min_category == c_thumbnail_private) {
+        if (max_category == c_thumbnail_private && this_pageno != other.pageno_) {
+            lin_category_ = c_thumbnail_shared;
+        } else {
+            lin_category_ = c_thumbnail_private;
+        }
+        return;
+    }
+    // All that remains is outlines and other. Keep whichever is highest priority.
+    lin_category_ = min_category;
+}
+
+template <typename T>
 void
 Lin::updateObjectMaps(
     ObjUser const& first_ou,
     QPDFObjectHandle first_oh,
+    T const& object_stream_data,
     std::function<int(QPDFObjectHandle&)> skip_stream_parameters)
 {
-    QPDFObjGen::set visited;
+    visited_.clear();
+    visited_.resize(max_obj_, false);
+
     std::vector<UpdateObjectMapsFrame> pending;
     pending.emplace_back(first_ou, first_oh, true);
     // Traverse the object tree from this point taking care to avoid crossing page boundaries.
@@ -221,54 +358,72 @@ Lin::updateObjectMaps(
         pending.pop_back();
 
         bool is_page_node = false;
-
-        if (cur.oh.isDictionaryOfType("/Page")) {
-            is_page_node = true;
-            if (!cur.top) {
-                continue;
-            }
-        }
+        bool is_stream = false;
+        int ssp = 0;
 
         if (cur.oh.indirect()) {
-            QPDFObjGen og(cur.oh.getObjGen());
-            if (!visited.add(og)) {
+            auto og = cur.oh.id_gen();
+            const int int_id = og.getObj();
+            if (int_id <= 0 || std::cmp_greater_equal(int_id, visited_.size())) {
+                no_ci_lin_warn_if(!cur.oh.null(), "ignoring unexpected object " + og.unparse(' '));
+                continue;
+            }
+            const size_t id = static_cast<size_t>(int_id);
+            if (visited_[id]) {
                 QTC::TC("qpdf", "QPDF opt loop detected");
                 continue;
             }
-            obj_user_to_objects_[cur.ou].insert(og);
-            object_to_obj_users_[og].insert(cur.ou);
+            visited_[id] = true;
+
+            if (cur.oh.isStream()) {
+                is_stream = true;
+                if (skip_stream_parameters) {
+                    ssp = skip_stream_parameters(cur.oh);
+                }
+            } else {
+                if (Name type = cur.oh["/Type"]) {
+                    // In prepare we called pushInheritedAttributesToPage which ensures that all
+                    // genuine page tree nodes are indirect.  We therefore don't need to test direct
+                    // objects.
+                    if (type == "/Page") {
+                        is_page_node = true;
+                        if (!cur.top) {
+                            continue;
+                        }
+                    } else if (first_ou.page() && type == "/Pages") {
+                        continue;
+                    }
+                }
+
+                resolveCompressedObject(og, object_stream_data);
+            }
+            obj_categories_[og].update(cur.ou, cur.top);
+            if (cur.ou.page()) {
+                page_objs_.at(cur.ou.pageno).push_back(og.getObj());
+            }
         }
 
         if (cur.oh.isArray()) {
             for (auto const& item: cur.oh.as_array()) {
                 pending.emplace_back(cur.ou, item, false);
             }
-        } else if (cur.oh.isDictionary() || cur.oh.isStream()) {
-            QPDFObjectHandle dict = cur.oh;
-            bool is_stream = cur.oh.isStream();
-            int ssp = 0;
-            if (is_stream) {
-                dict = cur.oh.getDict();
-                if (skip_stream_parameters) {
-                    ssp = skip_stream_parameters(cur.oh);
-                }
-            }
-
-            for (auto& [key, value]: dict.as_dictionary()) {
+        } else if (Dictionary dict = is_stream ? cur.oh.getDict() : cur.oh) {
+            for (auto& [key, value]: dict) {
                 if (value.null()) {
                     continue;
                 }
 
-                if (is_page_node && (key == "/Thumb")) {
+                if (is_page_node && key == "/Thumb") {
                     // Traverse page thumbnail dictionaries as a special case. There can only ever
                     // be one /Thumb key on a page, and we see at most one page node per call.
                     thumb_ou = std::make_unique<ObjUser>(ObjUser::ou_thumb, cur.ou.pageno);
-                    pending.emplace_back(*thumb_ou, dict.getKey(key), false);
+                    pending.emplace_back(*thumb_ou, value, false);
                 } else if (is_page_node && (key == "/Parent")) {
                     // Don't traverse back up the page tree
                 } else if (
-                    ((ssp >= 1) && (key == "/Length")) ||
-                    ((ssp >= 2) && ((key == "/Filter") || (key == "/DecodeParms")))) {
+                    ssp >= 1 &&
+                    (key == "/Length" ||
+                     (ssp >= 2 && (key == "/Filter" || key == "/DecodeParms")))) {
                     // Don't traverse into stream parameters that we are not going to write.
                 } else {
                     pending.emplace_back(cur.ou, value, false);
@@ -279,86 +434,20 @@ Lin::updateObjectMaps(
 }
 
 void
-Lin::filterCompressedObjects(std::map<int, int> const& object_stream_data)
+Lin::resolveCompressedObject(QPDFObjGen& og, std::map<int, int> const& object_stream_data)
 {
-    if (object_stream_data.empty()) {
-        return;
+    auto owner = object_stream_data.find(og.getObj());
+    if (owner != object_stream_data.end()) {
+        og = {owner->second, 0};
     }
-
-    // Transform object_to_obj_users and obj_user_to_objects so that they refer only to uncompressed
-    // objects.  If something is a user of a compressed object, then it is really a user of the
-    // object stream that contains it.
-
-    std::map<ObjUser, std::set<QPDFObjGen>> t_obj_user_to_objects;
-    std::map<QPDFObjGen, std::set<ObjUser>> t_object_to_obj_users;
-
-    for (auto const& [ou, ogs]: obj_user_to_objects_) {
-        for (auto const& og: ogs) {
-            auto i2 = object_stream_data.find(og.getObj());
-            if (i2 == object_stream_data.end()) {
-                t_obj_user_to_objects[ou].insert(og);
-            } else {
-                t_obj_user_to_objects[ou].insert({i2->second, 0});
-            }
-        }
-    }
-
-    for (auto const& [og, ous]: object_to_obj_users_) {
-        for (auto const& ou: ous) {
-            auto i2 = object_stream_data.find(og.getObj());
-            if (i2 == object_stream_data.end()) {
-                t_object_to_obj_users[og].insert(ou);
-            } else {
-                t_object_to_obj_users[{i2->second, 0}].insert(ou);
-            }
-        }
-    }
-
-    obj_user_to_objects_ = std::move(t_obj_user_to_objects);
-    object_to_obj_users_ = std::move(t_object_to_obj_users);
 }
 
 void
-Lin::filterCompressedObjects(QPDFWriter::ObjTable const& obj)
+Lin::resolveCompressedObject(QPDFObjGen& og, QPDFWriter::ObjTable const& obj)
 {
-    if (obj.getStreamsEmpty()) {
-        return;
+    if (auto owner = obj.contains(og) ? obj[og].object_stream : 0; owner > 0) {
+        og = {owner, 0};
     }
-
-    // Transform object_to_obj_users and obj_user_to_objects so that they refer only to uncompressed
-    // objects.  If something is a user of a compressed object, then it is really a user of the
-    // object stream that contains it.
-
-    std::map<ObjUser, std::set<QPDFObjGen>> t_obj_user_to_objects;
-    std::map<QPDFObjGen, std::set<ObjUser>> t_object_to_obj_users;
-
-    for (auto const& [ou, ogs]: obj_user_to_objects_) {
-        for (auto const& og: ogs) {
-            if (obj.contains(og)) {
-                if (auto const& i2 = obj[og].object_stream; i2 <= 0) {
-                    t_obj_user_to_objects[ou].insert(og);
-                } else {
-                    t_obj_user_to_objects[ou].insert(QPDFObjGen(i2, 0));
-                }
-            }
-        }
-    }
-
-    for (auto const& [og, ous]: object_to_obj_users_) {
-        if (obj.contains(og)) {
-            // Loop over obj_users.
-            for (auto const& ou: ous) {
-                if (auto i2 = obj[og].object_stream; i2 <= 0) {
-                    t_object_to_obj_users[og].insert(ou);
-                } else {
-                    t_object_to_obj_users[{i2, 0}].insert(ou);
-                }
-            }
-        }
-    }
-
-    obj_user_to_objects_ = std::move(t_obj_user_to_objects);
-    object_to_obj_users_ = std::move(t_object_to_obj_users);
 }
 
 void
@@ -366,6 +455,14 @@ Lin::linearizationWarning(std::string_view msg)
 {
     linearization_warnings_ = true;
     warn(qpdf_e_linearization, "", 0, std::string(msg));
+}
+
+void
+Lin::no_ci_lin_warn_if(bool condition, std::string_view msg)
+{
+    if (condition) {
+        linearizationWarning(msg);
+    }
 }
 
 bool
@@ -745,7 +842,7 @@ Lin::checkLinearizationInternal()
             "one in a cross-reference stream");
     }
 
-    // Further checking requires optimization and order calculation. Don't allow optimization to
+    // Further checking requires preparation and order calculation. Don't allow preparation to
     // make changes.  If it has to, then the file is not properly linearized.  We use the xref table
     // to figure out which objects are compressed and which are uncompressed.
     { // local scope
@@ -755,7 +852,7 @@ Lin::checkLinearizationInternal()
                 object_stream_data[og.getObj()] = entry.getObjStreamNumber();
             }
         }
-        optimize_internal(object_stream_data, false, nullptr);
+        prepare(object_stream_data, false, nullptr);
         calculateLinearizationData(object_stream_data);
     }
 
@@ -795,21 +892,10 @@ Lin::checkLinearizationInternal()
 }
 
 qpdf_offset_t
-Lin::maxEnd(ObjUser const& ou)
+Lin::objectEnd(QPDFObjGen og) const
 {
-    no_ci_stop_if(
-        !obj_user_to_objects_.contains(ou),
-        "no entry in object user table for requested object user" //
-    );
-
-    qpdf_offset_t end = 0;
-    for (auto const& og: obj_user_to_objects_[ou]) {
-        no_ci_stop_if(
-            !m->obj_cache.contains(og), "unknown object referenced in object user table" //
-        );
-        end = std::max(end, m->obj_cache[og].end_after_space);
-    }
-    return end;
+    auto oc = m->obj_cache.find(og);
+    return oc == m->obj_cache.end() ? 0 : oc->second.end_after_space;
 }
 
 qpdf_offset_t
@@ -944,7 +1030,11 @@ Lin::checkHPageOffset(
             int idx = he.shared_identifiers.at(i);
             no_ci_stop_if(
                 !shared_idx_to_obj.contains(idx),
-                "unable to get object for item in shared objects hint table");
+                "unable to get object " + std::to_string(idx) +
+                    " for item in shared objects hint table",
+                "",
+                false //
+            );
 
             hint_shared.insert(shared_idx_to_obj[idx]);
         }
@@ -1078,8 +1168,7 @@ Lin::checkHOutlines()
                 !m->xref_table.contains(og), "unknown object in outlines hint table" //
             );
             qpdf_offset_t offset = getLinearizationOffset(og);
-            ObjUser ou(ObjUser::ou_root_key, "/Outlines");
-            int length = toI(maxEnd(ou) - offset);
+            int length = toI(outlines_max_end_ - offset);
             qpdf_offset_t table_offset = adjusted_offset(outline_hints_.first_object_offset);
             if (offset != table_offset) {
                 linearizationWarning(
@@ -1148,6 +1237,40 @@ Lin::dumpLinearizationDataInternal()
         info << "\nOutlines Hint Table\n\n";
         dumpHGeneric(outline_hints_);
     }
+
+    info << "\nComputed Linearization Part Assignments\n\n";
+    dumpPart("4 (root, document open)", part4_);
+    dumpPart("6 (first page)", part6_);
+    dumpPart("7 (other pages, private)", part7_);
+    dumpPart("8 (other pages, shared)", part8_);
+    dumpPart("9 (everything else)", part9_);
+}
+
+void
+Lin::dumpPart(std::string_view label, std::vector<QPDFObjectHandle> const& part)
+{
+    auto& info = *cf.log()->getInfo();
+    info << "part " << std::string(label) << ":";
+    if (part.empty()) {
+        info << " none\n";
+        return;
+    }
+    size_t n = 0;
+    for (size_t i = 0; i < part.size(); ++i) {
+        int first = part[i].getObjectID();
+        int last = first;
+        while (i + 1 < part.size() && part[i + 1].getObjectID() == last + 1) {
+            ++i;
+            last = part[i].getObjectID();
+        }
+        info << (n % 10 == 0 ? "\n " : ", ");
+        ++n;
+        info << first;
+        if (last > first) {
+            info << "-" << last;
+        }
+    }
+    info << "\n";
 }
 
 qpdf_offset_t
@@ -1241,14 +1364,14 @@ Lin::calculateLinearizationData(T const& object_stream_data)
 {
     // This function calculates the ordering of objects, divides them into the appropriate parts,
     // and computes some values for the linearization parameter dictionary and hint tables.  The
-    // file must be optimized (via calling optimize()) prior to calling this function.  Note that
+    // file must be prepared (via calling prepare()) prior to calling this function.  Note that
     // actual offsets and lengths are not computed here, but anything related to object ordering is.
 
     util::assertion(
-        !object_to_obj_users_.empty(),
-        "INTERNAL ERROR: QPDF::calculateLinearizationData called before optimize()" //
+        !obj_categories_.empty(),
+        "INTERNAL ERROR: QPDF::calculateLinearizationData called before prepare()" //
     );
-    // Note that we can't call optimize here because we don't know whether it should be called
+    // Note that we can't call prepare here because we don't know whether it should be called
     // with or without allow changes.
 
     // Separate objects into the categories sufficient for us to determine which part of the
@@ -1270,39 +1393,68 @@ Lin::calculateLinearizationData(T const& object_stream_data)
     // Part 7 contains remaining objects private to pages other than the first page.
 
     // Part 8 contains all remaining shared objects except those that are shared only within
-    // thumbnails.
+    // thumbnails. "Shared objects" means objects referenced by more than one page.
 
     // Part 9 contains all remaining objects.
 
     // We sort objects into the following categories:
-
+    //   * root (the document catalog): part 4
     //   * open_document: part 4
-
-    //   * first_page_private: part 6
-
     //   * first_page_shared: part 6
-
-    //   * other_page_private: part 7
-
+    //   * first_page_private: part 6
     //   * other_page_shared: part 8
-
-    //   * thumbnail_private: part 9
-
+    //   * other_page_private: part 7
     //   * thumbnail_shared: part 9
-
+    //   * thumbnail_private: part 9
+    //   * pages_obj (the pages tree): part 9
+    //   * outlines_obj (the outlines dictionary): part 6 or 9
+    //   * outlines: part 6 or 9
     //   * other: part 9
 
-    //   * outlines: part 6 or 9
+    // Each part is further subdivided into regions. Create a separate vector for each subpart,
+    // then merge. Directly add the things that go to the beginning of the part in the final vector
+    // to avoid any extra moves.
 
-    part4_.clear();
-    part6_.clear();
-    part7_.clear();
-    part8_.clear();
-    part9_.clear();
+    std::vector<QPDFObjectHandle> uc_pages;
+    std::vector<QPDFObjGen> uc_page_ogs;
+    std::vector<QPDFObjectHandle> uc_thumbs;
+    std::vector<QPDFObjGen> thumb_ogs;
+    { // local scope
+        // Map all page objects to the containing object stream.  This should be a no-op in a
+        // properly linearized file.
+        for (auto oh: pages) {
+            auto uc = getUncompressedObject(oh, object_stream_data);
+            uc_page_ogs.emplace_back(uc.getObjGen());
+            QPDFObjectHandle thumb = uc.getKey("/Thumb");
+            thumb = getUncompressedObject(thumb, object_stream_data);
+            thumb_ogs.emplace_back(thumb.getObjGen());
+            uc_pages.emplace_back(uc);
+            uc_thumbs.emplace_back(thumb);
+        }
+    }
+    size_t npages = pages.size();
+
+    part4_.clear(); // root
+    std::vector<QPDFObjectHandle> part4a_open_document;
+    part6_.clear(); // first page
+    std::vector<QPDFObjectHandle> part6a_first_page_private;
+    std::vector<QPDFObjectHandle> part6b_first_page_shared;
+    part7_.clear(); // other page private
+    std::vector<std::vector<QPDFObjectHandle>> part7a_page_objects(npages);
+    std::vector<std::vector<QPDFObjectHandle>> part7b_other_page_private(npages);
+    part8_.clear(); // other page shared
+    part9_.clear(); // starts with pages objects
+    std::vector<std::vector<QPDFObjectHandle>> part9a_thumbnail_objects(npages);
+    std::vector<std::vector<QPDFObjectHandle>> part9b_thumbnail_private(npages);
+    std::vector<QPDFObjectHandle> part9c_thumbnail_shared;
+    std::vector<QPDFObjectHandle> part9d_other;
+    std::vector<QPDFObjectHandle> part_outlines_obj;
+    std::vector<QPDFObjectHandle> part_outlines;
     c_linp_ = LinParameters();
     c_page_offset_data_ = CHPageOffset();
     c_shared_object_data_ = CHSharedObject();
     c_outline_data_ = HGeneric();
+    outlines_max_end_ = 0;
 
     QPDFObjectHandle root = qpdf.getRoot();
     bool outlines_in_first_page = false;
@@ -1319,114 +1471,94 @@ Lin::calculateLinearizationData(T const& object_stream_data)
         QTC::TC("qpdf", "QPDF categorize pagemode outlines", outlines_in_first_page ? 1 : 0);
     }
 
-    std::set<std::string> open_document_keys;
-    open_document_keys.insert("/ViewerPreferences");
-    open_document_keys.insert("/PageMode");
-    open_document_keys.insert("/Threads");
-    open_document_keys.insert("/OpenAction");
-    open_document_keys.insert("/AcroForm");
+    // Generate ordering for objects in the output file.  Note that obj_categories_ is keyed by
+    // QPDFObjGen, so iterating it visits objects in object number order within each category.  In a
+    // linearized file, objects appear in sequence with the possible exception of hints tables which
+    // we won't see here anyway.  That means that running calculateLinearizationData() on a
+    // linearized file should give results identical to the original file ordering.
 
-    std::set<QPDFObjGen> lc_open_document;
-    std::set<QPDFObjGen> lc_first_page_private;
-    std::set<QPDFObjGen> lc_first_page_shared;
-    std::set<QPDFObjGen> lc_other_page_private;
-    std::set<QPDFObjGen> lc_other_page_shared;
-    std::set<QPDFObjGen> lc_thumbnail_private;
-    std::set<QPDFObjGen> lc_thumbnail_shared;
-    std::set<QPDFObjGen> lc_other;
-    std::set<QPDFObjGen> lc_outlines;
-    std::set<QPDFObjGen> lc_root;
-
-    for (auto& [og, ous]: object_to_obj_users_) {
-        bool in_open_document = false;
-        bool in_first_page = false;
-        int other_pages = 0;
-        int thumbs = 0;
-        int others = 0;
-        bool in_outlines = false;
-        bool is_root = false;
-
-        for (auto const& ou: ous) {
-            switch (ou.ou_type) {
-            case ObjUser::ou_trailer_key:
-                if (ou.key == "/Encrypt") {
-                    in_open_document = true;
-                } else {
-                    ++others;
-                }
-                break;
-
-            case ObjUser::ou_thumb:
-                ++thumbs;
-                break;
-
-            case ObjUser::ou_root_key:
-                if (open_document_keys.contains(ou.key)) {
-                    in_open_document = true;
-                } else if (ou.key == "/Outlines") {
-                    in_outlines = true;
-                } else {
-                    ++others;
-                }
-                break;
-
-            case ObjUser::ou_page:
-                if (ou.pageno == 0) {
-                    in_first_page = true;
-                } else {
-                    ++other_pages;
-                }
-                break;
-
-            case ObjUser::ou_root:
-                is_root = true;
-                break;
+    ObjTable<int8_t> shared_objects;
+    for (auto& [og, category]: obj_categories_) {
+        auto oh = qpdf.getObject(og);
+        switch (category.category()) {
+        case c_root:
+            part4_.emplace_back(oh);
+            break;
+        case c_open_document:
+            part4a_open_document.emplace_back(oh);
+            break;
+        case c_first_page_shared:
+            shared_objects[og.getObj()] = true;
+            part6b_first_page_shared.emplace_back(oh);
+            break;
+        case c_first_page_private:
+            if (og == uc_page_ogs.at(0)) {
+                part6_.emplace_back(uc_pages.at(0));
+                c_linp_.first_page_object = uc_pages.at(0).getObjectID();
+            } else {
+                part6a_first_page_private.emplace_back(oh);
             }
-        }
-
-        if (is_root) {
-            lc_root.insert(og);
-        } else if (in_outlines) {
-            lc_outlines.insert(og);
-        } else if (in_open_document) {
-            lc_open_document.insert(og);
-        } else if ((in_first_page) && (others == 0) && (other_pages == 0) && (thumbs == 0)) {
-            lc_first_page_private.insert(og);
-        } else if (in_first_page) {
-            lc_first_page_shared.insert(og);
-        } else if ((other_pages == 1) && (others == 0) && (thumbs == 0)) {
-            lc_other_page_private.insert(og);
-        } else if (other_pages > 1) {
-            lc_other_page_shared.insert(og);
-        } else if ((thumbs == 1) && (others == 0)) {
-            lc_thumbnail_private.insert(og);
-        } else if (thumbs > 1) {
-            lc_thumbnail_shared.insert(og);
-        } else {
-            lc_other.insert(og);
+            break;
+        case c_other_page_shared:
+            shared_objects[og.getObj()] = true;
+            part8_.emplace_back(oh);
+            break;
+        case c_other_page_private:
+            {
+                auto pageno = util::to<size_t>(category.pageno());
+                if (og == uc_page_ogs.at(pageno)) {
+                    part7a_page_objects.at(pageno).emplace_back(uc_pages.at(pageno));
+                } else {
+                    part7b_other_page_private.at(pageno).emplace_back(oh);
+                }
+            }
+            break;
+        case c_thumbnail_private:
+            {
+                auto pageno = util::to<size_t>(category.pageno());
+                if (og == thumb_ogs.at(pageno)) {
+                    part9a_thumbnail_objects.at(pageno).emplace_back(uc_thumbs.at(pageno));
+                } else {
+                    part9b_thumbnail_private.at(pageno).emplace_back(oh);
+                }
+            }
+            break;
+        case c_thumbnail_shared:
+            part9c_thumbnail_shared.emplace_back(oh);
+            break;
+        case c_outlines_obj:
+            part_outlines_obj.emplace_back(oh);
+            if constexpr (std::is_same_v<T, std::map<int, int>>) {
+                // Only used for linearization checks.
+                outlines_max_end_ = std::max(outlines_max_end_, objectEnd(og));
+            }
+            break;
+        case c_outlines:
+            part_outlines.emplace_back(oh);
+            if constexpr (std::is_same_v<T, std::map<int, int>>) {
+                // Only used for linearization checks.
+                outlines_max_end_ = std::max(outlines_max_end_, objectEnd(og));
+            }
+            break;
+        case c_pages_obj:
+            part9_.emplace_back(oh);
+            break;
+        case c_other:
+            part9d_other.emplace_back(oh);
+            break;
         }
     }
 
-    // Generate ordering for objects in the output file.  Sometimes we just dump right from a set
-    // into a vector.  Rather than optimizing this by going straight into the vector, we'll leave
-    // these phases separate for now.  That way, this section can be concerned only with ordering,
-    // and the above section can be considered only with categorization.  Note that sets of
-    // QPDFObjGens are sorted by QPDFObjGen.  In a linearized file, objects appear in sequence with
-    // the possible exception of hints tables which we won't see here anyway.  That means that
-    // running calculateLinearizationData() on a linearized file should give results identical to
-    // the original file ordering.
-
-    // We seem to traverse the page tree a lot in this code, but we can address this for a future
-    // code optimization if necessary. Premature optimization is the root of all evil.
-    std::vector<QPDFObjectHandle> uc_pages;
-    { // local scope
-        // Map all page objects to the containing object stream.  This should be a no-op in a
-        // properly linearized file.
-        for (auto oh: pages) {
-            uc_pages.emplace_back(getUncompressedObject(oh, object_stream_data));
-        }
+    if (!part_outlines_obj.empty()) {
+        c_outline_data_.first_object = part_outlines_obj.at(0).getObjectID();
+        c_outline_data_.nobjects = 1;
+    } else if (!part_outlines.empty()) {
+        // This case is probably not reachable. There can't be outlines without an outlines obj, and
+        // if any part of the outlines are swallowed up by a higher priority part, the entire
+        // structure will come along for the ride.
+        c_outline_data_.first_object = part_outlines.at(0).getObjectID();
     }
-    size_t npages = pages.size();
+    c_outline_data_.nobjects += toI(part_outlines.size());
 
     // We will be initializing some values of the computed hint tables.  Specifically, we can
     // initialize any items that deal with object numbers or counts but not any items that deal with
@@ -1442,44 +1574,26 @@ Lin::calculateLinearizationData(T const& object_stream_data)
     // Part 4: open document objects.  We don't care about the order.
 
     no_ci_stop_if(
-        lc_root.size() != 1, "found other than one root while calculating linearization data" //
+        part4_.size() != 1, "found other than one root while calculating linearization data" //
     );
-
-    part4_.emplace_back(qpdf.getObject(*(lc_root.begin())));
-    for (auto const& og: lc_open_document) {
-        part4_.emplace_back(qpdf.getObject(og));
-    }
+    append_vec(part4_, std::move(part4a_open_document));
 
     // Part 6: first page objects.  Note: implementation note 124 states that Acrobat always treats
     // page 0 as the first page for linearization regardless of /OpenAction.  pdlin doesn't provide
     // any option to set this and also disregards /OpenAction.  We will do the same.
-
-    // First, place the actual first page object itself.
     no_ci_stop_if(
-        pages.empty(), "no pages found while calculating linearization data" //
+        part6_.size() != 1, "part 6 has other than exactly one object (first page dictionary)" //
     );
-    QPDFObjGen first_page_og(uc_pages.at(0).getObjGen());
-    no_ci_stop_if(
-        !lc_first_page_private.erase(first_page_og), "unable to linearize first page" //
-    );
-    c_linp_.first_page_object = uc_pages.at(0).getObjectID();
-    part6_.emplace_back(uc_pages.at(0));
-
     // The PDF spec "recommends" an order for the rest of the objects, but we are going to disregard
     // it except to the extent that it groups private and shared objects contiguously for the sake
     // of hint tables.
-
-    for (auto const& og: lc_first_page_private) {
-        part6_.emplace_back(qpdf.getObject(og));
-    }
-
-    for (auto const& og: lc_first_page_shared) {
-        part6_.emplace_back(qpdf.getObject(og));
-    }
+    append_vec(part6_, std::move(part6a_first_page_private));
+    append_vec(part6_, std::move(part6b_first_page_shared));
 
     // Place the outline dictionary if it goes in the first page section.
     if (outlines_in_first_page) {
-        pushOutlinesToPart(part6_, lc_outlines, object_stream_data);
+        append_vec(part6_, std::move(part_outlines_obj));
+        append_vec(part6_, std::move(part_outlines));
     }
 
     // Fill in page offset hint table information for the first page. The PDF spec says that
@@ -1493,46 +1607,20 @@ Lin::calculateLinearizationData(T const& object_stream_data)
     // For each page in order:
     for (size_t i = 1; i < npages; ++i) {
         // Place this page's page object
-
-        QPDFObjGen page_og(uc_pages.at(i).getObjGen());
         no_ci_stop_if(
-            !lc_other_page_private.erase(page_og),
+            part7a_page_objects.at(i).size() != 1,
             "unable to linearize page " + std::to_string(i) //
         );
-
-        part7_.emplace_back(uc_pages.at(i));
+        append_vec(part7_, std::move(part7a_page_objects.at(i)));
 
         // Place all non-shared objects referenced by this page, updating the page object count for
         // the hint table.
-
-        c_page_offset_data_.entries.at(i).nobjects = 1;
-
-        ObjUser ou(ObjUser::ou_page, i);
-        no_ci_stop_if(
-            !obj_user_to_objects_.contains(ou),
-            "found unreferenced page while calculating linearization data" //
-        );
-
-        for (auto const& og: obj_user_to_objects_[ou]) {
-            if (lc_other_page_private.erase(og)) {
-                part7_.emplace_back(qpdf.getObject(og));
-                ++c_page_offset_data_.entries.at(i).nobjects;
-            }
-        }
+        c_page_offset_data_.entries.at(i).nobjects =
+            util::to<int>(1 + part7b_other_page_private.at(i).size());
+        append_vec(part7_, std::move(part7b_other_page_private.at(i)));
     }
-    // That should have covered all part7 objects.
-    util::assertion(
-        lc_other_page_private.empty(),
-        "INTERNAL ERROR: QPDF::calculateLinearizationData: lc_other_page_private is not empty "
-        "after generation of part7" //
-    );
 
-    // Part 8: other pages' shared objects
-
-    // Order is unimportant.
-    for (auto const& og: lc_other_page_shared) {
-        part8_.emplace_back(qpdf.getObject(og));
-    }
+    // Part 8: other pages' shared objects -- these were already appended
 
     // Part 9: other objects
 
@@ -1541,64 +1629,30 @@ Lin::calculateLinearizationData(T const& object_stream_data)
     // page order, then shared thumbnail objects, and then outlines (unless in part 6).  After that,
     // we throw all remaining objects in arbitrary order.
 
-    // Place the pages tree.
-    auto& pages_ogs = obj_user_to_objects_[{ObjUser::ou_root_key, "/Pages"}];
-    no_ci_stop_if(
-        pages_ogs.empty(), "found empty pages tree while calculating linearization data" //
-    );
-    for (auto const& og: pages_ogs) {
-        if (lc_other.erase(og)) {
-            part9_.emplace_back(qpdf.getObject(og));
-        }
-    }
-
     // Place private thumbnail images in page order.  Slightly more information would be required if
     // we were going to bother with thumbnail hint tables.
     for (size_t i = 0; i < npages; ++i) {
-        QPDFObjectHandle thumb = uc_pages.at(i).getKey("/Thumb");
-        thumb = getUncompressedObject(thumb, object_stream_data);
-        QPDFObjGen thumb_og(thumb.getObjGen());
         // Output the thumbnail itself
-        if (lc_thumbnail_private.erase(thumb_og) && !thumb.null()) {
-            part9_.emplace_back(thumb);
-        } else {
-            // No internal error this time...there's nothing to stop this object from having
-            // been referred to somewhere else outside of a page's /Thumb, and if it had been,
-            // there's nothing to prevent it from having been in some set other than
-            // lc_thumbnail_private.
-        }
-        for (auto const& og: obj_user_to_objects_[{ObjUser::ou_thumb, i}]) {
-            if (lc_thumbnail_private.erase(og)) {
-                part9_.emplace_back(qpdf.getObject(og));
-            }
-        }
+        append_vec(part9_, std::move(part9a_thumbnail_objects.at(i)));
+        append_vec(part9_, std::move(part9b_thumbnail_private.at(i)));
     }
-    util::assertion(
-        lc_thumbnail_private.empty(),
-        "INTERNAL ERROR: QPDF::calculateLinearizationData: lc_thumbnail_private not "
-        "empty after placing thumbnails" //
-    );
 
     // Place shared thumbnail objects
-    for (auto const& og: lc_thumbnail_shared) {
-        part9_.emplace_back(qpdf.getObject(og));
-    }
+    append_vec(part9_, std::move(part9c_thumbnail_shared));
 
     // Place outlines unless in first page
     if (!outlines_in_first_page) {
-        pushOutlinesToPart(part9_, lc_outlines, object_stream_data);
+        append_vec(part9_, std::move(part_outlines_obj));
+        append_vec(part9_, std::move(part_outlines));
     }
 
     // Place all remaining objects
-    for (auto const& og: lc_other) {
-        part9_.emplace_back(qpdf.getObject(og));
-    }
+    append_vec(part9_, std::move(part9d_other));
 
     // Make sure we got everything exactly once.
-
     size_t num_placed =
         part4_.size() + part6_.size() + part7_.size() + part8_.size() + part9_.size();
-    size_t num_wanted = object_to_obj_users_.size();
+    size_t num_wanted = obj_categories_.size();
     no_ci_stop_if(
         // This can happen with damaged files, e.g. if the root is part of the the pages tree.
         num_placed != num_wanted,
@@ -1616,7 +1670,7 @@ Lin::calculateLinearizationData(T const& object_stream_data)
 
     // Note that two objects never have the same object number, so we can map from object number
     // only without regards to generation.
-    std::map<int, int> obj_to_index;
+    ObjTable<int> obj_to_index;
 
     c_shared_object_data_.nshared_first_page = toI(part6_.size());
     c_shared_object_data_.nshared_total =
@@ -1644,70 +1698,28 @@ Lin::calculateLinearizationData(T const& object_stream_data)
     );
 
     // Now compute the list of shared objects for each page after the first page.
-
     for (size_t i = 1; i < npages; ++i) {
         CHPageOffsetEntry& pe = c_page_offset_data_.entries.at(i);
-        ObjUser ou(ObjUser::ou_page, i);
-        no_ci_stop_if(
-            !obj_user_to_objects_.contains(ou),
-            "found unreferenced page while calculating linearization data" //
-        );
-
-        for (auto const& og: obj_user_to_objects_[ou]) {
-            if (object_to_obj_users_[og].size() > 1 && obj_to_index.contains(og.getObj())) {
-                int idx = obj_to_index[og.getObj()];
+        for (auto obj: page_objs_.at(i)) {
+            if (shared_objects[obj]) {
                 ++pe.nshared_objects;
-                pe.shared_identifiers.push_back(idx);
+                pe.shared_identifiers.push_back(obj_to_index[obj]);
             }
         }
-    }
-}
-
-template <typename T>
-void
-Lin::pushOutlinesToPart(
-    std::vector<QPDFObjectHandle>& part,
-    std::set<QPDFObjGen>& lc_outlines,
-    T const& object_stream_data)
-{
-    QPDFObjectHandle root = qpdf.getRoot();
-    QPDFObjectHandle outlines = root.getKey("/Outlines");
-    if (outlines.null()) {
-        return;
-    }
-    outlines = getUncompressedObject(outlines, object_stream_data);
-    QPDFObjGen outlines_og(outlines.getObjGen());
-    QTC::TC(
-        "qpdf",
-        "QPDF lin outlines in part",
-        &part == &part6_         ? 0
-            : (&part == &part9_) ? 1
-                                 : 9999); // can't happen
-    if (lc_outlines.erase(outlines_og)) {
-        // Make sure outlines is in lc_outlines in case the file is damaged. in which case it may be
-        // included in an earlier part.
-        part.emplace_back(outlines);
-        c_outline_data_.first_object = outlines_og.getObj();
-        c_outline_data_.nobjects = 1;
-    }
-    for (auto const& og: lc_outlines) {
-        if (!c_outline_data_.first_object) {
-            c_outline_data_.first_object = og.getObj();
-        }
-        part.emplace_back(qpdf.getObject(og));
-        ++c_outline_data_.nobjects;
     }
 }
 
 void
 Lin::parts(
     QPDFWriter::ObjTable const& obj,
+    std::function<int(QPDFObjectHandle&)> skip_stream_parameters,
     std::vector<QPDFObjectHandle>& part4,
     std::vector<QPDFObjectHandle>& part6,
     std::vector<QPDFObjectHandle>& part7,
     std::vector<QPDFObjectHandle>& part8,
     std::vector<QPDFObjectHandle>& part9)
 {
+    prepare(obj, true, skip_stream_parameters);
     calculateLinearizationData(obj);
     part4 = part4_;
     part6 = part6_;

@@ -7,7 +7,6 @@ QPDF opt page resource hides ancestor 0
 QPDF opt loop detected 0
 QPDF categorize pagemode present 1
 QPDF categorize pagemode outlines 1
-QPDF lin outlines in part 1
 QPDF lin nshared_total > nshared_first_page 1
 QPDF lin part 8 empty 1
 QPDF lin check shared past first page 0
