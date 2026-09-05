@@ -57,6 +57,10 @@ more detail.
     - Detect and warn in check linearization when the xref stream reports the object containing a
       compressed object to itself be a compressed object.
 
+    - Report a file whose only line is a PDF header as damaged instead of failing with a
+      system error. Reading a line whose end-of-line run reaches the end of the file left the
+      input source one byte before the start of that line, which at offset 0 is a seek to -1.
+
   - Enhancements
 
     - Improve uniformity and accuracy of progress reporting when writing linearized files and
