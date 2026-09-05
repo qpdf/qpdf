@@ -4,13 +4,18 @@ set -ex
 cd $(dirname $0)/..
 
 triplet=$1
-if [[ $triplet =~ x86-.* ]]; then
+
+if [[ $triplet =~ ^x86- ]]; then
     wordsize=32
 else
     wordsize=64
 fi
 
 if [[ $triplet =~ .*-mingw-.* ]]; then
+    if [[ $triplet =~ ^arm64- ]]; then
+        echo 1>&2 "mingw is not supported for arm64"
+        exit 2
+    fi
     pacman -Sy --noconfirm make base-devel tar zip unzip
     if [ ! -x /c/msys64/mingw$wordsize/bin/g++.exe ]; then
         if [[ $wordsize == 64 ]]; then
@@ -23,7 +28,9 @@ if [[ $triplet =~ .*-mingw-.* ]]; then
 else
     cl
 fi
-PATH=/c/msys64/mingw$wordsize/bin:$PATH
+if [[ ! $triplet =~ ^arm64- ]]; then
+    PATH=/c/msys64/mingw$wordsize/bin:$PATH
+fi
 
 cwd=`pwd`
 

@@ -1,13 +1,26 @@
 #!/bin/bash
 set -ex
 cd $(dirname $0)/..
-wordsize=$1
+arch=$1
 tool=$2
+
+case $arch in
+    x86) wordsize=32 ;;
+    x64|arm64) wordsize=64 ;;
+    *)
+        echo 1>&2 "Usage: $(basename $0) {x86|x64|arm64} {msvc|mingw}"
+        exit 2
+        ;;
+esac
 
 declare -a cmake_xargs
 declare -a ctest_xargs
 config=Release
 if [[ $tool == mingw ]]; then
+    if [[ $arch == arm64 ]]; then
+        echo 1>&2 "mingw is not supported for arm64"
+        exit 2
+    fi
     pacman -Sy --noconfirm make base-devel tar zip unzip perl
     if [ ! -x /c/msys64/mingw$wordsize/bin/g++.exe ]; then
         if [[ $wordsize == 64 ]]; then
