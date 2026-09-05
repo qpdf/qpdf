@@ -52,14 +52,20 @@ jobs:
           name: distribution-linux
           path: distribution
   Windows:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.runner }}
     needs: Prebuild
     strategy:
       fail-fast: false
       max-parallel: 4
       matrix:
         tool: [msvc, mingw]
-        wordsize: [64, 32]
+        arch: [x64, x86]
+        runner: [windows-latest]
+        include:
+          # There is no MINGW for ARM64
+          - tool: msvc
+            arch: arm64
+            runner: windows-11-arm
     steps:
       - name: 'Disable git autocrlf'
         shell: bash
@@ -77,11 +83,11 @@ jobs:
           path: .
       - name: 'Build, test, generate binary distributions'
         shell: cmd
-        run: build-scripts/build-windows.bat ${{ matrix.wordsize }} ${{ matrix.tool }}
+        run: build-scripts/build-windows.bat ${{ matrix.arch }} ${{ matrix.tool }}
       - name: 'Upload binary distributions'
         uses: actions/upload-artifact@v7
         with:
-          name: distribution-windows-${{ matrix.wordsize }}-${{ matrix.tool }}
+          name: distribution-windows-${{ matrix.arch }}-${{ matrix.tool }}
           path: distribution
   macOS:
     runs-on: macos-latest
