@@ -599,6 +599,115 @@ test_3(QPDF& pdf, char const* arg2)
     }
 }
 
+// Test that the container mutators refuse to create a cycle among direct objects. Such a cycle
+// cannot be loaded from a PDF (every backward pointer in a file is an indirect reference) but can
+// be assembled in memory, where it would send unparse(), writeJSON() and disconnect() into
+// unbounded recursion. See https://github.com/qpdf/qpdf/issues/1730.
+static void
+test_4(QPDF& pdf, char const* arg2)
+{
+    using namespace qpdf;
+
+    // A dictionary may not be made to contain itself.
+    {
+        auto a = QPDFObjectHandle::newDictionary();
+        assert(throws<std::logic_error>([&]() { a.replaceKey("/Self", a); }));
+    }
+    // A dictionary may not contain itself indirectly through a direct array.
+    {
+        auto a = QPDFObjectHandle::newDictionary();
+        assert(throws<std::logic_error>([&]() {
+            a.replaceKey("/Kids", QPDFObjectHandle::newArray({a}));
+        }));
+    }
+    // The mutual cycle from issue #1730: a -> b -> a, closed by the second replaceKey.
+    {
+        auto a = QPDFObjectHandle::newDictionary();
+        auto b = QPDFObjectHandle::newDictionary();
+        a.replaceKey("/Kids", QPDFObjectHandle::newArray({b})); // a -> b: fine, no cycle yet
+        assert(throws<std::logic_error>([&]() {
+            b.replaceKey("/Kids", QPDFObjectHandle::newArray({a}));
+        }));
+    }
+    // An array may not be made to contain itself, through any of its mutators.
+    {
+        auto a = QPDFObjectHandle::newArray();
+        assert(throws<std::logic_error>([&]() { a.appendItem(a); }));
+        assert(throws<std::logic_error>([&]() { a.insertItem(0, a); }));
+        a.appendItem(QPDFObjectHandle::newNull());
+        assert(throws<std::logic_error>([&]() { a.setArrayItem(0, a); }));
+        assert(throws<std::logic_error>([&]() {
+            a.setArrayFromVector({QPDFObjectHandle::newNull(), a});
+        }));
+    }
+    // An array may not contain itself indirectly through a nested direct container.
+    {
+        auto outer = QPDFObjectHandle::newArray();
+        auto inner = QPDFObjectHandle::newArray();
+        outer.appendItem(inner);
+        assert(throws<std::logic_error>([&]() { inner.appendItem(outer); }));
+    }
+    // Sharing a direct object on two paths is fine as long as it does not form a cycle (a DAG,
+    // not a cycle, must still be accepted).
+    {
+        auto shared = QPDFObjectHandle::newDictionary();
+        shared.replaceKey("/Leaf", Integer(1));
+        auto a = QPDFObjectHandle::newArray();
+        a.appendItem(shared);
+        a.appendItem(shared); // diamond: same direct object twice, no cycle
+        auto d = QPDFObjectHandle::newDictionary();
+        d.replaceKey("/First", shared);
+        d.replaceKey("/Second", QPDFObjectHandle::newArray({shared}));
+        // Reachable without crashing.
+        assert(!a.unparse().empty());
+        assert(!d.unparse().empty());
+        // A single insertion whose subtree reaches the same direct object by two paths is also
+        // accepted: the cycle check visits each object once and does not mistake sharing for a
+        // cycle.
+        auto two_paths = QPDFObjectHandle::newArray({shared, QPDFObjectHandle::newArray({shared})});
+        auto e = QPDFObjectHandle::newArray();
+        e.appendItem(two_paths);
+        assert(!e.unparse().empty());
+    }
+    // A heavily shared (but acyclic) direct DAG must be validated in time linear in the number of
+    // distinct objects. Each level is an array whose two elements are the SAME direct object from
+    // the level below, so the graph has `depth` levels but 2^depth distinct root-to-leaf paths.
+    // Deduplicating shared containers keeps the cycle check O(depth); without dedup, building this
+    // would take exponential time and this test would hang.
+    {
+        auto node = QPDFObjectHandle::newDictionary();
+        for (int i = 0; i < 200; ++i) {
+            auto next = QPDFObjectHandle::newArray();
+            next.appendItem(node); // both elements are the same shared direct object
+            next.appendItem(node);
+            node = next;
+        }
+        assert(node.isArray() && node.getArrayNItems() == 2);
+    }
+    // A cycle is detected even when the path passes through a sparse array. qpdf stores arrays
+    // with more than 100 null elements in a different internal representation, exercised here.
+    {
+        std::string text = "[";
+        for (int i = 0; i < 101; ++i) {
+            text += " null";
+        }
+        text += " ]";
+        auto sparse = QPDFObjectHandle::parse(text);
+        auto d = QPDFObjectHandle::newDictionary();
+        sparse.appendItem(d);
+        assert(throws<std::logic_error>([&]() { d.replaceKey("/Loop", sparse); }));
+    }
+    // Indirect references break a cycle (they serialize as "N 0 R"), so qpdf continues to allow
+    // cyclic structures built from indirect objects, exactly as before.
+    {
+        auto a = pdf.makeIndirectObject(QPDFObjectHandle::newDictionary());
+        auto b = pdf.makeIndirectObject(QPDFObjectHandle::newDictionary());
+        a.replaceKey("/Other", b);
+        b.replaceKey("/Other", a); // indirect cycle: allowed
+        assert(a.unparse() == a.getObjGen().unparse(' ') + " R");
+    }
+}
+
 void
 runtest(int n, char const* filename1, char const* arg2)
 {
@@ -606,7 +715,7 @@ runtest(int n, char const* filename1, char const* arg2)
     // the test suite to see how the test is invoked to find the file
     // that the test is supposed to operate on.
 
-    std::set<int> ignore_filename = {1, 3};
+    std::set<int> ignore_filename = {1, 3, 4};
 
     QPDF pdf;
     std::shared_ptr<char> file_buf;
@@ -620,7 +729,7 @@ runtest(int n, char const* filename1, char const* arg2)
     }
 
     std::map<int, void (*)(QPDF&, char const*)> test_functions = {
-        {0, test_0}, {1, test_1}, {3, test_3}};
+        {0, test_0}, {1, test_1}, {3, test_3}, {4, test_4}};
 
     auto fn = test_functions.find(n);
     if (fn == test_functions.end()) {
