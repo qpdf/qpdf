@@ -20,6 +20,10 @@ crypto provider. There are several options:
   the MSVC releases, it is possible to link a debugging build with mingw against non-debugging libraries built with
   mingw.
 
+* `qpdf-<version>-msvc-arm64.exe` - This is an ARM64 version built with MSVC. Use this on ARM64 Windows systems. The
+  `msvc64` build will also run on these systems under emulation, but the native ARM64 build will perform better. There
+  is no mingw equivalent since MSYS2 does not provide a native ARM64 mingw tool chain.
+
 * `qpdf-<version>-msvc32.exe` - This is a 32-bit version built with MSVC. Use this if you need to run qpdf on a
   32-bit system or if you are building 32-bit executables in non-Debug mode with Microsoft Visual C++. The 32-bit
   executables will work on 64-bit systems as well and are capable of working with files larger than 2 GB.
