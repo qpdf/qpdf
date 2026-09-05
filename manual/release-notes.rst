@@ -54,6 +54,9 @@ more detail.
 
     - Avoid generating JSON with leading zeroes when converting real numbers.
 
+    - Reject trailing characters in bounded numeric command-line option values instead of
+      silently accepting their numeric prefixes.
+
     - Detect and warn in check linearization when the xref stream reports the object containing a
       compressed object to itself be a compressed object.
 

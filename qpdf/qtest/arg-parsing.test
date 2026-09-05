@@ -15,7 +15,7 @@ cleanup();
 
 my $td = new TestDriver('arg-parsing');
 
-my $n_tests = 35;
+my $n_tests = 37;
 
 $td->runtest("required argument",
              {$td->COMMAND => "qpdf --password minimal.pdf"},
@@ -191,6 +191,12 @@ $td->runtest("bad compression-level",
                   $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);
 
+$td->runtest("compression-level with trailing characters",
+             {$td->COMMAND => "qpdf --compression-level=9junk minimal.pdf"},
+             {$td->REGEXP => "invalid compression-level: must be a number between 1 and 9",
+                  $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+
 $td->runtest("bad jpeg-quality",
              {$td->COMMAND => "qpdf --jpeg-quality=101 minimal.pdf"},
              {$td->REGEXP => "invalid jpeg-quality: must be a number between 0 and 100",
@@ -201,6 +207,13 @@ $td->runtest("bad objects-container-max-container-size",
              {$td->COMMAND => "qpdf --global --parser-max-container-size=-1 -- minimal.pdf"},
              {$td->REGEXP =>
                 "invalid parser-max-container-size: must be a number between 0 and 4294967295",
+                  $td->EXIT_STATUS => 2},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("parser-max-errors with trailing characters",
+             {$td->COMMAND => "qpdf --global --parser-max-errors=2junk -- --check minimal.pdf"},
+             {$td->REGEXP =>
+                "invalid parser-max-errors: must be a number between 0 and 4294967295",
                   $td->EXIT_STATUS => 2},
              $td->NORMALIZE_NEWLINES);
 
