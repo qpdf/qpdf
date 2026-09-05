@@ -1,0 +1,302 @@
+=== 1. Iteration over all named destinations ===
+
+Named destination: /BothModernAndLegacy
+  kind = NAME
+  ndest.isNull() = false
+  ndest.hasValidWrapper() = true
+  raw = << /D 2 0 R /DebugLabel (From /Dests: Name keys) >> ==> << /D 2 0 R /DebugLabel (From /Dests: Name keys) >>
+  Explicit destination edest := ndest.unwrap()
+    edest.getExplicitArray() = 2 0 R ==> [ 8 0 R /XYZ 0 842 0 ]
+    edest.isStrictlyCompliant = true
+    findPageIndex(edest) = 1
+    edest.isRemote() = false
+
+Named destination: /InvalidLegacyTarget
+  kind = NAME
+  ndest.isNull() = false
+  ndest.hasValidWrapper() = false
+  raw = << /D (potatoes) >> ==> << /D (potatoes) >>
+  Explicit destination edest := ndest.unwrap()
+    edest.getExplicitArray() = null ==> null
+    edest.isStrictlyCompliant = false
+    findPageIndex(edest) = -1
+    edest.isRemote() = false
+
+Named destination: /InvalidLegacyTarget2
+  kind = NAME
+  ndest.isNull() = false
+  ndest.hasValidWrapper() = false
+  raw = << /D << /D 3 0 R >> >> ==> << /D << /D 3 0 R >> >>
+  Explicit destination edest := ndest.unwrap()
+    edest.getExplicitArray() = 3 0 R ==> [ 4 0 R /XYZ 0 24 0 ]
+    edest.isStrictlyCompliant = true
+    findPageIndex(edest) = 0
+    edest.isRemote() = false
+
+Named destination: /InvalidLegacyTarget3
+  kind = NAME
+  ndest.isNull() = false
+  ndest.hasValidWrapper() = true
+  raw = [ 4 0 R ] ==> [ 4 0 R ]
+  Explicit destination edest := ndest.unwrap()
+    edest.getExplicitArray() = [ 4 0 R ] ==> [ 4 0 R ]
+    edest.isStrictlyCompliant = false
+    findPageIndex(edest) = 0
+    edest.isRemote() = false
+
+Named destination: /InvalidLegacyTarget4
+  kind = NAME
+  ndest.isNull() = false
+  ndest.hasValidWrapper() = true
+  raw = [ ] ==> [ ]
+  Explicit destination edest := ndest.unwrap()
+    edest.getExplicitArray() = [ ] ==> [ ]
+    edest.isStrictlyCompliant = false
+    findPageIndex(edest) = -1
+    edest.isRemote() = false
+
+Named destination: /InvalidLegacyTarget5
+  kind = NAME
+  ndest.isNull() = false
+  ndest.hasValidWrapper() = false
+  raw = /LegacyTarget3 ==> /LegacyTarget3
+  Explicit destination edest := ndest.unwrap()
+    edest.getExplicitArray() = null ==> null
+    edest.isStrictlyCompliant = false
+    findPageIndex(edest) = -1
+    edest.isRemote() = false
+
+Named destination: /InvalidLegacyTarget6
+  kind = NAME
+  ndest.isNull() = false
+  ndest.hasValidWrapper() = true
+  raw = [ null /XYZ 0 300 0 ] ==> [ null /XYZ 0 300 0 ]
+  Explicit destination edest := ndest.unwrap()
+    edest.getExplicitArray() = [ null /XYZ 0 300 0 ] ==> [ null /XYZ 0 300 0 ]
+    edest.isStrictlyCompliant = false
+    findPageIndex(edest) = -1
+    edest.isRemote() = false
+
+Named destination: /InvalidLegacyTarget7
+  kind = NAME
+  ndest.isNull() = false
+  ndest.hasValidWrapper() = true
+  raw = [ -1 /XYZ 0 150 0 ] ==> [ -1 /XYZ 0 150 0 ]
+  Explicit destination edest := ndest.unwrap()
+    edest.getExplicitArray() = [ -1 /XYZ 0 150 0 ] ==> [ -1 /XYZ 0 150 0 ]
+    edest.isStrictlyCompliant = false
+    findPageIndex(edest) = -1
+    edest.isRemote() = false
+
+Named destination: /LegacyTarget
+  kind = NAME
+  ndest.isNull() = false
+  ndest.hasValidWrapper() = true
+  raw = [ 4 0 R /XYZ 0 48 0 ] ==> [ 4 0 R /XYZ 0 48 0 ]
+  Explicit destination edest := ndest.unwrap()
+    edest.getExplicitArray() = [ 4 0 R /XYZ 0 48 0 ] ==> [ 4 0 R /XYZ 0 48 0 ]
+    edest.isStrictlyCompliant = true
+    findPageIndex(edest) = 0
+    edest.isRemote() = false
+
+Named destination: /LegacyTarget2
+  kind = NAME
+  ndest.isNull() = false
+  ndest.hasValidWrapper() = true
+  raw = << /D [ 4 0 R /XYZ 0 135 0 ] >> ==> << /D [ 4 0 R /XYZ 0 135 0 ] >>
+  Explicit destination edest := ndest.unwrap()
+    edest.getExplicitArray() = [ 4 0 R /XYZ 0 135 0 ] ==> [ 4 0 R /XYZ 0 135 0 ]
+    edest.isStrictlyCompliant = true
+    findPageIndex(edest) = 0
+    edest.isRemote() = false
+
+Named destination: /LegacyTarget3
+  kind = NAME
+  ndest.isNull() = false
+  ndest.hasValidWrapper() = true
+  raw = << /D 3 0 R >> ==> << /D 3 0 R >>
+  Explicit destination edest := ndest.unwrap()
+    edest.getExplicitArray() = 3 0 R ==> [ 4 0 R /XYZ 0 24 0 ]
+    edest.isStrictlyCompliant = true
+    findPageIndex(edest) = 0
+    edest.isRemote() = false
+
+Named destination: /BothModernAndLegacy
+  kind = STRING
+  ndest.isNull() = false
+  ndest.hasValidWrapper() = true
+  raw = << /D 13 0 R /DebugLabel (From /Names/Dests: String key) >> ==> << /D 13 0 R /DebugLabel (From /Names/Dests: String key) >>
+  Explicit destination edest := ndest.unwrap()
+    edest.getExplicitArray() = 13 0 R ==> [ 5 0 R /FitH 12 ]
+    edest.isStrictlyCompliant = false
+    findPageIndex(edest) = -1
+    edest.isRemote() = false
+
+Named destination: InvalidModern
+  kind = STRING
+  ndest.isNull() = false
+  ndest.hasValidWrapper() = false
+  raw = << /D (potatoes) >> ==> << /D (potatoes) >>
+  Explicit destination edest := ndest.unwrap()
+    edest.getExplicitArray() = null ==> null
+    edest.isStrictlyCompliant = false
+    findPageIndex(edest) = -1
+    edest.isRemote() = false
+
+Named destination: InvalidModern2
+  kind = STRING
+  ndest.isNull() = false
+  ndest.hasValidWrapper() = false
+  raw = << /D << /D 2 0 R >> >> ==> << /D << /D 2 0 R >> >>
+  Explicit destination edest := ndest.unwrap()
+    edest.getExplicitArray() = 2 0 R ==> [ 8 0 R /XYZ 0 842 0 ]
+    edest.isStrictlyCompliant = true
+    findPageIndex(edest) = 1
+    edest.isRemote() = false
+
+Named destination: InvalidModern3
+  kind = STRING
+  ndest.isNull() = false
+  ndest.hasValidWrapper() = true
+  raw = [ 8 0 R ] ==> [ 8 0 R ]
+  Explicit destination edest := ndest.unwrap()
+    edest.getExplicitArray() = [ 8 0 R ] ==> [ 8 0 R ]
+    edest.isStrictlyCompliant = false
+    findPageIndex(edest) = 1
+    edest.isRemote() = false
+
+Named destination: InvalidModern4
+  kind = STRING
+  ndest.isNull() = false
+  ndest.hasValidWrapper() = true
+  raw = [ ] ==> [ ]
+  Explicit destination edest := ndest.unwrap()
+    edest.getExplicitArray() = [ ] ==> [ ]
+    edest.isStrictlyCompliant = false
+    findPageIndex(edest) = -1
+    edest.isRemote() = false
+
+Named destination: InvalidModern5
+  kind = STRING
+  ndest.isNull() = false
+  ndest.hasValidWrapper() = false
+  raw = /LegacyTarget3 ==> /LegacyTarget3
+  Explicit destination edest := ndest.unwrap()
+    edest.getExplicitArray() = null ==> null
+    edest.isStrictlyCompliant = false
+    findPageIndex(edest) = -1
+    edest.isRemote() = false
+
+Named destination: InvalidModern6
+  kind = STRING
+  ndest.isNull() = false
+  ndest.hasValidWrapper() = true
+  raw = [ null /XYZ 0 300 0 ] ==> [ null /XYZ 0 300 0 ]
+  Explicit destination edest := ndest.unwrap()
+    edest.getExplicitArray() = [ null /XYZ 0 300 0 ] ==> [ null /XYZ 0 300 0 ]
+    edest.isStrictlyCompliant = false
+    findPageIndex(edest) = -1
+    edest.isRemote() = false
+
+Named destination: InvalidModern7
+  kind = STRING
+  ndest.isNull() = false
+  ndest.hasValidWrapper() = true
+  raw = [ -1 /XYZ ] ==> [ -1 /XYZ ]
+  Explicit destination edest := ndest.unwrap()
+    edest.getExplicitArray() = [ -1 /XYZ ] ==> [ -1 /XYZ ]
+    edest.isStrictlyCompliant = false
+    findPageIndex(edest) = -1
+    edest.isRemote() = false
+
+Named destination: TrulyModern
+  kind = STRING
+  ndest.isNull() = false
+  ndest.hasValidWrapper() = true
+  raw = [ 8 0 R /XYZ 0 84 0 ] ==> [ 8 0 R /XYZ 0 84 0 ]
+  Explicit destination edest := ndest.unwrap()
+    edest.getExplicitArray() = [ 8 0 R /XYZ 0 84 0 ] ==> [ 8 0 R /XYZ 0 84 0 ]
+    edest.isStrictlyCompliant = true
+    findPageIndex(edest) = 1
+    edest.isRemote() = false
+
+Named destination: TrulyModern2
+  kind = STRING
+  ndest.isNull() = false
+  ndest.hasValidWrapper() = true
+  raw = << /D [ 8 0 R /XYZ 0 42 0 ] >> ==> << /D [ 8 0 R /XYZ 0 42 0 ] >>
+  Explicit destination edest := ndest.unwrap()
+    edest.getExplicitArray() = [ 8 0 R /XYZ 0 42 0 ] ==> [ 8 0 R /XYZ 0 42 0 ]
+    edest.isStrictlyCompliant = true
+    findPageIndex(edest) = 1
+    edest.isRemote() = false
+
+Named destination: TrulyModern3
+  kind = STRING
+  ndest.isNull() = false
+  ndest.hasValidWrapper() = true
+  raw = 2 0 R ==> [ 8 0 R /XYZ 0 842 0 ]
+  Explicit destination edest := ndest.unwrap()
+    edest.getExplicitArray() = 2 0 R ==> [ 8 0 R /XYZ 0 842 0 ]
+    edest.isStrictlyCompliant = true
+    findPageIndex(edest) = 1
+    edest.isRemote() = false
+
+
+=== 2. Lookup specific named destinations ===
+
+Named destination: Foo
+  kind = STRING
+  ndest.isNull() = true
+  ndest.hasValidWrapper() = false
+  raw = null ==> null
+  Explicit destination edest := ndest.unwrap()
+    edest.getExplicitArray() = null ==> null
+    edest.isStrictlyCompliant = false
+    findPageIndex(edest) = -1
+    edest.isRemote() = false
+
+Named destination: Foo
+  kind = NAME
+  ndest.isNull() = true
+  ndest.hasValidWrapper() = false
+  raw = null ==> null
+  Explicit destination edest := ndest.unwrap()
+    edest.getExplicitArray() = null ==> null
+    edest.isStrictlyCompliant = false
+    findPageIndex(edest) = -1
+    edest.isRemote() = false
+
+Named destination: /Foo
+  kind = NAME
+  ndest.isNull() = true
+  ndest.hasValidWrapper() = false
+  raw = null ==> null
+  Explicit destination edest := ndest.unwrap()
+    edest.getExplicitArray() = null ==> null
+    edest.isStrictlyCompliant = false
+    findPageIndex(edest) = -1
+    edest.isRemote() = false
+
+Named destination: TrulyModern
+  kind = STRING
+  ndest.isNull() = false
+  ndest.hasValidWrapper() = true
+  raw = [ 8 0 R /XYZ 0 84 0 ] ==> [ 8 0 R /XYZ 0 84 0 ]
+  Explicit destination edest := ndest.unwrap()
+    edest.getExplicitArray() = [ 8 0 R /XYZ 0 84 0 ] ==> [ 8 0 R /XYZ 0 84 0 ]
+    edest.isStrictlyCompliant = true
+    findPageIndex(edest) = 1
+    edest.isRemote() = false
+
+Named destination: /TrulyModern
+  kind = NAME
+  ndest.isNull() = true
+  ndest.hasValidWrapper() = false
+  raw = null ==> null
+  Explicit destination edest := ndest.unwrap()
+    edest.getExplicitArray() = null ==> null
+    edest.isStrictlyCompliant = false
+    findPageIndex(edest) = -1
+    edest.isRemote() = false
+
