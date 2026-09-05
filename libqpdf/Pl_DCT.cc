@@ -199,10 +199,10 @@ Pl_DCT::finish()
                 decompress(reinterpret_cast<void*>(&cinfo_decompress));
             }
         } catch (std::exception& e) {
-            // Convert an exception back to a longjmp so we can ensure that the right cleanup
-            // happens. This will get converted back to an exception.
+            // Record the error and fall through to the cleanup below.
+            // Using longjmp here livelocks on Windows ARM64.
             jerr.msg = e.what();
-            longjmp(jerr.jmpbuf, 1);
+            error = true;
         }
     } else {
         error = true;
