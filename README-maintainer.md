@@ -303,6 +303,15 @@ There are several parts to this.
 * Tag the branch with `vcpkg-cache-v1` and push the tag.
 * Create a release from the tag.
 
+### Manual Override
+
+Sometimes it may be necessary to update the vcpkg cache from something that's not yet on main in
+order to make a PR build and avoid a failure on main when it merges. In that case, it works to push
+to a branch called `vcpkg-release` in the main qpdf org and build the vcpkg action with manual
+dispatch from that branch. If you are testing modifications to vcpkg on a fork, you can use this
+same technique to update the release in your fork; other changes will be required to your build to
+test it, but this prevents you from having to push to main on your fork.
+
 ### Ongoing Maintenance
 
 * Weekly, the .github/workflows/vcpkg.yml workflow updates external libraries and pushes a new

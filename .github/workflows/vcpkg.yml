@@ -10,7 +10,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       fail-fast: false
-      max-parallel: 4
+      max-parallel: 8
       matrix:
         triplet:
           - x64-windows-static
