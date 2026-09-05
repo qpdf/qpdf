@@ -67,6 +67,8 @@ In order to build qpdf, you must have a copy of `zlib` and the `jpeg` library. Y
 
 If you prefer to use qpdf's automatic integration with vcpkg but download and build the libraries yourself, you can use the `./vcpkg-setup-win` script, which takes `msvc` or `mingw` as a parameter just like `cmake-win` does.
 
+The triplet is selected from the compiler in your current environment, so for an ARM64 build, run `./vcpkg-setup-win msvc` from an ARM64 Visual Studio shell (`vcvarsarm64.bat`, or `vcvarsamd64_arm64.bat` to cross compile from x64).
+
 You can also obtain `zlib` and `jpeg` directly on your own and install them. Just make sure cmake can find them. It's possible that a system version of `vcpkg` may work, though this is not regularly tested and was known to break msys-based builds.
 
 External libraries are built using GitHub Actions using the vcpkg.yml workflow. In addition to the special `vcpkg-cache-v1` release, you can download the specific `vcpkg.zip` that was used for any given build as the `distribution-vcpkg` artifact from the action's status page.
@@ -74,6 +76,8 @@ External libraries are built using GitHub Actions using the vcpkg.yml workflow. 
 # Running tools from the build area
 
 You can run qpdf's tests without modifying your PATH. If you want to manually run executables from the build tree on Windows, you need to add the `libqpdf` build directory to your path so it can find the qpdf DLL. This would typically be either `libqpdf` or `libqpdf/<CONFIG>` (e.g., `libqpdf/Release`) depending on which cmake generator you are using. Alternatively, you can disable `BUILD_SHARED_LIBS` for your Windows build. This will cause the executables to use the static qpdf library and not build a qpdf DLL at all.
+
+Note that if you cross-compile for ARM64 on an x64 host, you will not be able to run tests as x64 hosts cannot run ARM64 executables.
 
 # Runtime DLLs
 
