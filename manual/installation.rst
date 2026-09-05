@@ -107,6 +107,13 @@ Additional Requirements on Windows
   mingw64 tool chains. You can also build with MSVC from an MSYS2
   environment.
 
+- ARM64 is supported with Visual Studio only. Configure with ``-A
+  ARM64`` from a Visual Studio generator, or start an ARM64 command
+  shell (``vcvarsarm64.bat`` natively or ``vcvarsamd64_arm64.bat`` to
+  cross compile from x64) and use :command:`cmake-win`, which detects
+  the target architecture from the compiler. MSYS2 does not provide a
+  native ARM64 mingw tool chain.
+
 - qpdf's test suite can run within the MSYS2 environment for both
   mingw and MSVC-based builds.
 

@@ -49,6 +49,18 @@ more detail.
         be absent, and the outlines will appear in the groups of page objects, regardless of the
         document's page mode.
 
+    - Reject trailing characters in bounded numeric command-line option values instead of silently
+      accepting their numeric prefixes. This is technically a breaking change, but if you were
+      relying on qpdf's behavior of accepting malformed arguments, it's better to fix that.
+
+    - Report a file whose only line is a PDF header as damaged instead of failing with a
+      system error. Reading a line whose end-of-line run reaches the end of the file left the
+      input source one byte before the start of that line, which at offset 0 is a seek to -1.
+
+  - Build changes
+
+    - Create binary release for additional platforms: Windows arm64.
+
 12.4.1: August 27, 2026
   - Bug fixes
 

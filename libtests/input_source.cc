@@ -86,5 +86,22 @@ main()
     check("findLast found potato salad", true, is->findLast("potato", 0, 0, f1));
     check("findLast found first one", true, is->tell() == 2056);
 
+    // A line whose EOL run reaches the end of the file has no character after
+    // the terminator for read_line to seek to.
+    BufferInputSource line_at_eof("line at eof", std::string("one\n"));
+    check("line at offset zero", true, line_at_eof.readLine(100) == "one");
+    check("positioned at EOF from offset zero", true, line_at_eof.tell() == 4);
+
+    BufferInputSource lines_at_eof("lines at eof", std::string("one\ntwo\n"));
+    lines_at_eof.readLine(100);
+    check("line before an EOL run at EOF", true, lines_at_eof.readLine(100) == "two");
+    check("positioned at EOF", true, lines_at_eof.tell() == 8);
+
+    // The EOL run can also reach the end of the read window rather than the end
+    // of the file, in which case the next line is still ahead.
+    BufferInputSource within_window("within window", std::string("one\n\n\nx"));
+    check("line filling the read window", true, within_window.readLine(4) == "one");
+    check("positioned at the next line", true, within_window.tell() == 6);
+
     return 0;
 }

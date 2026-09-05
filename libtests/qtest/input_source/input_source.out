@@ -12,3 +12,9 @@ findLast found at EOF: PASS
 potato but not salad salad at EOF: PASS
 findLast found potato salad: PASS
 findLast found first one: PASS
+line at offset zero: PASS
+positioned at EOF from offset zero: PASS
+line before an EOL run at EOF: PASS
+positioned at EOF: PASS
+line filling the read window: PASS
+positioned at the next line: PASS

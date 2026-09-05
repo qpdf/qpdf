@@ -24,8 +24,9 @@ to_int(std::string_view option, std::string const& value, int max, int min)
 {
     qpdf_expect(min < max);
     try {
-        int result = std::stoi(value);
-        if (result < min || result > max) {
+        std::size_t pos = 0;
+        int result = std::stoi(value, &pos);
+        if (pos != value.size() || result < min || result > max) {
             int_usage(option, max, min);
         }
         return result;
@@ -43,8 +44,9 @@ to_uint32(
 {
     qpdf_expect(min < max);
     try {
-        auto result = std::stoll(value);
-        if (std::cmp_less(result, min) || std::cmp_greater(result, max)) {
+        std::size_t pos = 0;
+        auto result = std::stoll(value, &pos);
+        if (pos != value.size() || std::cmp_less(result, min) || std::cmp_greater(result, max)) {
             int_usage(option, max, min);
         }
         return static_cast<uint32_t>(result);

@@ -14,7 +14,10 @@ declare -a args
 case $tool in
     msvc)
         args=(-DCMAKE_BUILD_TYPE=$config)
-        if cl 2>&1 | grep -q 'for x86'; then
+        cl_banner=$(cl 2>&1 || true)
+        if echo "$cl_banner" | grep -q 'for ARM64'; then
+            args=("${args[@]}" -A ARM64)
+        elif echo "$cl_banner" | grep -q 'for x86'; then
             args=("${args[@]}" -A win32)
         fi
         ;;

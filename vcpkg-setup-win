@@ -10,7 +10,10 @@ tool=$1
 
 case $tool in
     msvc)
-        if cl 2>&1 | grep -q 'for x86'; then
+        cl_banner=$(cl 2>&1 || true)
+        if echo "$cl_banner" | grep -q 'for ARM64'; then
+            triplet=arm64-windows-static
+        elif echo "$cl_banner" | grep -q 'for x86'; then
             triplet=x86-windows-static
         else
             triplet=x64-windows-static
