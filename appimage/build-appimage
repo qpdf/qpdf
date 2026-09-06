@@ -14,7 +14,7 @@
 #   3. Run this script:  `bash appimage/build-appimage`
 #
 # The resulting AppImage will be placed in
-# './appimage/build/QPDF-x86_64.AppImage'. Read the output of the
+# './appimage/build/QPDF-$(uname -m).AppImage'. Read the output of the
 # script for hints in case something goes wrong.
 #
 # You may pass custom options for the configure step by setting them
@@ -145,7 +145,7 @@ done
 ls -l /usr/bin/env /bin/less /bin/busybox
 
 # Fetch 'linuxdeployqt' which will transform the AppDir into an AppImage:
-wget -c "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
+wget -c "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-$(uname -m).AppImage"
 chmod a+x linuxdeployqt*.AppImage
 
 # Set up a clean environment:
@@ -176,13 +176,13 @@ appimagetool_param="-n"
 MAJOR_QPDF_VERSION=$( ./appdir/usr/bin/qpdf --version | grep "qpdf version" | awk '{print $3}' )
 declare -a UPDATE_INFO
 VERSION=${MAJOR_QPDF_VERSION}
-UPDATE_INFO=(-u "gh-releases-zsync|qpdf|qpdf|latest|qpdf-*x86_64.AppImage.zsync")
+UPDATE_INFO=(-u "gh-releases-zsync|qpdf|qpdf|latest|qpdf-*$(uname -m).AppImage.zsync")
 
 # Remove the default AppRun/symlink and use our own custom AppRun script
 rm appdir/AppRun; cp $top/appimage/AppRun appdir; chmod a+x appdir/AppRun
 
 # Finally, generate the AppImage:
-PATH=./squashfs-root/usr/bin:$PATH ./squashfs-root/usr/bin/appimagetool $sign $UPDATE_FLAG ${UPDATE_INFO[*]} $appimagetool_param appdir qpdf-$VERSION-x86_64.AppImage
+PATH=./squashfs-root/usr/bin:$PATH ./squashfs-root/usr/bin/appimagetool $sign $UPDATE_FLAG ${UPDATE_INFO[*]} $appimagetool_param appdir qpdf-$VERSION-$(uname -m).AppImage
 
 set +x
 # Tell everyone where our result is stored:

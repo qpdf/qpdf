@@ -1,0 +1,45 @@
+#!/bin/bash
+set -ex
+cd $(dirname $0)/..
+
+# openssl is keg-only in homebrew, so pkg-config has to be told where it is.
+export PKG_CONFIG_PATH=$(brew --prefix openssl@3)/lib/pkgconfig:$PKG_CONFIG_PATH
+
+cmake -S . -B build \
+      -DCMAKE_BUILD_TYPE=Release -DBUILD_STATIC_LIBS=0 \
+      -DUSE_IMPLICIT_CRYPTO=0 -DREQUIRE_CRYPTO_OPENSSL=1 \
+      -DSTATIC_JPEG=1 -DSTATIC_OPENSSL=1 \
+      -DCMAKE_INSTALL_RPATH='@loader_path/../lib'
+cmake --build build --verbose -j$(sysctl -n hw.ncpu) -- -k
+(cd build; ctest --verbose)
+
+version=$(build/qpdf/qpdf --version | grep 'qpdf version' | awk '{print $3}')
+inst=$PWD/build/inst
+rm -rf $inst
+for i in lib cli; do
+    cmake --install build --prefix $inst --component $i
+done
+
+# Ensure that all dependencies are on libraries that are always
+# present on macOS or against the copy of libqpdf in the distribution.
+for i in $inst/bin/* $inst/lib/*.dylib; do
+    if [ -L $i ]; then
+        continue
+    fi
+    if otool -L $i | tail -n +2 | \
+            grep -v -E '^[[:space:]]+(/usr/lib/|/System/Library/|@rpath/)'; then
+        echo "$(basename $i) has a non-system dynamic dependency"
+        exit 2
+    fi
+    if nm -gU $i | grep -E ' _(EVP_|SSL_|jpeg_|jinit_)'; then
+        echo "$(basename $i) exports symbols from a statically linked library"
+        exit 2
+    fi
+done
+
+rm -rf distribution
+mkdir distribution
+D=$PWD/distribution
+(cd $inst; \
+ zip -9 --symlinks $D/qpdf-$version-bin-macos-$(uname -m)-ci.zip bin/* lib/*)
+shasum -a 256 distribution/*

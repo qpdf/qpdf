@@ -496,6 +496,30 @@ OSS_FUZZ
   reason to turn this on for any other reason. It is enabled by the
   build script that builds qpdf from that context.
 
+STATIC_JPEG, STATIC_OPENSSL
+  Link statically with the jpeg library and/or openssl even when shared
+  libraries are available. These are used to build self-contained binary
+  distributions whose only dynamic library dependencies are libraries
+  that are always present on the target system. Configuration fails if
+  the static libraries are not found.
+
+  The generated pkg-config and cmake package files do not reflect
+  static dependency linkage, so these options are not appropriate for
+  builds that install qpdf's development files.
+
+  There is no option to build statically with zlib since zlib is
+  almost everywhere. There's no option to build statically with gnutls
+  because it's much more complex to link with.
+
+  See also ``STATIC_EXTRA_LIBS``
+
+STATIC_EXTRA_LIBS
+  Provide a list of additional static libraries to link with. This is
+  usually not needed, but if you are trying to link some libraries
+  statically and your system's configuration doesn't provide the
+  required information automatically with pkg-config, this gives you a
+  way to add to the list.
+
 SKIP_OS_SECURE_RANDOM, USE_INSECURE_RANDOM
   The native crypto implementation uses the operating systems's secure
   random number source when available. It is not used when an external
