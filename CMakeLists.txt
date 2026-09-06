@@ -97,6 +97,11 @@ set(DEFAULT_CRYPTO CACHE STRING "")
 option(DEFAULT_CRYPTO
   "Specify default crypto; otherwise chosen automatically" "")
 
+option(STATIC_JPEG "Link statically with the jpeg library" OFF)
+option(STATIC_OPENSSL "Link statically with openssl" OFF)
+set(STATIC_EXTRA_LIBS "" CACHE STRING
+  "Additional libraries needed for static linking")
+
 option(ZOPFLI, "Use zopfli for zlib-compatible compression")
 
 # INSTALL_MANUAL is not dependent on building docs. When creating some

@@ -1,5 +1,6 @@
 .. _ticket: https://issues.qpdf.org
 .. _shared null: https://wiki.qpdf.org/PDF-null-objects-vs-qpdf-null-objects
+.. _top-level README.md: https://github.com/qpdf/qpdf/blob/main/README.md
 
 .. _release-notes:
 
@@ -66,6 +67,20 @@ more detail.
       - Linux aarch64 (arm64) AppImage
 
       - Linux aarch64 (arm64) stand-alone binaries
+
+      - macOS stand-alone binaries (Apple silicon and Intel). These are not signed with an Apple
+        Developer ID or notarized, so you will have to remove Apple's quarantine attribute as
+        described in the `top-level README.md`_ in the source distribution.
+
+    - Add cmake flags ``STATIC_JPEG`` and ``STATIC_OPENSSL`` which link jpeg and openssl statically.
+      This is to make it easier to create binary distributions without dependencies on libraries
+      that are less likely to be present on the system. On some platforms, the static libraries will
+      have to be built with position-independent code, so this may not work seamlessly in all
+      environment. It is used to create the macOS binaries included in qpdf releases.
+
+    - Add cmake flag ``STATIC_EXTRA_LIBS`` to pass additional static libraries when linking qpdf.
+      This is useful if you are trying to link statically with libraries that are not automatically
+      detected as dependencies.
 
 12.4.1: August 27, 2026
   - Bug fixes
@@ -316,7 +331,7 @@ more detail.
       - QPDF::compute_encryption_key
 
       - All QPDF::EncryptionData methods. These methods are not exported in the
-        shared library and are only useable in statically linked programs.
+        shared library and are only usable in statically linked programs.
 
 .. [#inspect] not in :ref:`inspection-mode`
 

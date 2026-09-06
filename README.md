@@ -13,6 +13,14 @@ programmatic or command-line-based manipulation of PDF files.
 The [qpdf manual](https://qpdf.readthedocs.io) is hosted online at https://qpdf.readthedocs.io. The project website
 is https://qpdf.sourceforge.io. The source code repository is hosted at GitHub: https://github.com/qpdf/qpdf.
 
+# macOS Binaries
+
+Starting with version 12.4.2, macOS binaries are available for download in the [releases](https://github.com/qpdf/qpdf/releases) area. These are not signed with an Apple Developer ID or notarized, so you will have to remove the quarantine attribute that macOS adds to downloaded files. The easiest way to do this is to run this in the directory where you unzipped the Mac binaries:
+
+```
+xattr -r -d com.apple.quarantine bin lib
+```
+
 # Verifying Distributions
 
 Official qpdf releases are signed using [cosign](https://docs.sigstore.dev/quickstart/quickstart-cosign/). Each release includes a `sha256` file containing sha256 checksums of all the release files. To verify a release, use `sha256sum file`, or similar, to generate the checksum of the file you want to verify and check to make sure it matches what's in the sha256 file. You can verify the sha256 file itself with gpg or with `cosign verify-blob`. Example:
