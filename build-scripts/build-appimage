@@ -56,7 +56,7 @@ for i in qpdf fix-qdf zlib-flate; do
     fi
 done
 (cd squashfs-root/usr; \
- zip -9 --symlinks $D/qpdf-$version-bin-linux-x86_64-ci.zip \
+ zip -9 --symlinks $D/qpdf-$version-bin-linux-$(uname -m)-ci.zip \
      bin/{qpdf,fix-qdf,zlib-flate} lib/*)
 
 sha256sum distribution/*

@@ -59,7 +59,13 @@ more detail.
 
   - Build changes
 
-    - Create binary release for additional platforms: Windows arm64.
+    - Create binary release for additional platforms:
+
+      - Windows arm64
+
+      - Linux aarch64 (arm64) AppImage
+
+      - Linux aarch64 (arm64) stand-alone binaries
 
 12.4.1: August 27, 2026
   - Bug fixes

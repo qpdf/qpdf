@@ -97,8 +97,17 @@ jobs:
       - name: 'Mac build and test'
         run: build-scripts/build-mac
   AppImage:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runner }}
     needs: Prebuild
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-latest
+          - arch: aarch64
+            runner: ubuntu-22.04-arm
     steps:
       - uses: actions/checkout@v7
       - name: 'Build AppImage'
@@ -106,7 +115,7 @@ jobs:
       - name: 'Upload AppImage'
         uses: actions/upload-artifact@v7
         with:
-          name: distribution-appimage
+          name: distribution-appimage-${{ matrix.arch }}
           path: distribution
   pikepdf:
     strategy:
