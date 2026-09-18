@@ -15,6 +15,9 @@ Doxyfile
 # ./Testing is created if you run ctest from the wrong place.
 /Testing
 
+# JetBrains IDE files
+/.idea
+
 # macOS junk files
 .DS_Store
 ._*
