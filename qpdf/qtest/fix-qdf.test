@@ -14,9 +14,12 @@ cleanup();
 
 my $td = new TestDriver('fix-qdf');
 
-my $n_tests = 11;
+my $n_tests = 15;
 
-for (my $n = 1; $n <= 2; ++$n)
+# fix3.qdf has objects that are not QDF-style object streams but match
+# /Type /ObjStm: a directly referenced object stream written as a
+# regular stream and a string containing "/Type /ObjStm".
+for (my $n = 1; $n <= 3; ++$n)
 {
     $td->runtest("fix-qdf $n",
                  {$td->COMMAND => "fix-qdf fix$n.qdf"},
