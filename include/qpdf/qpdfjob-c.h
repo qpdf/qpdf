@@ -142,6 +142,27 @@ extern "C" {
     QPDF_DLL
     int qpdfjob_write_qpdf(qpdfjob_handle j, qpdf_data qpdf);
 
+    /* QuestPDF extension. The following two functions read and replace the document's XMP metadata
+     * (the stream in the document catalog's /Metadata key) between qpdfjob_create_qpdf and
+     * qpdfjob_write_qpdf. Errors are reported through the job's logger, and the return value is an
+     * exit code, like the one returned by qpdfjob_write_qpdf.
+     *
+     * questpdf_job_get_xmp_metadata stores the decoded metadata in *bufp and its size in *len. The
+     * buffer must be freed with qpdf_oh_free_buffer. If the document has no metadata, or the
+     * metadata is empty, *bufp is set to NULL and *len to 0; this is not an error.
+     */
+    QPDF_DLL
+    int questpdf_job_get_xmp_metadata(
+        qpdfjob_handle j, qpdf_data qpdf, unsigned char** bufp, size_t* len);
+
+    /* questpdf_job_set_xmp_metadata replaces the metadata with a copy of the given buffer, which is
+     * stored without any filter. If the document has no metadata stream, a new one is created. The
+     * content is not validated, but it must not be empty.
+     */
+    QPDF_DLL
+    int questpdf_job_set_xmp_metadata(
+        qpdfjob_handle j, qpdf_data qpdf, unsigned char const* buf, size_t len);
+
     /* Allow specification of a custom progress reporter. The progress reporter is only used if
      * progress is otherwise requested (with the --progress option or "progress": "" in the JSON).
      */

@@ -99,7 +99,7 @@ qpdf_get_qpdf_version()
 int
 questpdf_get_compatibility_version()
 {
-    return 3;
+    return 4;
 }
 
 // obsolete

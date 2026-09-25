@@ -7,6 +7,8 @@
 #include <qpdf/qpdflogger-c_impl.hh>
 
 #include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 struct _qpdfjob_handle
 {
@@ -115,6 +117,64 @@ qpdfjob_write_qpdf(qpdfjob_handle j, qpdf_data qpdf)
     return wrap_qpdfjob(j, [qpdf](qpdfjob_handle jh) {
         jh->j.writeQPDF(*(qpdf->qpdf));
         return jh->j.getExitCode();
+    });
+}
+
+int
+questpdf_job_get_xmp_metadata(qpdfjob_handle j, qpdf_data qpdf, unsigned char** bufp, size_t* len)
+{
+    return wrap_qpdfjob(j, [qpdf, bufp, len](qpdfjob_handle) {
+        if (!qpdf || !bufp || !len) {
+            throw std::logic_error("questpdf_job_get_xmp_metadata called with a null argument");
+        }
+        *bufp = nullptr;
+        *len = 0;
+
+        auto metadata = qpdf->qpdf->getRoot().getKey("/Metadata");
+        if (!metadata.isStream()) {
+            return 0;
+        }
+
+        auto data = metadata.getStreamData(qpdf_dl_all);
+        if (data->getSize() == 0) {
+            return 0;
+        }
+        auto result = static_cast<unsigned char*>(malloc(data->getSize()));
+        if (!result) {
+            throw std::bad_alloc();
+        }
+        memcpy(result, data->getBuffer(), data->getSize());
+        *bufp = result;
+        *len = data->getSize();
+        return 0;
+    });
+}
+
+int
+questpdf_job_set_xmp_metadata(
+    qpdfjob_handle j, qpdf_data qpdf, unsigned char const* buf, size_t len)
+{
+    return wrap_qpdfjob(j, [qpdf, buf, len](qpdfjob_handle) {
+        if (!qpdf) {
+            throw std::logic_error("questpdf_job_set_xmp_metadata called with a null document");
+        }
+        if (!buf || len == 0) {
+            throw std::runtime_error("XMP metadata must not be empty");
+        }
+
+        auto root = qpdf->qpdf->getRoot();
+        auto metadata = root.getKey("/Metadata");
+        if (!metadata.isStream()) {
+            metadata = qpdf->qpdf->newStream();
+            metadata.getDict().replaceKey("/Type", QPDFObjectHandle::newName("/Metadata"));
+            metadata.getDict().replaceKey("/Subtype", QPDFObjectHandle::newName("/XML"));
+            root.replaceKey("/Metadata", metadata);
+        }
+        metadata.replaceStreamData(
+            std::string(reinterpret_cast<char const*>(buf), len),
+            QPDFObjectHandle::newNull(),
+            QPDFObjectHandle::newNull());
+        return 0;
     });
 }
 
