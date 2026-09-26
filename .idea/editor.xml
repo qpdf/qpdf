@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BackendCodeEditorSettings">
+    <option name="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003Astd_005Ffunction_002Eh_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003Fusr_003Finclude_003Fc_002B_002B_003F15_003Fbits_003Fstd_005Ffunction_002Eh/@EntryIndexedValue" value="ForceIncluded" type="string" />
+    <option name="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003Avector_002Etcc_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003Fusr_003Finclude_003Fc_002B_002B_003F15_003Fbits_003Fvector_002Etcc/@EntryIndexedValue" value="ForceIncluded" type="string" />
     <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=CDeclarationWithImplicitIntType/@EntryIndexedValue" value="WARNING" type="string" />
     <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=CommentTypo/@EntryIndexedValue" value="DO_NOT_SHOW" type="string" />
     <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=ConstevalIfIsAlwaysConstant/@EntryIndexedValue" value="WARNING" type="string" />
@@ -28,6 +30,22 @@
     <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppConstValueFunctionReturnType/@EntryIndexedValue" value="SUGGESTION" type="string" />
     <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppConstexprIfDiscardedBranch/@EntryIndexedValue" value="HINT" type="string" />
     <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppCoroutineCallResolveError/@EntryIndexedValue" value="WARNING" type="string" />
+    <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppCudaConflictingMemorySpaceSpecifiers/@EntryIndexedValue" value="ERROR" type="string" />
+    <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppCudaForLoopCanBeReplacedWithIRange/@EntryIndexedValue" value="SUGGESTION" type="string" />
+    <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppCudaFunctionIsNotCallableFromExecutionSpace/@EntryIndexedValue" value="ERROR" type="string" />
+    <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppCudaGotoStatementIsNotAllowedInTileGlobalFunction/@EntryIndexedValue" value="ERROR" type="string" />
+    <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppCudaGridConstantIsOnlyAllowedOnKernelParameter/@EntryIndexedValue" value="ERROR" type="string" />
+    <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppCudaGridConstantParameterMustBeConstNonReference/@EntryIndexedValue" value="ERROR" type="string" />
+    <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppCudaIRangeStepMustBePositive/@EntryIndexedValue" value="ERROR" type="string" />
+    <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppCudaMemorySpaceLocalVariableMustBeExternOrStatic/@EntryIndexedValue" value="ERROR" type="string" />
+    <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppCudaMemorySpaceSpecifierIsNotAllowedOnDataMember/@EntryIndexedValue" value="ERROR" type="string" />
+    <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppCudaMemorySpaceSpecifierIsNotAllowedOnParameter/@EntryIndexedValue" value="ERROR" type="string" />
+    <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppCudaMemorySpaceSpecifierIsNotAllowedOnTypeAlias/@EntryIndexedValue" value="ERROR" type="string" />
+    <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppCudaMemorySpaceVariableIsNotAllowedInHostFunction/@EntryIndexedValue" value="ERROR" type="string" />
+    <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppCudaReturnStatementInsideLoopIsNotAllowedInTileGlobalFunction/@EntryIndexedValue" value="ERROR" type="string" />
+    <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppCudaSharedVariableCannotHaveInitializer/@EntryIndexedValue" value="ERROR" type="string" />
+    <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppCudaTileKernelLaunchMustHaveBlockSizeOne/@EntryIndexedValue" value="ERROR" type="string" />
+    <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppCudaVariableIsNotAccessibleFromExecutionSpace/@EntryIndexedValue" value="ERROR" type="string" />
     <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppDFAArrayIndexOutOfBounds/@EntryIndexedValue" value="DO_NOT_SHOW" type="string" />
     <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppDFAConstantConditions/@EntryIndexedValue" value="DO_NOT_SHOW" type="string" />
     <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppDFAConstantFunctionResult/@EntryIndexedValue" value="DO_NOT_SHOW" type="string" />
@@ -205,6 +223,7 @@
     <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppStaticDataMemberInUnnamedStruct/@EntryIndexedValue" value="WARNING" type="string" />
     <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppStaticSpecifierOnAnonymousNamespaceMember/@EntryIndexedValue" value="SUGGESTION" type="string" />
     <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppStringLiteralToCharPointerConversion/@EntryIndexedValue" value="WARNING" type="string" />
+    <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppSyntaxWarning/@EntryIndexedValue" value="WARNING" type="string" />
     <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppTabsAreDisallowed/@EntryIndexedValue" value="DO_NOT_SHOW" type="string" />
     <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppTemplateArgumentsCanBeDeduced/@EntryIndexedValue" value="HINT" type="string" />
     <option name="/Default/CodeInspection/Highlighting/InspectionSeverities/=CppTemplateParameterNeverUsed/@EntryIndexedValue" value="HINT" type="string" />
