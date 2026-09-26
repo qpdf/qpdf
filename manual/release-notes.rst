@@ -14,7 +14,7 @@ more detail.
 
 .. x.y.z: not yet released
 
-12.4.2: not yet released
+12.4.2: September 26, 2026
   - Enhancements
 
     - Improve validation of object ids and generation numbers when reading special objects (such as
