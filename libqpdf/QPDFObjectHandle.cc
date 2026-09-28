@@ -449,7 +449,10 @@ BaseHandle::equivalent_to(BaseHandle const& other, int depth) const
             if (!s1.m->stream_dict.equivalent_to(s2.m->stream_dict, depth - 1)) {
                 return false;
             }
-            return s1.m->stream_data->view() == s2.m->stream_data->view();
+            if (s1.m->stream_data && s2.m->stream_data) {
+                return s1.m->stream_data->view() == s2.m->stream_data->view();
+            }
+            return Stream{obj}.getRawStreamData() == Stream{other.obj}.getRawStreamData();
         }
     case ::ot_operator:
         throw std::logic_error("Internal error in BaseHandle::equivalent_to: found ot_operator");
@@ -2314,6 +2317,12 @@ QPDFObjectHandle::isImage(bool exclude_imagemask) const
         ((!exclude_imagemask) ||
          (!(getDict().getKey("/ImageMask").isBool() &&
             getDict().getKey("/ImageMask").getBoolValue()))));
+}
+
+bool
+QPDFObjectHandle::equivalent_to(QPDFObjectHandle const& other, int depth) const
+{
+    return qpdf::BaseHandle::equivalent_to(other, depth);
 }
 
 void

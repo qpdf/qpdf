@@ -597,6 +597,40 @@ test_3(QPDF& pdf, char const* arg2)
         assert(stale.raw_type_code() == ::ot_reference);
         assert(!stale.equivalent_to(Integer(42)));
     }
+    // Scenario 43: Round-trip streams through serialization
+    {
+        // 1. Build synthetic content in a fresh, valid PDF
+        QPDF tmp;
+        tmp.emptyPDF();
+        auto s1 = tmp.newStream("hello world");
+        auto s2 = tmp.newStream("hello world");
+        auto arr = QPDFObjectHandle::newArray({s1, s2});
+        tmp.getRoot().replaceKey("/Test", arr);
+
+        // 2. Serialize to memory, preserving raw stream data
+        QPDFWriter w(tmp, "mem.pdf");
+        w.setOutputMemory();
+        // Note: equivalent_to compares raw bytes. A stream created in-memory has raw
+        // bytes equal to its uncompressed content. After serialization with compression,
+        // the raw bytes change, so equivalent_to would correctly return false.
+        // setCompressStreams(false) ensures the on-disk raw bytes match the in-memory ones.
+        w.setCompressStreams(false); // write streams uncompressed
+        w.write();
+        std::unique_ptr<Buffer> buf(w.getBuffer());
+        std::string data(reinterpret_cast<const char*>(buf->getBuffer()), buf->getSize());
+
+        // 3. Reload into a fresh QPDF
+        QPDF pdf2;
+        pdf2.processMemoryFile("mem.pdf", data.data(), data.size());
+
+        // 4. Compare — fetch from each document's root independently
+        auto r1 = tmp.getRoot().getKey("/Test").getArrayItem(0);
+        auto r2 = pdf2.getRoot().getKey("/Test").getArrayItem(0);
+        auto r1b = tmp.getRoot().getKey("/Test").getArrayItem(1);
+        auto r2b = pdf2.getRoot().getKey("/Test").getArrayItem(1);
+        assert(r1.equivalent_to(r2));
+        assert(r1b.equivalent_to(r2b));
+    }
 }
 
 void
