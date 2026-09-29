@@ -219,3 +219,36 @@ qpdfjob_register_progress_reporter(
 {
     j->j.registerProgressReporter(std::bind(report_progress, std::placeholders::_1, data));
 }
+
+int
+qpdfjob_register_buffer_input(
+    qpdfjob_handle j, char const* name, unsigned char const* data, size_t length)
+{
+    return wrap_qpdfjob(j, [name, data, length](qpdfjob_handle jh) {
+        jh->j.registerBufferInput(name ? name : "", data, length);
+        return 0;
+    });
+}
+
+int
+qpdfjob_register_buffer_output(
+    qpdfjob_handle j, char const* name, qpdfjob_buffer_output_fn_t fn, void* udata)
+{
+    return wrap_qpdfjob(j, [name, fn, udata](qpdfjob_handle jh) {
+        if (fn == nullptr) {
+            throw std::runtime_error("qpdfjob_register_buffer_output: fn may not be null");
+        }
+
+        std::string identifier{name ? name : ""};
+        jh->j.registerBufferOutput(
+            identifier, [identifier, fn, udata](unsigned char const* data, size_t length) {
+                int code = fn(data, length, udata);
+                if (code != 0) {
+                    throw std::runtime_error(
+                        "buffer output " + identifier + " function returned code " +
+                        std::to_string(code));
+                }
+            });
+        return 0;
+    });
+}

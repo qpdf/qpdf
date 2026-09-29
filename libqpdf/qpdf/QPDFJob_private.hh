@@ -263,6 +263,8 @@ class QPDFJob::Members
     bool check_requires_password{false};
     bool empty_input{false};
     std::string outfilename;
+    std::map<std::string, std::pair<unsigned char const*, size_t>> buffer_inputs;
+    std::map<std::string, std::function<void(unsigned char const*, size_t)>> buffer_outputs;
     bool json_input{false};
     bool json_output{false};
     std::string update_from_json;

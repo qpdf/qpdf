@@ -170,6 +170,26 @@ extern "C" {
     void qpdfjob_register_progress_reporter(
         qpdfjob_handle j, void (*report_progress)(int percent, void* data), void* data);
 
+    /* IN-MEMORY BUFFERS (QuestPDF extension)
+     * Let a job read its inputs from memory and write its output to memory instead of files.
+     * In the job configuration, use "qpdf-buffer://name" in place of a file name.
+     */
+    QPDF_DLL
+    int qpdfjob_register_buffer_input(
+        qpdfjob_handle j, char const* name, unsigned char const* data, size_t length);
+
+    /* Return 0 on success. Any other value stops the job with an error.
+     */
+    typedef int (*qpdfjob_buffer_output_fn_t)(
+        unsigned char const* data, size_t length, void* udata);
+
+    /* Registers an output function under the given name, for use as "outputFile": "qpdf-buffer://name".
+     * The function receives the output in order, in chunks of about 64 KiB.
+     */
+    QPDF_DLL
+    int qpdfjob_register_buffer_output(
+        qpdfjob_handle j, char const* name, qpdfjob_buffer_output_fn_t fn, void* udata);
+
 #ifdef __cplusplus
 }
 #endif

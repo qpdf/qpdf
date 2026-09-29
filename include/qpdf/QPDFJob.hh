@@ -120,6 +120,25 @@ class QPDFJob
     QPDF_DLL
     void registerProgressReporter(std::function<void(int)>);
 
+    // IN-MEMORY BUFFERS (QuestPDF extension)
+    //
+    // Registers a read-only input buffer. In the job configuration, use "qpdf-buffer://name" in
+    // place of any input file name: the main input (also with --json-input), --pages, overlay,
+    // underlay, --add-attachment, --copy-attachments-from and --copy-encryption. The buffer is read
+    // in place, without copying, and may still be read while the output is written. Keep it valid
+    // and unchanged until this QPDFJob and any QPDF returned by createQPDF() are destroyed. QPDFJob
+    // never frees it. Registering a name again replaces the previous buffer.
+    QPDF_DLL
+    void registerBufferInput(std::string const& name, unsigned char const* data, size_t length);
+
+    // Registers an output function. In the job configuration, use "qpdf-buffer://name" as the
+    // output file name. The function receives the output in order, in chunks of about 64 KiB. The
+    // last chunk may be smaller, and a single large write is passed on as one bigger chunk. If the
+    // job fails, the function may already have received part of the output.
+    QPDF_DLL
+    void registerBufferOutput(
+        std::string const& name, std::function<void(unsigned char const*, size_t)> fn);
+
     // Check to make sure no contradictory options have been specified. This is called automatically
     // after initializing from argv or json and is also called by run, but you can call it manually
     // as well. It throws a QPDFUsage exception if there are any errors. This Config object (see
@@ -449,6 +468,11 @@ class QPDFJob
     static void parse_object_id(std::string const& objspec, bool& trailer, int& obj, int& gen);
     void parseRotationParameter(std::string const&);
     std::vector<int> parseNumrange(char const* range, int max);
+
+    static bool isBufferReference(std::string const& name);
+    std::pair<unsigned char const*, size_t> resolveInputBuffer(std::string const& reference);
+    std::function<void(unsigned char const*, size_t)> const& resolveOutputBuffer(std::string const& reference);
+    std::shared_ptr<InputSource> createBufferInputSource(std::string const& reference);
 
     // Basic file processing
     void processFile(

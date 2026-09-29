@@ -7,6 +7,7 @@
 #include <qpdf/AcroForm.hh>
 #include <qpdf/ClosedFileInputSource.hh>
 #include <qpdf/FileInputSource.hh>
+#include <qpdf/InputSource_private.hh>
 #include <qpdf/Pipeline_private.hh>
 #include <qpdf/Pl_DCT.hh>
 #include <qpdf/Pl_Discard.hh>
@@ -314,6 +315,128 @@ QPDFJob::registerProgressReporter(std::function<void(int)> handler)
     m->progress_handler = handler;
 }
 
+namespace
+{
+    constexpr std::string_view BUFFER_REFERENCE_SCHEME{"qpdf-buffer://"};
+
+    // Collects the writer's output into chunks of about BUFFER_OUTPUT_CHUNK_SIZE bytes before
+    // passing it to the output function. The writer makes many writes of only a few bytes, and each
+    // call to the function may be expensive, for example a callback into managed code. Writes of at
+    // least BUFFER_OUTPUT_CHUNK_SIZE bytes are passed on as they are.
+    constexpr size_t BUFFER_OUTPUT_CHUNK_SIZE{64 * 1024};
+
+    class BufferOutput final: public Pipeline
+    {
+      public:
+        BufferOutput(
+            std::string const& identifier, std::function<void(unsigned char const*, size_t)> fn) :
+            Pipeline(identifier.data(), nullptr),
+            fn(std::move(fn))
+        {
+            buffer.reserve(BUFFER_OUTPUT_CHUNK_SIZE);
+        }
+
+        ~BufferOutput() final = default;
+
+        void
+        write(unsigned char const* buf, size_t len) final
+        {
+            if (buffer.size() + len > BUFFER_OUTPUT_CHUNK_SIZE) {
+                flush();
+            }
+            if (len >= BUFFER_OUTPUT_CHUNK_SIZE) {
+                fn(buf, len);
+            } else if (len) {
+                buffer.append(reinterpret_cast<char const*>(buf), len);
+            }
+        }
+
+        void
+        finish() final
+        {
+            flush();
+        }
+
+      private:
+        void
+        flush()
+        {
+            if (!buffer.empty()) {
+                fn(reinterpret_cast<unsigned char const*>(buffer.data()), buffer.size());
+                buffer.clear();
+            }
+        }
+
+        std::function<void(unsigned char const*, size_t)> fn;
+        std::string buffer;
+    };
+} // namespace
+
+bool
+QPDFJob::isBufferReference(std::string const& name)
+{
+    return name.starts_with(BUFFER_REFERENCE_SCHEME);
+}
+
+void
+QPDFJob::registerBufferInput(std::string const& name, unsigned char const* data, size_t length)
+{
+    if (name.empty()) {
+        throw std::runtime_error("registerBufferInput: buffer name may not be empty");
+    }
+    if (data == nullptr && length > 0) {
+        throw std::runtime_error("registerBufferInput: buffer data may not be null");
+    }
+    m->buffer_inputs[name] = {data, length};
+}
+
+void
+QPDFJob::registerBufferOutput(
+    std::string const& name, std::function<void(unsigned char const*, size_t)> fn)
+{
+    if (name.empty()) {
+        throw std::runtime_error("registerBufferOutput: buffer name may not be empty");
+    }
+    if (!fn) {
+        throw std::runtime_error("registerBufferOutput: output function may not be null");
+    }
+    m->buffer_outputs[name] = fn;
+}
+
+std::pair<unsigned char const*, size_t>
+QPDFJob::resolveInputBuffer(std::string const& reference)
+{
+    auto iter = m->buffer_inputs.find(reference.substr(BUFFER_REFERENCE_SCHEME.size()));
+    if (iter == m->buffer_inputs.end()) {
+        throw std::runtime_error(
+            reference +
+            ": no input buffer has been registered under this name; register it before "
+            "running the job");
+    }
+    return iter->second;
+}
+
+std::function<void(unsigned char const*, size_t)> const&
+QPDFJob::resolveOutputBuffer(std::string const& reference)
+{
+    auto iter = m->buffer_outputs.find(reference.substr(BUFFER_REFERENCE_SCHEME.size()));
+    if (iter == m->buffer_outputs.end()) {
+        throw std::runtime_error(
+            reference +
+            ": no output buffer has been registered under this name; register it before "
+            "running the job");
+    }
+    return iter->second;
+}
+
+std::shared_ptr<InputSource>
+QPDFJob::createBufferInputSource(std::string const& reference)
+{
+    auto [data, length] = resolveInputBuffer(reference);
+    return std::make_shared<is::OffsetBuffer>(
+        reference, std::string_view{reinterpret_cast<char const*>(data), length});
+}
+
 void
 QPDFJob::doIfVerbose(std::function<void(Pipeline&, std::string const& prefix)> fn)
 {
@@ -594,6 +717,17 @@ QPDFJob::checkConfiguration()
     }
     if (m->replace_input && m->infile_name().empty()) {
         usage("--replace-input may not be used with --empty");
+    }
+    if (m->replace_input && isBufferReference(m->infile_name())) {
+        usage("--replace-input may not be used with an in-memory buffer input");
+    }
+    if (isBufferReference(m->outfilename)) {
+        if (m->split_pages) {
+            usage("--split-pages may not be used with an in-memory buffer output");
+        }
+        if (m->json_version) {
+            usage("--json may not be used with an in-memory buffer output");
+        }
     }
     if (m->require_outfile && m->outfilename.empty() && !m->replace_input) {
         usage("an output file name is required; use - for standard output");
@@ -1737,7 +1871,11 @@ QPDFJob::doProcessOnce(
     if (empty) {
         pdf->emptyPDF();
     } else if (main_input && m->json_input) {
-        pdf->createFromJSON(m->infile_name());
+        if (isBufferReference(m->infile_name())) {
+            pdf->createFromJSON(createBufferInputSource(m->infile_name()));
+        } else {
+            pdf->createFromJSON(m->infile_name());
+        }
     } else {
         fn(pdf.get(), password);
     }
@@ -1828,6 +1966,13 @@ QPDFJob::processFile(
     bool used_for_input,
     bool main_input)
 {
+    if (isBufferReference(filename)) {
+        auto is = createBufferInputSource(filename);
+        auto f1 = std::mem_fn(&QPDF::processInputSource);
+        auto fn = std::bind(f1, std::placeholders::_1, is, std::placeholders::_2);
+        doProcess(pdf, fn, password, false, used_for_input, main_input);
+        return;
+    }
     auto f1 = std::mem_fn<void(char const*, char const*)>(&QPDF::processFile);
     auto fn = std::bind(f1, std::placeholders::_1, filename, std::placeholders::_2);
     doProcess(pdf, fn, password, strcmp(filename, "") == 0, used_for_input, main_input);
@@ -2054,7 +2199,19 @@ QPDFJob::addAttachments(QPDF& pdf)
             continue;
         }
 
-        auto fs = QPDFFileSpecObjectHelper::createFileSpec(pdf, to_add.filename, to_add.path);
+        auto fs = [&]() {
+            if (isBufferReference(to_add.path)) {
+                auto [data, length] = resolveInputBuffer(to_add.path);
+                auto efs =
+                    QPDFEFStreamObjectHelper::createEFStream(pdf, [data, length](Pipeline* p) {
+                        p->write(data, length);
+                        p->finish();
+                    });
+                return QPDFFileSpecObjectHelper::createFileSpec(pdf, to_add.filename, efs);
+            }
+            return QPDFFileSpecObjectHelper::createFileSpec(pdf, to_add.filename, to_add.path);
+        }();
+
         if (!to_add.description.empty()) {
             fs.setDescription(to_add.description);
         }
@@ -2424,7 +2581,11 @@ QPDFJob::Inputs::process(QPDFJob& job, std::string const& filename, QPDFJob::Inp
     job.doIfVerbose([&](Pipeline& v, std::string const& prefix) {
         v << prefix << ": processing " << filename << "\n";
     });
-    if (!keep_files_open) {
+    if (QPDFJob::isBufferReference(filename)) {
+        // In-memory inputs use no file handles, so keep_files_open doesn't apply.
+        job.processInputSource(
+            input.qpdf_p, job.createBufferInputSource(filename), password.data(), true);
+    } else if (!keep_files_open) {
         auto cis = std::make_shared<ClosedFileInputSource>(filename.data());
         input.cfis = cis.get();
         input.cfis->stayOpen(true);
@@ -3086,9 +3247,13 @@ QPDFJob::writeOutfile(QPDF& pdf)
     if (m->json_version) {
         writeJSON(pdf);
     } else {
-        // Writer must have block scope so the output file will be closed after write() finishes.
+        std::unique_ptr<BufferOutput> buffer_out;
         Writer w(pdf, m->w_cfg);
-        if (!m->outfilename.empty()) {
+        if (isBufferReference(m->outfilename)) {
+            buffer_out =
+                std::make_unique<BufferOutput>(m->outfilename, resolveOutputBuffer(m->outfilename));
+            w.setOutputPipeline(buffer_out.get());
+        } else if (!m->outfilename.empty()) {
             w.setOutputFilename(m->outfilename.data());
         } else {
             // saveToStandardOutput has already been called, but calling it again is defensive and
