@@ -137,6 +137,8 @@ namespace qpdf
         inline void assign(qpdf_object_type_e required, BaseHandle&& other);
         inline void nullify();
 
+        void check_insertion(QPDFObjectHandle const& item) const;
+
         std::string description() const;
         inline QPDFObjectHandle const& get(std::string const& key) const;
 
