@@ -484,6 +484,12 @@ if(BUILD_SHARED_LIBS)
     SOVERSION ${qpdf_SOVERSION}
     POSITION_INDEPENDENT_CODE ${BUILD_SHARED_LIBS})
 
+  # QuestPDF: ship the library under a unique, unversioned name
+  # (questpdf_qpdf.dll, libquestpdf_qpdf.so, libquestpdf_qpdf.dylib)
+  set_target_properties(${SHARED_LIB} PROPERTIES OUTPUT_NAME questpdf_qpdf)
+  set_property(TARGET ${SHARED_LIB} PROPERTY VERSION)
+  set_property(TARGET ${SHARED_LIB} PROPERTY SOVERSION)
+
   target_compile_definitions(${SHARED_LIB} PRIVATE libqpdf_EXPORTS)
   target_include_directories(${SHARED_LIB}
     SYSTEM PRIVATE ${dep_include_directories})
