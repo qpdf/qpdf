@@ -450,7 +450,6 @@ QPDFJob::createQPDF()
             trailer.replaceKey(
                 "/Info", pdf.makeIndirectObject(Dictionary({{"/ModDate", mod_date}})));
         }
-        root.erase("/Metadata");
     }
     if (m->remove_metadata) {
         root.erase("/Metadata");
