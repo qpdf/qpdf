@@ -12,14 +12,14 @@
 #include <qpdf/Util.hh>
 #include <qpdf/global.hh>
 
-using namespace qpdf::util;
-
 #include <climits>
+#include <clocale>
 #include <cstdio>
-#include <cstdlib>
 #include <cstring>
 #include <iostream>
 #include <map>
+
+using namespace qpdf::util;
 
 static char const* whoami = nullptr;
 
@@ -145,6 +145,64 @@ test_1(QPDF& pdf, char const* arg2)
     d.replace("/C", Integer(42));
     assert(Integer(d["/C"]) == 42);
     assert(QPDFObjectHandle(d).getDictAsMap().size() == 4);
+}
+
+// Test getNumericValue real number conversion
+static void
+test_2(QPDF&, char const* comma)
+{
+    // Disable warnings because the code using std::from_chars and
+    auto log = QPDFLogger::defaultLogger();
+    log->setError(log->discard());
+
+    const std::vector<std::tuple<std::string, QPDFObjectHandle, double>> numbers({
+        {"1.0", "1.0"_qpdf, 1.0},
+        {"+1.5", "+1.5"_qpdf, 1.5},
+        {"-2.5", "-2.5"_qpdf, -2.5},
+        {".314159", ".314159"_qpdf, .314159},
+        {"-.314159", "-.314159"_qpdf, -.314159},
+        {"+.314159", "+.314159"_qpdf, +.314159},
+        {"0", "0"_qpdf, 0},
+        {"-0", "-0"_qpdf, 0},
+        {"+0", "+0"_qpdf, 0},
+        {"1.2 ", "1.2 "_qpdf, 1.2},
+        {" 1.3 ", " 1.3 "_qpdf, 1.3},
+        {"-.2", "-.2 "_qpdf, -0.2},
+        {"+7.", "+7. "_qpdf, 7.0},
+        // The remaining items would generate parser errors
+        {"1.4junk", "1.4"_qpdf, 1.4},
+        {"6.73e1", " 67.3"_qpdf, 67.3},
+        // {"+", "0"_qpdf, 0},
+        {"-", "0"_qpdf, 0},
+        {"", "0"_qpdf, 0},
+    });
+    if (std::string_view(comma) == "comma") {
+        for (auto locale:
+             {"de_DE.UTF-8",
+              "de_DE.utf8",
+              "de_DE",
+              "fr_FR.UTF-8",
+              "fr_FR.utf8",
+              "fr_FR",
+              "it_IT.UTF-8",
+              "it_IT.utf8"}) {
+            if (std::setlocale(LC_NUMERIC, locale) != nullptr) {
+                auto* lconv = std::localeconv();
+                if (lconv && lconv->decimal_point && (lconv->decimal_point[0] == ',')) {
+                    break;
+                }
+            }
+        }
+    }
+    for (auto const& [s, oh, d]: numbers) {
+        assert(QPDFObjectHandle::newReal(s).getNumericValue() == d);
+        assert(oh.getNumericValue() == d);
+    }
+    assert(QPDFObjectHandle::newReal("").getRealValue() == "0.0");
+    assert(QPDFObjectHandle::newReal("    1.3").getRealValue() == "1.3");
+    assert(QPDFObjectHandle::newReal("3.1   ").getRealValue() == "3.1");
+    assert(QPDFObjectHandle::newReal("2.4").getRealValue() == "2.4");
+    assert(QPDFObjectHandle::newReal("  4.2   ").getRealValue() == "4.2");
 }
 
 // test equivalent_to
@@ -599,6 +657,64 @@ test_3(QPDF& pdf, char const* arg2)
     }
 }
 
+// // Test getNumericValue real number conversion
+// static void
+// test_4(QPDF&, char const* comma)
+// {
+//     // Disable warnings because the code using std::from_chars and
+//     auto log = QPDFLogger::defaultLogger();
+//     log->setError(log->discard());
+//
+//     const std::vector<std::tuple<std::string, QPDFObjectHandle, double>> numbers({
+//         {"1.0", "1.0"_qpdf, 1.0},
+//         {"+1.5", "+1.5"_qpdf, 1.5},
+//         {"-2.5", "-2.5"_qpdf, -2.5},
+//         {".314159", ".314159"_qpdf, .314159},
+//         {"-.314159", "-.314159"_qpdf, -.314159},
+//         {"+.314159", "+.314159"_qpdf, +.314159},
+//         {"0", "0"_qpdf, 0},
+//         {"-0", "-0"_qpdf, 0},
+//         {"+0", "+0"_qpdf, 0},
+//         {"1.2 ", "1.2 "_qpdf, 1.2},
+//         {" 1.3 ", " 1.3 "_qpdf, 1.3},
+//         {"-.2", "-.2 "_qpdf, -0.2},
+//         {"+7.", "+7. "_qpdf, 7.0},
+//         {"1.4junk", "1.4"_qpdf, 1.4},
+//         {"6.73e1", " 67.3"_qpdf, 67.3},
+//         {"-", "0"_qpdf, 0},
+//         {"", "0"_qpdf, 0},
+//         // The remaining items would generate parser errors
+//         // {"+", "0"_qpdf, 0},
+//     });
+//     if (std::string_view(comma) == "comma") {
+//         for (auto locale:
+//              {"de_DE.UTF-8",
+//               "de_DE.utf8",
+//               "de_DE",
+//               "fr_FR.UTF-8",
+//               "fr_FR.utf8",
+//               "fr_FR",
+//               "it_IT.UTF-8",
+//               "it_IT.utf8"}) {
+//             if (std::setlocale(LC_NUMERIC, locale) != nullptr) {
+//                 auto* lconv = std::localeconv();
+//                 if (lconv && lconv->decimal_point && (lconv->decimal_point[0] == ',')) {
+//                     break;
+//                 }
+//             }
+//         }
+//     }
+//     for (auto const& [s, oh, d]: numbers) {
+//         assert(QPDFObjectHandle::newReal(s).getNumericValue() == d);
+//         assert(oh.getNumericValue() == d);
+//     }
+//     assert(QPDFObjectHandle::newReal("").getRealValue() == "0.0");
+//     assert(QPDFObjectHandle::newReal("    1.3").getRealValue() == "1.3");
+//     assert(QPDFObjectHandle::newReal("3.1   ").getRealValue() == "3.1");
+//     assert(QPDFObjectHandle::newReal("2.4").getRealValue() == "2.4");
+//     assert(QPDFObjectHandle::newReal("  4.2   ").getRealValue() == "4.2");
+// }
+
 void
 runtest(int n, char const* filename1, char const* arg2)
 {
@@ -606,7 +722,7 @@ runtest(int n, char const* filename1, char const* arg2)
     // the test suite to see how the test is invoked to find the file
     // that the test is supposed to operate on.
 
-    std::set<int> ignore_filename = {1, 3};
+    std::set<int> ignore_filename = {1, 2, 3};
 
     QPDF pdf;
     std::shared_ptr<char> file_buf;
@@ -620,7 +736,7 @@ runtest(int n, char const* filename1, char const* arg2)
     }
 
     std::map<int, void (*)(QPDF&, char const*)> test_functions = {
-        {0, test_0}, {1, test_1}, {3, test_3}};
+        {0, test_0}, {1, test_1}, {2, test_2}, {3, test_3}};
 
     auto fn = test_functions.find(n);
     if (fn == test_functions.end()) {
