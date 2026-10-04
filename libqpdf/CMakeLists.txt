@@ -61,6 +61,7 @@ set(libqpdf_SOURCES
   QPDFDocumentHelper.cc
   QPDFEFStreamObjectHelper.cc
   QPDFEmbeddedFileDocumentHelper.cc
+  QPDFExplicitDestinationObjectHelper.cc
   QPDFExc.cc
   QPDFFileSpecObjectHelper.cc
   QPDFFormFieldObjectHelper.cc
@@ -70,6 +71,8 @@ set(libqpdf_SOURCES
   QPDFJob_json.cc
   QPDFLogger.cc
   QPDFMatrix.cc
+  QPDFNamedDestinationDocumentHelper.cc
+  QPDFNamedDestinationObjectHelper.cc
   QPDFObject.cc
   QPDFObjectHandle.cc
   QPDFObjectHelper.cc

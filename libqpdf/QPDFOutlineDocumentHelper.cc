@@ -1,3 +1,4 @@
+#include <qpdf/QPDFNamedDestinationDocumentHelper.hh>
 #include <qpdf/QPDFOutlineDocumentHelper.hh>
 
 #include <qpdf/QPDFObjectHandle_private.hh>
@@ -13,9 +14,8 @@ class QPDFOutlineDocumentHelper::Members
 
     std::vector<QPDFOutlineObjectHelper> outlines;
     QPDFObjGen::set seen;
-    QPDFObjectHandle dest_dict;
-    std::unique_ptr<QPDFNameTreeObjectHelper> names_dest;
     std::map<QPDFObjGen, std::vector<QPDFOutlineObjectHelper>> by_page;
+    std::unique_ptr<QPDFNamedDestinationDocumentHelper> named_dest_document_helper;
 };
 
 bool
@@ -41,7 +41,8 @@ void
 QPDFOutlineDocumentHelper::validate(bool repair)
 {
     m->outlines.clear();
-    m->names_dest = nullptr;
+    m->by_page.clear();
+    m->named_dest_document_helper = nullptr;
 
     QPDFObjectHandle root = qpdf.getRoot();
     if (!root.hasKey("/Outlines")) {
@@ -105,37 +106,13 @@ QPDFOutlineDocumentHelper::getOutlinesForPage(QPDFObjGen og)
 QPDFObjectHandle
 QPDFOutlineDocumentHelper::resolveNamedDest(QPDFObjectHandle name)
 {
-    QPDFObjectHandle result;
-    if (name.isName()) {
-        if (!m->dest_dict) {
-            m->dest_dict = qpdf.getRoot().getKey("/Dests");
-        }
-        result = m->dest_dict.getKeyIfDict(name.getName());
-    } else if (name.isString()) {
-        if (!m->names_dest) {
-            auto dests = qpdf.getRoot().getKey("/Names").getKeyIfDict("/Dests");
-            if (dests.isDictionary()) {
-                m->names_dest = std::make_unique<QPDFNameTreeObjectHelper>(
-                    dests,
-                    qpdf,
-                    [](QPDFObjectHandle const& o) -> bool {
-                        return o.isArray() || o.contains("/D");
-                    },
-                    true);
-                m->names_dest->validate();
-            }
-        }
-        if (m->names_dest) {
-            if (m->names_dest->findObject(name.getUTF8Value(), result)) {
-                QTC::TC("qpdf", "QPDFOutlineDocumentHelper string named dest");
-            }
-        }
+    if (!m->named_dest_document_helper) {
+        m->named_dest_document_helper = std::make_unique<QPDFNamedDestinationDocumentHelper>(qpdf);
     }
-    if (!result) {
+    auto named_dest_object_helper = m->named_dest_document_helper->lookup(name);
+    if (named_dest_object_helper.isNull()) {
         return QPDFObjectHandle::newNull();
     }
-    if (result.isDictionary()) {
-        return result.getKey("/D");
-    }
-    return result;
+    auto explicit_dest_helper = named_dest_object_helper.unwrap();
+    return explicit_dest_helper.getExplicitArray();
 }
