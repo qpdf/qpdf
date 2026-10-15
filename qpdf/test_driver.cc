@@ -3598,6 +3598,99 @@ test_102(QPDF& pdf, char const* arg2)
     j2.writeQPDF(*q);
 }
 
+static void
+test_103(QPDF& pdf, char const* arg2)
+{
+    // A single Flate filter has the same meaning as a name or a one-item array. Preserve both
+    // its encoded bytes and its decode parameters unless recompression or modification is
+    // requested.
+    auto compress = [](std::string const& data) {
+        std::string compressed;
+        Pl_String result("result", nullptr, compressed);
+        Pl_Flate flate("flate", &result, Pl_Flate::a_deflate);
+        flate << data;
+        flate.finish();
+        return compressed;
+    };
+    auto check = [](std::string const& data,
+                    std::string const& filters,
+                    std::string const& parms,
+                    std::string const& decoded,
+                    bool recompress,
+                    bool preserve,
+                    bool modify = false) {
+        QPDF input;
+        input.emptyPDF();
+        auto stream = input.newStream();
+        stream.replaceStreamData(
+            data, QPDFObjectHandle::parse(filters), QPDFObjectHandle::parse(parms));
+        input.getRoot().replaceKey("/TestStream", stream);
+        assert(stream.getRawStreamData()->view() == data);
+        assert(stream.getStreamData()->view() == decoded);
+        if (modify) {
+            stream.addTokenFilter(std::make_shared<TokenFilter>());
+            assert(stream.isDataModified());
+        }
+
+        QPDFWriter writer(input);
+        writer.setOutputMemory();
+        writer.setRecompressFlate(recompress);
+        writer.write();
+        auto buffer = writer.getBufferSharedPointer();
+        QPDF output;
+        output.processMemoryFile("flate filters", buffer->data(), buffer->size());
+        auto result = output.getRoot().getKey("/TestStream");
+        auto dict = result.getDict();
+        assert(result.getStreamData()->view() == (modify ? "(Salad)\n/bye\n" : decoded));
+        if (preserve) {
+            assert(result.getRawStreamData()->view() == data);
+            assert(
+                dict.getKey("/Filter").unparse() == stream.getDict().getKey("/Filter").unparse());
+            assert(
+                dict.getKey("/DecodeParms").unparse() ==
+                stream.getDict().getKey("/DecodeParms").unparse());
+        } else {
+            assert(dict.getKey("/DecodeParms").isNull());
+            if (decoded.empty()) {
+                assert(result.getRawStreamData()->empty());
+                assert(dict.getKey("/Filter").isNull());
+            } else {
+                assert(result.getRawStreamData()->view() != data);
+                assert(dict.getKey("/Filter").isNameAndEquals("/FlateDecode"));
+            }
+        }
+    };
+
+    std::string decoded = "abcdefghijkl";
+    std::string parms = "<< /Predictor 2 /Colors 3 /Columns 4 /BitsPerComponent 8 >>";
+    auto compressed = compress("abc" + std::string(9, '\3'));
+    for (std::string name: {"/FlateDecode", "/Fl"}) {
+        for (bool array: {false, true}) {
+            std::string filter = array ? "[" + name + "]" : name;
+            std::string decode_parms = array ? "[" + parms + "]" : parms;
+            for (bool recompress: {false, true}) {
+                check(compressed, filter, decode_parms, decoded, recompress, !recompress);
+            }
+            check(compress("(Potato)\n"), filter, "null", "(Potato)\n", false, false, true);
+            check("", filter, "null", "", false, false);
+        }
+    }
+    check(
+        compress(QUtil::hex_encode(decoded) + ">"),
+        "[/FlateDecode /ASCIIHexDecode]",
+        "[null null]",
+        decoded,
+        false,
+        false);
+    check(
+        QUtil::hex_encode(compressed) + ">",
+        "[/ASCIIHexDecode /FlateDecode]",
+        "[null " + parms + "]",
+        decoded,
+        false,
+        false);
+}
+
 void
 runtest(int n, char const* filename1, char const* arg2)
 {
@@ -3605,7 +3698,7 @@ runtest(int n, char const* filename1, char const* arg2)
     // the test suite to see how the test is invoked to find the file
     // that the test is supposed to operate on.
 
-    std::set<int> ignore_filename = {61, 62, 81, 83, 84, 85, 86, 87, 92, 95, 96, 101, 102};
+    std::set<int> ignore_filename = {61, 62, 81, 83, 84, 85, 86, 87, 92, 95, 96, 101, 102, 103};
 
     if (n == 0) {
         // Throw in some random test cases that don't fit anywhere
@@ -3679,27 +3772,27 @@ runtest(int n, char const* filename1, char const* arg2)
     }
 
     std::map<int, void (*)(QPDF&, char const*)> test_functions = {
-        {0, test_0_1},   {1, test_0_1},   {2, test_2},    {3, test_3},   {4, test_4},
-        {5, test_5},     {6, test_6},     {7, test_7},    {8, test_8},   {9, test_9},
-        {10, test_10},   {11, test_11},   {12, test_12},  {13, test_13}, {14, test_14},
-        {15, test_15},   {16, test_16},   {17, test_17},  {18, test_18}, {19, test_19},
-        {20, test_20},   {21, test_21},   {22, test_22},  {23, test_23}, {24, test_24},
-        {25, test_25},   {26, test_26},   {27, test_27},  {28, test_28}, {29, test_29},
-        {30, test_30},   {31, test_31},   {32, test_32},  {33, test_33}, {34, test_34},
-        {35, test_35},   {36, test_36},   {37, test_37},  {38, test_38}, {39, test_39},
-        {40, test_40},   {41, test_41},   {42, test_42},  {43, test_43}, {44, test_44},
-        {45, test_45},   {46, test_46},   {47, test_47},  {48, test_48}, {49, test_49},
-        {50, test_50},   {51, test_51},   {52, test_52},  {53, test_53}, {54, test_54},
-        {55, test_55},   {56, test_56},   {57, test_57},  {58, test_58}, {59, test_59},
-        {60, test_60},   {61, test_61},   {62, test_62},  {63, test_63}, {64, test_64},
-        {65, test_65},   {66, test_66},   {67, test_67},  {68, test_68}, {69, test_69},
-        {70, test_70},   {71, test_71},   {72, test_72},  {73, test_73}, {74, test_74},
-        {75, test_75},   {76, test_76},   {77, test_77},  {78, test_78}, {79, test_79},
-        {80, test_80},   {81, test_81},   {82, test_82},  {83, test_83}, {84, test_84},
-        {85, test_85},   {86, test_86},   {87, test_87},  {88, test_88}, {89, test_89},
-        {90, test_90},   {91, test_91},   {92, test_92},  {93, test_93}, {94, test_94},
-        {95, test_95},   {96, test_96},   {97, test_97},  {98, test_98}, {99, test_99},
-        {100, test_100}, {101, test_101}, {102, test_102}};
+        {0, test_0_1},   {1, test_0_1},   {2, test_2},     {3, test_3},    {4, test_4},
+        {5, test_5},     {6, test_6},     {7, test_7},     {8, test_8},    {9, test_9},
+        {10, test_10},   {11, test_11},   {12, test_12},   {13, test_13},  {14, test_14},
+        {15, test_15},   {16, test_16},   {17, test_17},   {18, test_18},  {19, test_19},
+        {20, test_20},   {21, test_21},   {22, test_22},   {23, test_23},  {24, test_24},
+        {25, test_25},   {26, test_26},   {27, test_27},   {28, test_28},  {29, test_29},
+        {30, test_30},   {31, test_31},   {32, test_32},   {33, test_33},  {34, test_34},
+        {35, test_35},   {36, test_36},   {37, test_37},   {38, test_38},  {39, test_39},
+        {40, test_40},   {41, test_41},   {42, test_42},   {43, test_43},  {44, test_44},
+        {45, test_45},   {46, test_46},   {47, test_47},   {48, test_48},  {49, test_49},
+        {50, test_50},   {51, test_51},   {52, test_52},   {53, test_53},  {54, test_54},
+        {55, test_55},   {56, test_56},   {57, test_57},   {58, test_58},  {59, test_59},
+        {60, test_60},   {61, test_61},   {62, test_62},   {63, test_63},  {64, test_64},
+        {65, test_65},   {66, test_66},   {67, test_67},   {68, test_68},  {69, test_69},
+        {70, test_70},   {71, test_71},   {72, test_72},   {73, test_73},  {74, test_74},
+        {75, test_75},   {76, test_76},   {77, test_77},   {78, test_78},  {79, test_79},
+        {80, test_80},   {81, test_81},   {82, test_82},   {83, test_83},  {84, test_84},
+        {85, test_85},   {86, test_86},   {87, test_87},   {88, test_88},  {89, test_89},
+        {90, test_90},   {91, test_91},   {92, test_92},   {93, test_93},  {94, test_94},
+        {95, test_95},   {96, test_96},   {97, test_97},   {98, test_98},  {99, test_99},
+        {100, test_100}, {101, test_101}, {102, test_102}, {103, test_103}};
 
     auto fn = test_functions.find(n);
     if (fn == test_functions.end()) {
