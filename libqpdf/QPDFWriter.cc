@@ -1560,9 +1560,10 @@ impl::Writer::will_filter_stream(QPDFObjectHandle stream, std::string* stream_da
             // make it worse if the original file used a better Flate algorithm, and we don't spend
             // time and CPU cycles uncompressing and recompressing stuff. This can be overridden
             // with setRecompressFlate(true).
-            Name Filter = stream_dict["/Filter"];
-            if (Filter && !cfg.recompress_flate() && !stream.isDataModified() &&
-                (Filter == "/FlateDecode" || Filter == "/Fl")) {
+            auto Filter = stream_dict["/Filter"];
+            Name filter_name = Filter.size() == 1 ? Filter[0] : QPDFObjectHandle();
+            if (filter_name && !cfg.recompress_flate() && !stream.isDataModified() &&
+                (filter_name == "/FlateDecode" || filter_name == "/Fl")) {
                 filter = false;
             }
         }
