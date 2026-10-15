@@ -14,7 +14,7 @@ cleanup();
 
 my $td = new TestDriver('compression-level');
 
-my $n_tests = 4;
+my $n_tests = 5;
 
 check_pdf($td, "recompress with level",
           "qpdf --static-id --recompress-flate --compression-level=9" .
@@ -24,6 +24,11 @@ check_pdf($td, "recompress with level",
           "qpdf --static-id --recompress-flate --compression-level=1" .
           " --object-streams=generate minimal.pdf",
           "minimal-1.pdf", 0);
+
+$td->runtest("preserve a single Flate filter and decode parameters",
+             {$td->COMMAND => "test_driver 103 -"},
+             {$td->STRING => "test 103 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 cleanup();
 $td->report($n_tests);
