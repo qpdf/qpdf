@@ -270,11 +270,12 @@ to_utf8_test()
 
     // Overlong characters: characters represented by more bytes than necessary.
     size_t pos = 0;
-    std::string utf8 = "\xC0\x81"                  // 1 << 7
-                       "\xE0\x80\x82"              // 1 << 11
-                       "\xF0\x80\x80\x83"          // 1 << 16
-                       "\xF8\x80\x80\x80\x84"      // 1 << 21
-                       "\xFC\x80\x80\x80\x80\x85"; // 1 << 26
+    std::string utf8 = "\xC0\x81"                 // 1 << 7
+                       "\xE0\x80\x82"             // 1 << 11
+                       "\xF0\x80\x80\x83"         // 1 << 16
+                       "\xF8\x80\x80\x80\x84"     // 1 << 21
+                       "\xFC\x80\x80\x80\x80\x85" // 1 << 26
+                       "\xF8\x80\x81\x80\x80";    // 1 << 21, value >= 1 << 12
     auto check = [&pos, &utf8](unsigned long val, unsigned long wanted_pos) {
         bool error = false;
         assert(
@@ -285,6 +286,7 @@ to_utf8_test()
     check(3, 9);
     check(4, 14);
     check(5, 20);
+    check(0x1000, 25);
 }
 
 static void
