@@ -822,7 +822,7 @@ QPDFObjectHandle::getNumericValue() const
     if (isInteger()) {
         return static_cast<double>(getIntValue());
     } else if (isReal()) {
-        return atof(getRealValue().c_str());
+        return util::string_to_double(getRealValue()).value_or(0.0);
     } else {
         typeWarning("number", "returning 0");
         QTC::TC("qpdf", "QPDFObjectHandle numeric non-numeric");

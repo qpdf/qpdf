@@ -374,6 +374,18 @@ QUtil::double_to_string(double num, int decimal_places, bool trim_trailing_zeroe
     return result;
 }
 
+std::optional<double>
+util::string_to_double(std::string const& str)
+{
+    std::istringstream buf(str);
+    buf.imbue(std::locale::classic());
+    double result;
+    if (buf >> result) {
+        return result;
+    }
+    return std::nullopt;
+}
+
 long long
 QUtil::string_to_ll(char const* str)
 {
