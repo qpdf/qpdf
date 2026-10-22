@@ -6,6 +6,7 @@
 #include <concepts>
 #include <cstdint>
 #include <limits>
+#include <optional>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -158,6 +159,9 @@ namespace qpdf::util
     }
 
     std::string random_string(size_t len);
+
+    // Locale-independent equivalent of strtod. Returns std::nullopt if `str` can't be converted.
+    std::optional<double> string_to_double(std::string const& str);
 
     // Test helpers
 

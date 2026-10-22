@@ -725,11 +725,9 @@ QPDF::JSONReactor::makeObject(JSON const& value)
         } else {
             // JSON allows scientific notation, but PDF does not.
             if (str_v.find('e') != std::string::npos || str_v.find('E') != std::string::npos) {
-                try {
-                    auto v = std::stod(str_v);
-                    str_v = QUtil::double_to_string(v);
-                } catch (std::exception&) {
-                    // Keep it as it was
+                // Keep it as it was if it can't be converted.
+                if (auto v = util::string_to_double(str_v)) {
+                    str_v = QUtil::double_to_string(*v);
                 }
             }
             result = QPDFObjectHandle::newReal(str_v);

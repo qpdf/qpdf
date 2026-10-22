@@ -9,7 +9,7 @@ require TestDriver;
 
 my $td = new TestDriver('qutil');
 
-my $n_tests = 4;
+my $n_tests = 5;
 
 $td->runtest("QUtil",
              {$td->COMMAND => "qutil"},
@@ -41,6 +41,11 @@ $td->runtest("util::fits",
 $td->runtest("util::to",
              {$td->COMMAND => "util 1 -"},
              {$td->STRING => "test 1 done\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("util::string_to_double",
+             {$td->COMMAND => "util 2 -"},
+             {$td->STRING => "test 2 done\n", $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 $td->report($n_tests);

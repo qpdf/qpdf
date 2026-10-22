@@ -11,6 +11,7 @@
 #include <qpdf/QPDF_private.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
+#include <qpdf/Util.hh>
 #include <cstdlib>
 
 #include <memory>
@@ -809,7 +810,7 @@ namespace
             switch (ttype) {
             case QPDFTokenizer::tt_integer:
             case QPDFTokenizer::tt_real:
-                last_num = strtod(value.c_str(), nullptr);
+                last_num = util::string_to_double(value).value_or(0.0);
                 last_num_idx = QIntC::to_int(DA.size() - 1);
                 break;
 
@@ -852,7 +853,7 @@ namespace
             int i = -1;
             for (auto const& cur: DA) {
                 if (++i == tf_idx) {
-                    double delta = strtod(cur.c_str(), nullptr) - tf;
+                    double delta = util::string_to_double(cur).value_or(0.0) - tf;
                     if (delta > 0.001 || delta < -0.001) {
                         // tf doesn't match the font size passed to Tf, so substitute.
                         QTC::TC("qpdf", "QPDFFormFieldObjectHelper fallback Tf");
