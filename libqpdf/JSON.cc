@@ -686,7 +686,7 @@ JSONParser::handle_u_code(
         high_surrogate = codepoint;
     } else if ((codepoint & 0xFC00) == 0xDC00) {
         // low surrogate
-        if (offset != (high_offset + 6)) {
+        if (!high_offset || offset != (high_offset + 6)) {
             QTC::TC("libtests", "JSON 16 low not after high");
             throw std::runtime_error(
                 "JSON: offset " + std::to_string(offset) +
