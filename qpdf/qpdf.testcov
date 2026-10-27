@@ -219,6 +219,8 @@ QPDF_encryption same password 1
 QPDFWriter no encryption sig contents 0
 QPDFPageObjectHelper colorspace lookup 0
 QPDFPageObjectHelper filter form xobject 0
+QPDFPageObjectHelper nothing to remove 0
+QPDFPageObjectHelper share resource category 0
 QPDFJob found resources in non-leaf 0
 QPDFJob found shared resources in leaf 0
 QPDFJob found shared xobject in leaf 0

@@ -1,0 +1,262 @@
+%PDF-1.7
+%¿÷¢þ
+%QDF-1.0
+
+%% Original object ID: 1 0
+1 0 obj
+<<
+  /Pages 2 0 R
+  /Type /Catalog
+>>
+endobj
+
+%% Original object ID: 2 0
+2 0 obj
+<<
+  /Count 1
+  /Kids [
+    3 0 R
+  ]
+  /Type /Pages
+>>
+endobj
+
+%% Page 1
+%% Original object ID: 3 0
+3 0 obj
+<<
+  /Contents 4 0 R
+  /MediaBox [
+    0
+    0
+    612
+    792
+  ]
+  /Parent 2 0 R
+  /Resources <<
+    /XObject <<
+      /Fx0 6 0 R
+    >>
+  >>
+  /Type /Page
+>>
+endobj
+
+%% Contents for page 1
+%% Original object ID: 4 0
+4 0 obj
+<<
+  /Length 5 0 R
+>>
+stream
+q 1 0 0 1 0 0 cm /Fx0 Do Q
+endstream
+endobj
+
+%QDF: ignore_newline
+5 0 obj
+26
+endobj
+
+%% Original object ID: 10 0
+6 0 obj
+<<
+  /BBox [
+    0
+    0
+    612
+    792
+  ]
+  /Resources 8 0 R
+  /Subtype /Form
+  /Type /XObject
+  /Length 7 0 R
+>>
+stream
+/G0 gs 0 0 100 100 re f /Fx1 Do
+endstream
+endobj
+
+%QDF: ignore_newline
+7 0 obj
+31
+endobj
+
+%% Original object ID: 5 0
+8 0 obj
+<<
+  /ExtGState <<
+    /G0 <<
+      /CA 0.0000
+      /Type /ExtGState
+    >>
+    /G1 <<
+      /CA 0.0625
+      /Type /ExtGState
+    >>
+    /G10 <<
+      /CA 0.6250
+      /Type /ExtGState
+    >>
+    /G11 <<
+      /CA 0.6875
+      /Type /ExtGState
+    >>
+    /G12 <<
+      /CA 0.7500
+      /Type /ExtGState
+    >>
+    /G13 <<
+      /CA 0.8125
+      /Type /ExtGState
+    >>
+    /G14 <<
+      /CA 0.8750
+      /Type /ExtGState
+    >>
+    /G15 <<
+      /CA 0.9375
+      /Type /ExtGState
+    >>
+    /G2 <<
+      /CA 0.1250
+      /Type /ExtGState
+    >>
+    /G3 <<
+      /CA 0.1875
+      /Type /ExtGState
+    >>
+    /G4 <<
+      /CA 0.2500
+      /Type /ExtGState
+    >>
+    /G5 <<
+      /CA 0.3125
+      /Type /ExtGState
+    >>
+    /G6 <<
+      /CA 0.3750
+      /Type /ExtGState
+    >>
+    /G7 <<
+      /CA 0.4375
+      /Type /ExtGState
+    >>
+    /G8 <<
+      /CA 0.5000
+      /Type /ExtGState
+    >>
+    /G9 <<
+      /CA 0.5625
+      /Type /ExtGState
+    >>
+  >>
+  /ProcSet [
+    /PDF
+  ]
+  /XObject <<
+    /Fx0 6 0 R
+    /Fx1 9 0 R
+    /Fx2 11 0 R
+    /Fx3 13 0 R
+  >>
+>>
+endobj
+
+%% Original object ID: 11 0
+9 0 obj
+<<
+  /BBox [
+    0
+    0
+    612
+    792
+  ]
+  /Resources 8 0 R
+  /Subtype /Form
+  /Type /XObject
+  /Length 10 0 R
+>>
+stream
+/G1 gs 100 100 100 100 re f
+endstream
+endobj
+
+%QDF: ignore_newline
+10 0 obj
+27
+endobj
+
+%% Original object ID: 12 0
+11 0 obj
+<<
+  /BBox [
+    0
+    0
+    612
+    792
+  ]
+  /Resources 8 0 R
+  /Subtype /Form
+  /Type /XObject
+  /Length 12 0 R
+>>
+stream
+/G2 gs 200 200 50 50 re f
+endstream
+endobj
+
+%QDF: ignore_newline
+12 0 obj
+25
+endobj
+
+%% Original object ID: 13 0
+13 0 obj
+<<
+  /BBox [
+    0
+    0
+    612
+    792
+  ]
+  /Resources 8 0 R
+  /Subtype /Form
+  /Type /XObject
+  /Length 14 0 R
+>>
+stream
+/G3 gs 200 200 50 50 re f
+endstream
+endobj
+
+%QDF: ignore_newline
+14 0 obj
+25
+endobj
+
+xref
+0 15
+0000000000 65535 f 
+0000000052 00000 n 
+0000000133 00000 n 
+0000000242 00000 n 
+0000000469 00000 n 
+0000000572 00000 n 
+0000000619 00000 n 
+0000000822 00000 n 
+0000000868 00000 n 
+0000001980 00000 n 
+0000002180 00000 n 
+0000002228 00000 n 
+0000002427 00000 n 
+0000002475 00000 n 
+0000002674 00000 n 
+trailer <<
+  /Root 1 0 R
+  /Size 15
+  /ID [<31415926535897932384626433832795><31415926535897932384626433832795>]
+>>
+startxref
+2694
+%%EOF

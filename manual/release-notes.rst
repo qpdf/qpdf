@@ -14,6 +14,18 @@ more detail.
 
 .. x.y.z: not yet released
 
+12.4.3: not yet released
+  - Enhancements
+
+    - Removing unreferenced resources (``--remove-unreferenced-resources``,
+      ``QPDFPageObjectHelper::removeUnreferencedResources``) no longer gives a page or form
+      XObject its own copy of a shared resources dictionary when nothing is removed from it, and
+      when it does make a copy, large resource categories such as ``/ExtGState`` stay shared
+      instead of being repeated in every copy. Where many form XObjects share one resources
+      dictionary, a split page could become many times larger than the original: one 1.5 MB
+      page grew to 94 MB and now stays at 1.7 MB. The object structure of the output changes
+      for some files.
+
 12.4.2: September 26, 2026
   - Enhancements
 

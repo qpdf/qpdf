@@ -67,11 +67,7 @@
             792
           ],
           "/Parent": "2 0 R",
-          "/Resources": {
-            "/Font": {
-              "/F1": "6 0 R"
-            }
-          },
+          "/Resources": "8 0 R",
           "/Type": "/Page"
         }
       },
@@ -99,11 +95,7 @@
             792
           ],
           "/Parent": "2 0 R",
-          "/Resources": {
-            "/Font": {
-              "/F1": "6 0 R"
-            }
-          },
+          "/Resources": "8 0 R",
           "/Type": "/Page"
         }
       },

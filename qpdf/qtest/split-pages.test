@@ -16,8 +16,8 @@ cleanup();
 
 my $td = new TestDriver('split-pages');
 
-my $n_tests = 42;
-my $n_compare_pdfs = 2;
+my $n_tests = 44;
+my $n_compare_pdfs = 3;
 
 # sp = split-pages
 my @sp_cases = (
@@ -190,7 +190,8 @@ foreach my $i (qw(1 2))
 
 my @fo_resources = (['form-xobjects-no-resources', 1],
                     ['form-xobjects-some-resources1', 0],
-                    ['form-xobjects-some-resources2', 0]);
+                    ['form-xobjects-some-resources2', 0],
+                    ['shared-form-resources', 1]);
 foreach my $d (@fo_resources)
 {
     my ($f, $compare) = @$d;

@@ -12,6 +12,8 @@
 #include <qpdf/QUtil.hh>
 #include <qpdf/ResourceFinder.hh>
 
+#include <algorithm>
+
 using namespace std::literals;
 
 namespace
@@ -564,22 +566,23 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
     }
 
     // We will walk through /Font and /XObject dictionaries, removing any resources that are not
-    // referenced. We must make copies of resource dictionaries down into the dictionaries are
-    // mutating to prevent mutating one dictionary from having the side effect of mutating the one
-    // it was copied from.
-    QPDFObjectHandle resources = ph.getAttribute("/Resources", true);
-    std::vector<QPDFObjectHandle> rdicts;
-    std::set<std::string> known_names;
+    // referenced. Forms often share one resources dictionary that names every resource of a
+    // figure, so the work here is done in proportion to the names the content uses, never to the
+    // size of those dictionaries.
+    QPDFObjectHandle resources = ph.getAttribute("/Resources", false);
+    std::vector<std::pair<std::string, QPDFObjectHandle>> rdicts;
     if (resources.isDictionary()) {
         for (auto const& iter: {"/Font", "/XObject"}) {
             QPDFObjectHandle dict = resources.getKey(iter);
             if (dict.isDictionary()) {
-                dict = resources.replaceKeyAndGetNew(iter, dict.shallowCopy());
-                rdicts.push_back(dict);
-                known_names.merge(dict.getKeys());
+                rdicts.emplace_back(iter, dict);
             }
         }
     }
+    auto known = [&rdicts](std::string const& name) {
+        return std::ranges::any_of(
+            rdicts, [&name](auto const& rdict) { return rdict.second.hasKey(name); });
+    };
 
     std::set<std::string> local_unresolved;
     auto const& names_by_rtype = rf.getNamesByResourceType();
@@ -590,7 +593,7 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
         }
         for (auto const& n_iter: it->second) {
             std::string const& name = n_iter.first;
-            if (!known_names.contains(name)) {
+            if (!known(name)) {
                 unresolved.insert(name);
                 local_unresolved.insert(name);
             }
@@ -619,15 +622,64 @@ QPDFPageObjectHelper::removeUnreferencedResourcesHelper(
         return false;
     }
 
-    for (auto& dict: rdicts) {
-        for (auto const& key: dict.getKeys()) {
-            if (is_page && unresolved.contains(key)) {
-                // This name is referenced by some nested form xobject, so don't remove it.
-                QTC::TC("qpdf", "QPDFPageObjectHelper resolving unresolved");
-            } else if (!rf.getNames().contains(key)) {
-                dict.removeKey(key);
+    // Build the filtered dictionaries from the names to keep: those the content uses and, on a
+    // page, those that some nested form xobject could not resolve.
+    std::vector<std::pair<std::string, QPDFObjectHandle>> filtered;
+    bool any_removed = false;
+    for (auto const& [key, dict]: rdicts) {
+        auto kept = QPDFObjectHandle::newDictionary();
+        auto keep = [&dict, &kept](std::string const& name) {
+            if (dict.hasKey(name)) {
+                kept.replaceKey(name, dict.getKey(name));
+            }
+        };
+        for (auto const& name: rf.getNames()) {
+            keep(name);
+        }
+        if (is_page) {
+            for (auto const& name: unresolved) {
+                if (!rf.getNames().contains(name) && dict.hasKey(name)) {
+                    // This name is referenced by some nested form xobject, so don't remove it.
+                    QTC::TC("qpdf", "QPDFPageObjectHelper resolving unresolved");
+                    keep(name);
+                }
             }
         }
+        if (Dictionary(kept).getAsMap().size() < Dictionary(dict).getAsMap().size()) {
+            any_removed = true;
+        }
+        filtered.emplace_back(key, kept);
+    }
+    if (!any_removed) {
+        // Leave the resources as they are, shared or not.
+        QTC::TC("qpdf", "QPDFPageObjectHelper nothing to remove");
+        return true;
+    }
+
+    // Each object whose resources lose entries gets its own copy of the resources dictionary, so
+    // that mutating it does not affect any other object sharing it. A shallow copy would repeat
+    // every direct dictionary or array in a shared resources dictionary, such as /ExtGState, in
+    // every copy, so make the large ones indirect first and let the copies keep sharing them. A
+    // small one costs less to repeat than an object of its own.
+    constexpr size_t min_shared_entries = 16;
+    if (resources.isIndirect()) {
+        for (auto const& key: resources.getKeys()) {
+            auto value = resources.getKey(key);
+            if (key == "/Font" || key == "/XObject" || value.isIndirect()) {
+                continue;
+            }
+            size_t entries = value.isDictionary() ? Dictionary(value).getAsMap().size()
+                : value.isArray()                 ? QIntC::to_size(value.getArrayNItems())
+                                                  : 0;
+            if (entries >= min_shared_entries) {
+                QTC::TC("qpdf", "QPDFPageObjectHelper share resource category");
+                resources.replaceKey(key, ph.oh().getQPDF().makeIndirectObject(value));
+            }
+        }
+    }
+    resources = ph.getAttribute("/Resources", true);
+    for (auto const& [key, kept]: filtered) {
+        resources.replaceKey(key, kept);
     }
     return true;
 }
