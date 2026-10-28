@@ -754,6 +754,8 @@ Related Options
    producers. See also :qpdf:ref:`--copy-encryption` and
    :qpdf:ref:`--remove-restrictions`.
 
+   Supply the password using the :qpdf:ref:`--password` option.
+
 .. qpdf:option:: --remove-restrictions
 
    .. help: remove security restrictions from input file
