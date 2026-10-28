@@ -185,22 +185,28 @@ options:
       update-from-json: qpdf-json file
       json-stream-prefix: stream-file-prefix
     required_parameter:
+      author: author
       compression-level: level
-      jpeg-quality: level
+      creator: creator
       encryption-file-password: password
       force-version: version
       ii-min-bytes: minimum
+      jpeg-quality: level
       json-object: trailer
       keep-files-open-threshold: count
+      keywords: keywords
       min-version: version
       oi-min-area: minimum
       oi-min-height: minimum
       oi-min-width: minimum
       password: password
+      producer: producer
       remove-attachment: attachment
       rotate: "[+|-]angle"
       show-attachment: attachment
       show-object: trailer
+      subject: subject
+      title: title
     required_choices:
       compress-streams: yn
       decode-level: decode_level
@@ -505,6 +511,12 @@ json:
     - null
   set-page-labels:
     - null
+  author:
+  creator:
+  keywords:
+  producer:
+  subject:
+  title:
   overlay:
     - UO.file:
       UO.password:

@@ -166,6 +166,18 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
   "setPageLabels": [
     "number pages for the entire document"
   ],
+  "author": "set document author",
+  "creator": "set document creator",
+  "keywords": "set document keywords",
+  "producer": "set document producer",
+  "subject": "set document subject",
+  "title": "set document title",
+  "Author": "set document author",
+  "Creator": "set document creator",
+  "Keywords": "set document keywords",
+  "Producer": "set document producer",
+  "Subject": "set document subject",
+  "Title": "set document title",
   "overlay": [
     {
       "file": "source for pages",
