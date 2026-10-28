@@ -247,6 +247,18 @@ class QPDFJob::Members
     bool remove_info{false};
     bool remove_metadata{false};
     bool remove_page_labels{false};
+    bool info_author_set{false};
+    bool info_creator_set{false};
+    bool info_keywords_set{false};
+    bool info_producer_set{false};
+    bool info_subject_set{false};
+    bool info_title_set{false};
+    std::string info_author;
+    std::string info_creator;
+    std::string info_keywords;
+    std::string info_producer;
+    std::string info_subject;
+    std::string info_title;
     bool remove_structure{false};
     size_t oi_min_width{DEFAULT_OI_MIN_WIDTH};
     size_t oi_min_height{DEFAULT_OI_MIN_HEIGHT};

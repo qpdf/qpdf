@@ -114,6 +114,14 @@ QPDFJob::Config::allowWeakCrypto()
 }
 
 QPDFJob::Config*
+QPDFJob::Config::author(std::string const& parameter)
+{
+    o.m->info_author_set = true;
+    o.m->info_author = parameter;
+    return this;
+}
+
+QPDFJob::Config*
 QPDFJob::Config::check()
 {
     o.m->check = true;
@@ -205,6 +213,14 @@ QPDFJob::Config::copyEncryption(std::string const& parameter)
 }
 
 QPDFJob::Config*
+QPDFJob::Config::creator(std::string const& parameter)
+{
+    o.m->info_creator_set = true;
+    o.m->info_creator = parameter;
+    return this;
+}
+
+QPDFJob::Config*
 QPDFJob::Config::decrypt()
 {
     o.m->decrypt = true;
@@ -241,6 +257,14 @@ QPDFJob::Config*
 QPDFJob::Config::filteredStreamData()
 {
     o.m->show_filtered_stream_data = true;
+    return this;
+}
+
+QPDFJob::Config*
+QPDFJob::Config::keywords(std::string const& parameter)
+{
+    o.m->info_keywords_set = true;
+    o.m->info_keywords = parameter;
     return this;
 }
 
@@ -395,6 +419,14 @@ QPDFJob::Config::testJsonSchema()
 }
 
 QPDFJob::Config*
+QPDFJob::Config::title(std::string const& parameter)
+{
+    o.m->info_title_set = true;
+    o.m->info_title = parameter;
+    return this;
+}
+
+QPDFJob::Config*
 QPDFJob::Config::keepFilesOpen(std::string const& parameter)
 {
     o.m->inputs.keep_files_open_set = true;
@@ -533,6 +565,14 @@ QPDFJob::Config*
 QPDFJob::Config::progress()
 {
     o.m->progress = true;
+    return this;
+}
+
+QPDFJob::Config*
+QPDFJob::Config::producer(std::string const& parameter)
+{
+    o.m->info_producer_set = true;
+    o.m->info_producer = parameter;
     return this;
 }
 
@@ -791,6 +831,14 @@ QPDFJob::Config::streamData(std::string const& parameter)
     } else {
         usage("invalid stream-data option");
     }
+    return this;
+}
+
+QPDFJob::Config*
+QPDFJob::Config::subject(std::string const& parameter)
+{
+    o.m->info_subject_set = true;
+    o.m->info_subject = parameter;
     return this;
 }
 

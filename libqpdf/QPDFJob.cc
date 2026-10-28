@@ -83,6 +83,42 @@ namespace
         std::string prefix;
         std::string filename;
     };
+
+    void
+    apply_info_metadata(
+        QPDF& pdf,
+        bool author_set,
+        std::string const& author,
+        bool creator_set,
+        std::string const& creator,
+        bool keywords_set,
+        std::string const& keywords,
+        bool producer_set,
+        std::string const& producer,
+        bool subject_set,
+        std::string const& subject,
+        bool title_set,
+        std::string const& title)
+    {
+        if (author_set || creator_set || keywords_set || producer_set || subject_set || title_set) {
+            auto trailer = pdf.getTrailer();
+            if (!trailer.hasKey("/Info")) {
+                trailer.replaceKey("/Info", pdf.makeIndirectObject(QPDFObjectHandle::newDictionary()));
+            }
+            auto info = trailer.getKey("/Info");
+            auto set_info = [&](char const* key, bool set, std::string const& value) {
+                if (set) {
+                    info.replaceKey(key, QPDFObjectHandle::newUnicodeString(value));
+                }
+            };
+            set_info("/Author", author_set, author);
+            set_info("/Creator", creator_set, creator);
+            set_info("/Keywords", keywords_set, keywords);
+            set_info("/Producer", producer_set, producer);
+            set_info("/Subject", subject_set, subject);
+            set_info("/Title", title_set, title);
+        }
+    }
 } // namespace
 
 ImageOptimizer::ImageOptimizer(
@@ -459,6 +495,21 @@ QPDFJob::createQPDF()
         root.erase("/StructTreeRoot");
         root.erase("/MarkInfo");
     }
+
+    apply_info_metadata(
+        pdf,
+        m->info_author_set,
+        m->info_author,
+        m->info_creator_set,
+        m->info_creator,
+        m->info_keywords_set,
+        m->info_keywords,
+        m->info_producer_set,
+        m->info_producer,
+        m->info_subject_set,
+        m->info_subject,
+        m->info_title_set,
+        m->info_title);
 
     return pdf_sp;
 }
@@ -3026,6 +3077,20 @@ QPDFJob::doSplitPages(QPDF& pdf)
         if (QUtil::same_file(m->infile_nm(), outfile.data())) {
             throw std::runtime_error("split pages would overwrite input file with " + outfile);
         }
+        apply_info_metadata(
+            outpdf,
+            m->info_author_set,
+            m->info_author,
+            m->info_creator_set,
+            m->info_creator,
+            m->info_keywords_set,
+            m->info_keywords,
+            m->info_producer_set,
+            m->info_producer,
+            m->info_subject_set,
+            m->info_subject,
+            m->info_title_set,
+            m->info_title);
         Writer w(outpdf, m->w_cfg);
         w.setOutputFilename(outfile.data());
         setWriterOptions(w);
