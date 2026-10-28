@@ -482,24 +482,6 @@ popHandler(); // key: subject
 pushKey("title");
 addParameter([this](std::string const& p) { c_main->title(p); });
 popHandler(); // key: title
-pushKey("Author");
-addParameter([this](std::string const& p) { c_main->author(p); });
-popHandler(); // key: Author
-pushKey("Creator");
-addParameter([this](std::string const& p) { c_main->creator(p); });
-popHandler(); // key: Creator
-pushKey("Keywords");
-addParameter([this](std::string const& p) { c_main->keywords(p); });
-popHandler(); // key: Keywords
-pushKey("Producer");
-addParameter([this](std::string const& p) { c_main->producer(p); });
-popHandler(); // key: Producer
-pushKey("Subject");
-addParameter([this](std::string const& p) { c_main->subject(p); });
-popHandler(); // key: Subject
-pushKey("Title");
-addParameter([this](std::string const& p) { c_main->title(p); });
-popHandler(); // key: Title
 pushKey("overlay");
 beginArray(bindJSON(&Handlers::beginOverlayArray), bindBare(&Handlers::endOverlayArray)); // .overlay[]
 beginDict(bindJSON(&Handlers::beginOverlay), bindBare(&Handlers::endOverlay)); // .overlay

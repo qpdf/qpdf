@@ -172,12 +172,6 @@ static constexpr char const* JOB_SCHEMA_DATA = R"({
   "producer": "set document producer",
   "subject": "set document subject",
   "title": "set document title",
-  "Author": "set document author",
-  "Creator": "set document creator",
-  "Keywords": "set document keywords",
-  "Producer": "set document producer",
-  "Subject": "set document subject",
-  "Title": "set document title",
   "overlay": [
     {
       "file": "source for pages",
