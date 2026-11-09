@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <cstring>
+#include <new>
 #include <stdexcept>
 
 using namespace qpdf;
@@ -83,6 +84,9 @@ Pl_Buffer::getMallocBuffer(unsigned char** buf, size_t* len)
     *len = size;
     if (size > 0) {
         *buf = reinterpret_cast<unsigned char*>(malloc(size));
+        if (*buf == nullptr) {
+            throw std::bad_alloc();
+        }
         memcpy(*buf, m->data.data(), size);
     } else {
         *buf = nullptr;
