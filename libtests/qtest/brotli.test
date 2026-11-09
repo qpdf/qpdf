@@ -1,0 +1,13 @@
+#!/usr/bin/env perl
+require 5.008;
+use warnings;
+use strict;
+
+require TestDriver;
+
+my $td = new TestDriver('brotli');
+$td->runtest("Brotli stream decoding (or preservation when disabled)",
+             {$td->COMMAND => "brotli brotli/streams.pdf"},
+             {$td->STRING => "Brotli tests complete\n", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->report(1);

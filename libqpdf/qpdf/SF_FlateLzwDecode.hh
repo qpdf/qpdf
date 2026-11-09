@@ -8,8 +8,10 @@
 class SF_FlateLzwDecode final: public QPDFStreamFilter
 {
   public:
-    SF_FlateLzwDecode(bool lzw) :
-        lzw(lzw)
+    enum compression_e { flate, lzw, brotli };
+
+    SF_FlateLzwDecode(compression_e compression) :
+        compression(compression)
     {
     }
     ~SF_FlateLzwDecode() final = default;
@@ -20,16 +22,22 @@ class SF_FlateLzwDecode final: public QPDFStreamFilter
     static std::shared_ptr<QPDFStreamFilter>
     flate_factory()
     {
-        return std::make_shared<SF_FlateLzwDecode>(false);
+        return std::make_shared<SF_FlateLzwDecode>(flate);
     }
     static std::shared_ptr<QPDFStreamFilter>
     lzw_factory()
     {
-        return std::make_shared<SF_FlateLzwDecode>(true);
+        return std::make_shared<SF_FlateLzwDecode>(lzw);
+    }
+
+    static std::shared_ptr<QPDFStreamFilter>
+    brotli_factory()
+    {
+        return std::make_shared<SF_FlateLzwDecode>(brotli);
     }
 
   private:
-    bool lzw{};
+    compression_e compression;
     // Defaults as per the PDF spec
     int predictor{1};
     int columns{1};

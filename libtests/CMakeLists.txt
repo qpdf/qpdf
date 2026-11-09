@@ -6,6 +6,7 @@ set(TEST_PROGRAMS
   base64
   bits
   buffer
+  brotli
   closed_file_input_source
   concatenate
   crypto_provider

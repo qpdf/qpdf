@@ -3,10 +3,10 @@ set -ex
 sudo apt-get update
 sudo apt-get -y install \
    build-essential cmake zlib1g-dev libjpeg-dev libgnutls28-dev \
-   libssl-dev libtiff-tools ghostscript zsh
+   libssl-dev libtiff-tools ghostscript zsh libbrotli-dev
 cmake -S . -B build -DCI_MODE=1 -DCMAKE_BUILD_TYPE=RelWithDebInfo \
       -DREQUIRE_CRYPTO_OPENSSL=1 -DREQUIRE_CRYPTO_GNUTLS=1 \
-      -DREQUIRE_SHELLS=1
+      -DREQUIRE_SHELLS=1 -DBROTLI=ON
 cmake --build build --verbose -j$(nproc) -- -k
 cd build
 # Make sure char is signed by default -- see also test-unsigned-char

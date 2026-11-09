@@ -1,4 +1,5 @@
 /* options */
+#cmakedefine BROTLI 1
 #cmakedefine AVOID_WINDOWS_HANDLE 1
 #cmakedefine DEFAULT_CRYPTO "${DEFAULT_CRYPTO}"
 #cmakedefine USE_CRYPTO_GNUTLS 1

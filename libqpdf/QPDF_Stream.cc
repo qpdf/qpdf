@@ -19,6 +19,7 @@
 #include <qpdf/SF_DCTDecode.hh>
 #include <qpdf/SF_FlateLzwDecode.hh>
 #include <qpdf/SF_RunLengthDecode.hh>
+#include <qpdf/qpdf-config.h>
 
 #include <stdexcept>
 
@@ -235,6 +236,11 @@ QPDF_Stream::Members::filter_factory(std::string const& name) const
     if (name == "/FlateDecode") {
         return SF_FlateLzwDecode::flate_factory;
     }
+#ifdef BROTLI
+    if (name == "/BrotliDecode") {
+        return SF_FlateLzwDecode::brotli_factory;
+    }
+#endif
     if (name == "/Crypt") {
         return []() { return std::make_shared<SF_Crypt>(); };
     }

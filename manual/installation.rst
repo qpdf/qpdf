@@ -317,6 +317,13 @@ QTEST_COLOR
   Turn this on or off to control whether qtest uses color in its
   output.
 
+BROTLI
+  Enable reading ``/BrotliDecode`` streams with the Brotli decoder
+  library (off by default). Install the Brotli development headers and
+  decoder/common libraries, then configure with ``-DBROTLI=ON``.
+  Both ordinary and large-window Brotli streams are supported, including
+  TIFF and PNG predictors. No Brotli encoder is required.
+
 ZOPFLI
   Use the `zopfli <https://github.com/google/zopfli>`__ library for
   zlib-compatible compression. See :ref:`zopfli`.

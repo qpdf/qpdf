@@ -1,5 +1,10 @@
 #include <qpdf/SF_FlateLzwDecode.hh>
 
+#include <qpdf/qpdf-config.h>
+#ifdef BROTLI
+# include <qpdf/Pl_Brotli.hh>
+#endif
+
 #include <qpdf/Pl_Flate.hh>
 #include <qpdf/Pl_LZWDecoder.hh>
 #include <qpdf/Pl_PNGFilter.hh>
@@ -47,7 +52,7 @@ SF_FlateLzwDecode::setDecodeParms(QPDFObjectHandle decode_parms)
             } else {
                 return false;
             }
-        } else if (lzw && (key == "/EarlyChange")) {
+        } else if (compression == lzw && (key == "/EarlyChange")) {
             if (value.isInteger()) {
                 int earlychange = value.getIntValueAsInt();
                 early_code_change = (earlychange == 1);
@@ -95,7 +100,12 @@ SF_FlateLzwDecode::getDecodePipeline(Pipeline* next)
         pipelines.push_back(std::move(pipeline));
     }
 
-    if (lzw) {
+#ifdef BROTLI
+    if (compression == brotli) {
+        pipeline = std::make_unique<Pl_Brotli>("brotli decode", next);
+    } else
+#endif
+        if (compression == lzw) {
         pipeline = std::make_unique<Pl_LZWDecoder>("lzw decode", next, early_code_change);
     } else {
         pipeline = std::make_unique<Pl_Flate>("stream inflate", next, Pl_Flate::a_inflate);

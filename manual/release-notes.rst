@@ -12,7 +12,15 @@ Prior to version 12, file :file:`ChangeLog` contained more detail.
 From version 12 onward, please consult version control history for
 more detail.
 
-.. x.y.z: not yet released
+x.y.z: not yet released
+
+  - Add optional reading support for the PDF Association's
+    ``/BrotliDecode`` extension, including large-window streams and
+    TIFF/PNG predictors. Configure with ``-DBROTLI=ON`` and install the
+    Brotli decoder development files. Decoding streams uses bounded
+    buffers and applies the Flate memory limit separately to decoded
+    output and decoder allocations. Normal rewrites convert Brotli
+    streams to Flate; qpdf does not emit Brotli-compressed data.
 
 12.4.2: September 26, 2026
   - Enhancements

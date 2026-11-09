@@ -923,7 +923,11 @@ Related Options
      generalized filters as those to be used for general-purpose
      compression or encoding, as opposed to filters specifically
      designed for image data. This is the default except when
-     :qpdf:ref:`--json-output` is given.
+     :qpdf:ref:`--json-output` is given. Builds configured with
+     ``-DBROTLI=ON`` also decode ``/BrotliDecode`` streams. These are
+     recompressed with Flate on a normal rewrite, allowing conversion
+     for readers that do not support the PDF Association's
+     `Brotli extension <https://pdfa.org/resource/extension-brotli/>`__.
 
    - :samp:`specialized`: in addition to generalized, decode streams
      with supported non-lossy specialized filters; currently this is

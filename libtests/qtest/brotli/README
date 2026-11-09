@@ -1,0 +1,11 @@
+streams.pdf is a synthetic PDF 2.0 file with no customer data. Its page paints
+one black square. /BrotliDecode is used for all three kinds of streams:
+
+- Page content (object 4).
+- An object stream (object 6) containing object 5, a dictionary with
+  /Value (Brotli object stream), referenced from the catalog's /Test key.
+- The cross-reference stream (object 7), which additionally uses PNG Up
+  prediction (/Predictor 12, /Columns 7, /W [1 4 2]).
+
+Streams were compressed using the reference Brotli 1.2.1 CLI at quality 11.
+The file includes the PDF Association's PDFa developer extension dictionary.

@@ -102,6 +102,8 @@ option(STATIC_OPENSSL "Link statically with openssl" OFF)
 set(STATIC_EXTRA_LIBS "" CACHE STRING
   "Additional libraries needed for static linking")
 
+option(BROTLI "Decode Brotli-compressed PDF streams" OFF)
+
 option(ZOPFLI, "Use zopfli for zlib-compatible compression")
 
 # INSTALL_MANUAL is not dependent on building docs. When creating some
