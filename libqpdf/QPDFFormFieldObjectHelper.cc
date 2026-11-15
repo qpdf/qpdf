@@ -11,6 +11,7 @@
 #include <qpdf/QPDF_private.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
+#include <algorithm>
 #include <cstdlib>
 
 #include <memory>
@@ -712,7 +713,13 @@ ValueSetter::writeAppearance()
 
     // Write one or more lines, centered vertically, possibly with one row highlighted.
 
-    auto max_rows = static_cast<size_t>((bbox.ury - bbox.lly) / tfh);
+    // The bounding box comes from the file and may be arbitrarily large. Converting an out-of-range
+    // double to size_t is undefined, so clamp first. Rows beyond the number of options are unused.
+    double rows = (bbox.ury - bbox.lly) / tfh;
+    size_t max_rows = 0;
+    if (rows >= 1.0) {
+        max_rows = static_cast<size_t>(std::min(rows, static_cast<double>(opt.size() + 1)));
+    }
     bool highlight = false;
     size_t highlight_idx = 0;
 

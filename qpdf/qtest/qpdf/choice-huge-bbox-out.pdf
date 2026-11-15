@@ -1,0 +1,152 @@
+%PDF-1.7
+%¿÷¢þ
+%QDF-1.0
+
+1 0 obj
+<<
+  /AcroForm <<
+    /DA (/Helv 0 Tf 0 g)
+    /DR <<
+      /Font <<
+        /Helv 2 0 R
+      >>
+    >>
+    /Fields [
+      3 0 R
+    ]
+  >>
+  /Pages 4 0 R
+  /Type /Catalog
+>>
+endobj
+
+2 0 obj
+<<
+  /BaseFont /Helvetica
+  /Encoding /WinAnsiEncoding
+  /Subtype /Type1
+  /Type /Font
+>>
+endobj
+
+3 0 obj
+<<
+  /AP <<
+    /N 5 0 R
+  >>
+  /DA (/Helv 12 Tf 0 g)
+  /FT /Ch
+  /Opt [
+    (one)
+    (two)
+    (three)
+    (four)
+    (five)
+  ]
+  /P 7 0 R
+  /Rect [
+    100
+    100
+    200
+    150
+  ]
+  /Subtype /Widget
+  /T (list)
+  /Type /Annot
+  /V (one)
+>>
+endobj
+
+4 0 obj
+<<
+  /Count 1
+  /Kids [
+    7 0 R
+  ]
+  /Type /Pages
+>>
+endobj
+
+5 0 obj
+<<
+  /BBox [
+    0
+    0
+    100
+    1000000000000000000000000.0
+  ]
+  /Resources <<
+    /Font <<
+      /Helv 2 0 R
+    >>
+  >>
+  /Subtype /Form
+  /Type /XObject
+  /Length 6 0 R
+>>
+stream
+/Tx BMC
+q
+0.85 0.85 0.85 rg
+0 499999999999999991611392 100 14.4 re f
+Q
+q
+BT
+/Helv 12 Tf 0 g
+1 499999999999999991611392 Td
+(one) Tj
+0 -14.4 Td
+(two) Tj
+0 -14.4 Td
+(three) Tj
+0 -14.4 Td
+(four) Tj
+0 -14.4 Td
+(five) Tj
+ET
+Q
+EMC
+endstream
+endobj
+
+6 0 obj
+224
+endobj
+
+%% Page 1
+7 0 obj
+<<
+  /Annots [
+    3 0 R
+  ]
+  /MediaBox [
+    0
+    0
+    612
+    792
+  ]
+  /Parent 4 0 R
+  /Resources <<
+  >>
+  /Type /Page
+>>
+endobj
+
+xref
+0 8
+0000000000 65535 f 
+0000000025 00000 n 
+0000000218 00000 n 
+0000000324 00000 n 
+0000000588 00000 n 
+0000000660 00000 n 
+0000001098 00000 n 
+0000001128 00000 n 
+trailer <<
+  /Root 1 0 R
+  /Size 8
+  /ID [<31415926535897932384626433832795><31415926535897932384626433832795>]
+>>
+startxref
+1273
+%%EOF
