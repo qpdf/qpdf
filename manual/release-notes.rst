@@ -12,7 +12,11 @@ Prior to version 12, file :file:`ChangeLog` contained more detail.
 From version 12 onward, please consult version control history for
 more detail.
 
-.. x.y.z: not yet released
+x.y.z: not yet released
+  - Bug fixes
+
+    - Normalize leading plus signs and signed leading zeros in PDF real numbers when writing JSON,
+      preserving decimal precision and producing valid JSON numeric syntax.
 
 12.4.2: September 26, 2026
   - Enhancements
