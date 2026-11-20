@@ -114,6 +114,23 @@ test_main()
         check(QPDFObjectHandle::newReal("-78.").getJSON(i), "-78.0");
         check(QPDFObjectHandle::newReal("0000612.00").getJSON(i), "612.00");
         check(QPDFObjectHandle::newReal("000000").getJSON(i), "0");
+        check(QPDFObjectHandle::newReal("+.5").getJSON(i), "0.5");
+        check(QPDFObjectHandle::newReal("+1.5").getJSON(i), "1.5");
+        check(QPDFObjectHandle::newReal("+612.").getJSON(i), "612.0");
+        check(QPDFObjectHandle::newReal("-007.5").getJSON(i), "-7.5");
+        check(QPDFObjectHandle::newReal("-00.25").getJSON(i), "-0.25");
+        check(QPDFObjectHandle::newReal("+0000612.00").getJSON(i), "612.00");
+        check(QPDFObjectHandle::newReal("-0000612.00").getJSON(i), "-612.00");
+        check(QPDFObjectHandle::newReal("+000000").getJSON(i), "0");
+        check(QPDFObjectHandle::newReal("-000000").getJSON(i), "-0");
+        check(QPDFObjectHandle::newReal("+000.").getJSON(i), "0.0");
+        check(QPDFObjectHandle::newReal("-000.").getJSON(i), "-0.0");
+        check(QPDFObjectHandle::newReal("+000.1250").getJSON(i), "0.1250");
+        check(QPDFObjectHandle::newReal("-000.1250").getJSON(i), "-0.1250");
+        check(
+            QPDFObjectHandle::newReal("-000123456789012345678901234567890.1234567890123456789")
+                .getJSON(i),
+            "-123456789012345678901234567890.1234567890123456789");
     }
     JSON jmap2 = JSON::parse(R"({"a": 1, "b": "two", "c": [true]})");
     std::map<std::string, std::string> dvalue;
