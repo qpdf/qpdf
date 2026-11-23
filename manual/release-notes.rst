@@ -14,6 +14,14 @@ more detail.
 
 .. x.y.z: not yet released
 
+12.4.3: not yet released
+  - Bug fixes
+
+    - Fix a replacement made with ``QPDF::replaceObject``, including through
+      :qpdf:ref:`--update-from-json`, being silently lost when the replaced object was stored in an
+      object stream that qpdf had not read yet. Reading that object stream later, for example to
+      get another object stored in it while writing, put the original object back.
+
 12.4.2: September 26, 2026
   - Enhancements
 
