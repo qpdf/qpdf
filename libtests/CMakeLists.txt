@@ -67,3 +67,11 @@ add_test(
   --tc "${qpdf_SOURCE_DIR}/libtests/*.cc"
   --tc "${qpdf_SOURCE_DIR}/libqpdf/*.cc"
   --tc "${qpdf_SOURCE_DIR}/libqpdf/qpdf/bits_functions.hh")
+
+# Allocation-failure injection uses the GNU-compatible Linux linker wrapper.
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  add_executable(malloc_failure malloc_failure.cc)
+  target_link_libraries(malloc_failure libqpdf_object)
+  target_link_options(malloc_failure PRIVATE "-Wl,--wrap=malloc")
+  add_test(NAME malloc_failure COMMAND malloc_failure)
+endif()
