@@ -12,12 +12,13 @@ Prior to version 12, file :file:`ChangeLog` contained more detail.
 From version 12 onward, please consult version control history for
 more detail.
 
-x.y.z: not yet released
+.. x.y.z: not yet released
+
+12.4.3: not yet released
   - Bug fixes
 
     - Preserve existing Flate-compressed streams when ``/Filter`` is a one-element array, just as
-      when it is a name. This avoids unnecessary recompression and preserves decode parameters,
-      including predictors. Explicit ``--recompress-flate`` behavior is unchanged.
+      when it is a name.
 
 12.4.2: September 26, 2026
   - Enhancements
