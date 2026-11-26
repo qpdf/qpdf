@@ -21,6 +21,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <stdexcept>
+#include <string_view>
 
 using namespace std::literals;
 using namespace qpdf;
@@ -566,17 +567,21 @@ BaseHandle::write_json(int json_version, JSON::Writer& p) const
         break;
     case ::ot_real:
         {
-            auto const& val = std::get<QPDF_Real>(obj->value).val;
+            std::string_view val = std::get<QPDF_Real>(obj->value).val;
+            if (!val.empty() && (val.at(0) == '-' || val.at(0) == '+')) {
+                if (val.at(0) == '-') {
+                    p << "-";
+                }
+                val.remove_prefix(1);
+            }
             if (val.empty()) {
                 // Can't really happen...
                 p << "0";
             } else if (val.at(0) == '.') {
                 p << "0" << val;
-            } else if (val.length() >= 2 && val.at(0) == '-' && val.at(1) == '.') {
-                p << "-0." << val.substr(2);
             } else if (val.at(0) == '0') {
                 auto i = val.find_first_not_of('0');
-                if (i == std::string::npos) {
+                if (i == std::string_view::npos) {
                     p << "0";
                 } else if (val.at(i) == '.') {
                     p << "0" << val.substr(i);
@@ -586,7 +591,7 @@ BaseHandle::write_json(int json_version, JSON::Writer& p) const
             } else {
                 p << val;
             }
-            if (val.back() == '.') {
+            if (!val.empty() && val.back() == '.') {
                 p << "0";
             }
         }
