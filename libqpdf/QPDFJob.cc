@@ -2538,8 +2538,10 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     doIfVerbose([&](Pipeline& v, std::string const& prefix) {
         v << prefix << ": removing unreferenced pages from primary input\n";
     });
-    for (auto const& page: main_input.orig_pages) {
-        pdf.removePage(page);
+    // Removing the last page leaves the indices of all remaining pages unchanged.
+    auto const& pages = main_input.orig_pages;
+    for (auto it = pages.rbegin(); it != pages.rend(); ++it) {
+        pdf.removePage(*it);
     }
 
     auto n_collate = m->collate.size();
