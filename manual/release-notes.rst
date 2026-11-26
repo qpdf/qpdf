@@ -17,6 +17,13 @@ more detail.
 12.4.3: not yet released
   - Bug fixes
 
+    - Read 32-bit linearization hint offsets as unsigned
+
+    - ``fix-qdf``: Don't lose object streams that were not written by qpdf in QDF style
+
+    - Fix regression: counting duplicated dictionary keys as token errors could cause complete loss
+      of some PDF dictionaries. This bug was introduced in 12.4.0.
+
     - Preserve existing Flate-compressed streams when ``/Filter`` is a one-element array, just as
       when it is a name.
 
@@ -24,6 +31,8 @@ more detail.
 
     - Normalize leading plus signs and signed leading zeros in PDF real numbers when writing JSON,
       preserving decimal precision and producing valid JSON numeric syntax.
+
+    - Include many small, contributed fixes for various edge cases
 
 12.4.2: September 26, 2026
   - Enhancements
