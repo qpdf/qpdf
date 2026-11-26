@@ -26,10 +26,16 @@ more detail.
     - Read 32-bit linearization hint offsets as unsigned
 
     - Bound shared object counts in linearization hint tables by the number of objects in the
-      file, preventing memory exhaustion when checking or showing linearization of a crafted file
+      file, preventing memory exhaustion when checking or showing linearization of a crafted file.
+      This fixes a security vulnerability (GHSA-248r-xqc3-9538). Packagers can backport the fix to
+      earlier versions by applying commit 1894bd5a3e12aafe1624d92b5eff9ad1ca6024ee, which contains
+      only this fix.
 
     - Reject PNG predictor parameters whose row size is the maximum 32-bit value, preventing a heap
-      buffer overflow when decoding a crafted stream. This bug was introduced in 12.4.0.
+      buffer overflow when decoding a crafted stream. This bug was introduced in 12.4.0. This fixes
+      a security vulnerability (GHSA-xx67-gh88-599v). Packagers can backport the fix to earlier
+      versions by applying commit 42e2c965d7d66220ae9d81c79acff5475f57baf3, which contains only
+      this fix.
 
     - ``fix-qdf``: Don't lose object streams that were not written by qpdf in QDF style
 
