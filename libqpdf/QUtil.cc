@@ -374,6 +374,18 @@ QUtil::double_to_string(double num, int decimal_places, bool trim_trailing_zeroe
     return result;
 }
 
+std::optional<double>
+util::string_to_double(std::string const& str)
+{
+    std::istringstream buf(str);
+    buf.imbue(std::locale::classic());
+    double result;
+    if (buf >> result) {
+        return result;
+    }
+    return std::nullopt;
+}
+
 long long
 QUtil::string_to_ll(char const* str)
 {
@@ -1522,7 +1534,7 @@ QUtil::get_next_utf8_codepoint(std::string const& utf8_val, size_t& pos, bool& e
         lower_bound = 1 << 16;
         break;
     case 5:
-        lower_bound = 1 << 12;
+        lower_bound = 1 << 21;
         break;
     case 6:
         lower_bound = 1 << 26;

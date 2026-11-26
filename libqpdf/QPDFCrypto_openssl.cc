@@ -127,7 +127,7 @@ QPDFCrypto_openssl::MD5_init()
 void
 QPDFCrypto_openssl::SHA2_init(int bits)
 {
-    static const EVP_MD* md = EVP_sha512();
+    const EVP_MD* md = nullptr;
     switch (bits) {
     case 256:
         md = EVP_sha256();

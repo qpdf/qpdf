@@ -692,19 +692,19 @@ Lin::readHPageOffset(BitStream h)
 
     HPageOffset& t = page_offset_hints_;
 
-    t.min_nobjects = h.getBitsInt(32);               // 1
-    t.first_page_offset = h.getBitsInt(32);          // 2
-    t.nbits_delta_nobjects = h.getBitsInt(16);       // 3
-    t.min_page_length = h.getBitsInt(32);            // 4
-    t.nbits_delta_page_length = h.getBitsInt(16);    // 5
-    t.min_content_offset = h.getBitsInt(32);         // 6
-    t.nbits_delta_content_offset = h.getBitsInt(16); // 7
-    t.min_content_length = h.getBitsInt(32);         // 8
-    t.nbits_delta_content_length = h.getBitsInt(16); // 9
-    t.nbits_nshared_objects = h.getBitsInt(16);      // 10
-    t.nbits_shared_identifier = h.getBitsInt(16);    // 11
-    t.nbits_shared_numerator = h.getBitsInt(16);     // 12
-    t.shared_denominator = h.getBitsInt(16);         // 13
+    t.min_nobjects = h.getBitsInt(32);                     // 1
+    t.first_page_offset = QIntC::to_offset(h.getBits(32)); // 2
+    t.nbits_delta_nobjects = h.getBitsInt(16);             // 3
+    t.min_page_length = h.getBitsInt(32);                  // 4
+    t.nbits_delta_page_length = h.getBitsInt(16);          // 5
+    t.min_content_offset = h.getBitsInt(32);               // 6
+    t.nbits_delta_content_offset = h.getBitsInt(16);       // 7
+    t.min_content_length = h.getBitsInt(32);               // 8
+    t.nbits_delta_content_length = h.getBitsInt(16);       // 9
+    t.nbits_nshared_objects = h.getBitsInt(16);            // 10
+    t.nbits_shared_identifier = h.getBitsInt(16);          // 11
+    t.nbits_shared_numerator = h.getBitsInt(16);           // 12
+    t.shared_denominator = h.getBitsInt(16);               // 13
 
     std::vector<HPageOffsetEntry>& entries = t.entries;
     entries.clear();
@@ -739,13 +739,13 @@ Lin::readHSharedObject(BitStream h)
 {
     HSharedObject& t = shared_object_hints_;
 
-    t.first_shared_obj = h.getBitsInt(32);         // 1
-    t.first_shared_offset = h.getBitsInt(32);      // 2
-    t.nshared_first_page = h.getBitsInt(32);       // 3
-    t.nshared_total = h.getBitsInt(32);            // 4
-    t.nbits_nobjects = h.getBitsInt(16);           // 5
-    t.min_group_length = h.getBitsInt(32);         // 6
-    t.nbits_delta_group_length = h.getBitsInt(16); // 7
+    t.first_shared_obj = h.getBitsInt(32);                   // 1
+    t.first_shared_offset = QIntC::to_offset(h.getBits(32)); // 2
+    t.nshared_first_page = h.getBitsInt(32);                 // 3
+    t.nshared_total = h.getBitsInt(32);                      // 4
+    t.nbits_nobjects = h.getBitsInt(16);                     // 5
+    t.min_group_length = h.getBitsInt(32);                   // 6
+    t.nbits_delta_group_length = h.getBitsInt(16);           // 7
 
     QTC::TC(
         "qpdf",
@@ -773,10 +773,10 @@ Lin::readHSharedObject(BitStream h)
 void
 Lin::readHGeneric(BitStream h, HGeneric& t)
 {
-    t.first_object = h.getBitsInt(32);        // 1
-    t.first_object_offset = h.getBitsInt(32); // 2
-    t.nobjects = h.getBitsInt(32);            // 3
-    t.group_length = h.getBitsInt(32);        // 4
+    t.first_object = h.getBitsInt(32);                       // 1
+    t.first_object_offset = QIntC::to_offset(h.getBits(32)); // 2
+    t.nobjects = h.getBitsInt(32);                           // 3
+    t.group_length = h.getBitsInt(32);                       // 4
 }
 
 void

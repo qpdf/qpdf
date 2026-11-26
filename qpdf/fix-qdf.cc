@@ -70,6 +70,7 @@ class QdfFixer
     size_t ostream_idx{0};
     int ostream_id{0};
     std::string ostream_extends;
+    size_t ostream_dict_lcount{0};
 };
 
 QdfFixer::QdfFixer(std::string const& filename, std::ostream& out) :
@@ -178,7 +179,17 @@ QdfFixer::processLines(std::string const& input)
             }
         } else if (state == st_in_ostream_dict) {
             if (line.compare("stream\n"sv) == 0) {
+                ostream_dict_lcount = ostream_discarded.size();
+                stream_start = offset;
                 state = st_in_ostream_offsets;
+            } else if (line.compare("endobj\n"sv) == 0) {
+                for (auto const& l: ostream_discarded) {
+                    out << l;
+                }
+                out << line;
+                state = st_top;
+                ostream_discarded.clear();
+                ostream_extends.clear();
             } else {
                 ostream_discarded.push_back(line);
                 if (matches(re_extends)) {
@@ -192,6 +203,20 @@ QdfFixer::processLines(std::string const& input)
                 stream_start = last_offset;
                 state = st_in_ostream_outer;
                 ostream.push_back(line);
+            } else if (line.compare("endstream\n"sv) == 0) {
+                for (size_t i = 0; i < ostream_dict_lcount; ++i) {
+                    out << ostream_discarded[i];
+                }
+                out << "stream\n";
+                for (size_t i = ostream_dict_lcount; i < ostream_discarded.size(); ++i) {
+                    out << ostream_discarded[i];
+                }
+                out << line;
+                stream_length = QIntC::to_size(last_offset - stream_start);
+                state = st_after_stream;
+                ostream_discarded.clear();
+                ostream_extends.clear();
+                ostream_dict_lcount = 0;
             } else {
                 ostream_discarded.push_back(line);
             }
@@ -354,6 +379,7 @@ QdfFixer::writeOstream()
     ostream_offsets.clear();
     ostream_discarded.clear();
     ostream_extends.clear();
+    ostream_dict_lcount = 0;
 }
 
 void

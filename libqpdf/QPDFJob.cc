@@ -2,6 +2,7 @@
 
 #include <cstring>
 #include <iostream>
+#include <limits>
 #include <memory>
 
 #include <qpdf/AcroForm.hh>
@@ -134,18 +135,25 @@ ImageOptimizer::makePipeline(std::string const& description, Pipeline* next)
         return {};
     }
     // Files have been seen in the wild whose width and height are floating point, which is goofy,
-    // but we can deal with it.
+    // but we can deal with it. Converting an out-of-range double to an integer is undefined, so
+    // treat such values as 0, which is what getUIntValueAsUInt returns for out-of-range integers.
+    auto real_to_dimension = [](double val) -> JDIMENSION {
+        if (val >= 0.0 && val <= static_cast<double>(std::numeric_limits<JDIMENSION>::max())) {
+            return static_cast<JDIMENSION>(val);
+        }
+        return 0;
+    };
     JDIMENSION w = 0;
     if (w_obj.isInteger()) {
         w = w_obj.getUIntValueAsUInt();
     } else {
-        w = static_cast<JDIMENSION>(w_obj.getNumericValue());
+        w = real_to_dimension(w_obj.getNumericValue());
     }
     JDIMENSION h = 0;
     if (h_obj.isInteger()) {
         h = h_obj.getUIntValueAsUInt();
     } else {
-        h = static_cast<JDIMENSION>(h_obj.getNumericValue());
+        h = real_to_dimension(h_obj.getNumericValue());
     }
     std::string colorspace = (colorspace_obj.isName() ? colorspace_obj.getName() : std::string());
     int components = 0;
@@ -2538,8 +2546,10 @@ QPDFJob::handlePageSpecs(QPDF& pdf)
     doIfVerbose([&](Pipeline& v, std::string const& prefix) {
         v << prefix << ": removing unreferenced pages from primary input\n";
     });
-    for (auto const& page: main_input.orig_pages) {
-        pdf.removePage(page);
+    // Removing the last page leaves the indices of all remaining pages unchanged.
+    auto const& pages = main_input.orig_pages;
+    for (auto it = pages.rbegin(); it != pages.rend(); ++it) {
+        pdf.removePage(*it);
     }
 
     auto n_collate = m->collate.size();
