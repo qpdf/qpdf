@@ -12,16 +12,15 @@ Prior to version 12, file :file:`ChangeLog` contained more detail.
 From version 12 onward, please consult version control history for
 more detail.
 
-Next release
-------------
-
-* Speed up page selection with :qpdf:ref:`--pages` when the primary input has many pages.
+.. x.y.z: not yet released
 
 12.4.3: not yet released
   - Bug fixes
 
     - Preserve existing Flate-compressed streams when ``/Filter`` is a one-element array, just as
       when it is a name.
+
+    - Speed up page selection with :qpdf:ref:`--pages` when the primary input has many pages.
 
 12.4.2: September 26, 2026
   - Enhancements
