@@ -25,6 +25,9 @@ more detail.
 
     - Read 32-bit linearization hint offsets as unsigned
 
+    - Bound shared object counts in linearization hint tables by the number of objects in the
+      file, preventing memory exhaustion when checking or showing linearization of a crafted file
+
     - ``fix-qdf``: Don't lose object streams that were not written by qpdf in QDF style
 
     - Fix regression: counting duplicated dictionary keys as token errors could cause complete loss

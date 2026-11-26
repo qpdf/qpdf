@@ -14,7 +14,7 @@ cleanup();
 
 my $td = new TestDriver('bound-checks');
 
-my $n_tests = 3;
+my $n_tests = 6;
 
 $td->runtest("bounds check linearization data 1",
              {$td->COMMAND => "qpdf --check linearization-bounds-1.pdf"},
@@ -31,6 +31,27 @@ $td->runtest("sanity check array size",
              {$td->COMMAND =>
                   "qpdf --check linearization-large-vector-alloc.pdf"},
              {$td->FILE => "linearization-large-vector-alloc.out",
+              $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+# A plausible count whose entries run past the end of the hint stream
+$td->runtest("shared object table overruns bit stream",
+             {$td->COMMAND =>
+                  "qpdf --check linearization-shared-overflow.pdf"},
+             {$td->FILE => "linearization-shared-overflow.out",
+              $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+# Huge counts with zero-bit fields, which consume no bits from the
+# hint stream
+$td->runtest("shared object count bounded by object count",
+             {$td->COMMAND =>
+                  "qpdf --check linearization-nshared-total.pdf"},
+             {$td->FILE => "linearization-nshared-total.out",
+              $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("page shared object count bounded by object count",
+             {$td->COMMAND =>
+                  "qpdf --check linearization-page-nshared-objects.pdf"},
+             {$td->FILE => "linearization-page-nshared-objects.out",
               $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
 
