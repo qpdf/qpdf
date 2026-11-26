@@ -223,6 +223,10 @@ namespace QUtil
     QPDF_DLL
     bool get_env(std::string const& var, std::string* value = nullptr);
 
+    // Return the current time. If the SOURCE_DATE_EPOCH environment variable is set to a non-empty
+    // value (see https://reproducible-builds.org/specs/source-date-epoch/), return its value
+    // instead. Throw std::runtime_error if SOURCE_DATE_EPOCH is not a non-negative decimal integer
+    // that fits in time_t.
     QPDF_DLL
     time_t get_current_time();
 
@@ -251,6 +255,8 @@ namespace QUtil
         int tz_delta; // minutes before UTC
     };
 
+    // Return the current local time. If SOURCE_DATE_EPOCH is set, return its value in UTC instead,
+    // as with get_current_time.
     QPDF_DLL
     QPDFTime get_current_qpdf_time();
 

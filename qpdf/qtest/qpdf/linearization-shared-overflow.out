@@ -1,0 +1,6 @@
+checking linearization-shared-overflow.pdf
+PDF Version: 1.3
+File is not encrypted
+File is linearized
+WARNING: linearization-shared-overflow.pdf: error encountered while checking linearization data: overflow reading bit stream: wanted = 32; available = 24
+qpdf: operation succeeded with warnings

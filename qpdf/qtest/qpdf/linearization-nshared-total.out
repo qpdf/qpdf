@@ -1,0 +1,6 @@
+checking linearization-nshared-total.pdf
+PDF Version: 1.3
+File is not encrypted
+File is linearized
+WARNING: linearization-nshared-total.pdf: error encountered while checking linearization data: linearization-nshared-total.pdf (linearization hint table, offset 1288): number of shared object groups exceeds number of objects in file
+qpdf: operation succeeded with warnings

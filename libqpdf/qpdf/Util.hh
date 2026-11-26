@@ -5,6 +5,7 @@
 
 #include <concepts>
 #include <cstdint>
+#include <ctime>
 #include <limits>
 #include <optional>
 #include <stdexcept>
@@ -159,6 +160,12 @@ namespace qpdf::util
     }
 
     std::string random_string(size_t len);
+
+    // Return the value of the SOURCE_DATE_EPOCH environment variable
+    // (https://reproducible-builds.org/specs/source-date-epoch/), or std::nullopt if it is not
+    // set. Throw std::runtime_error if it is set to something other than a non-negative decimal
+    // integer that fits in time_t.
+    std::optional<time_t> source_date_epoch();
 
     // Locale-independent equivalent of strtod. Returns std::nullopt if `str` can't be converted.
     std::optional<double> string_to_double(std::string const& str);

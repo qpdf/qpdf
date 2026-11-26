@@ -714,6 +714,18 @@ Lin::readHPageOffset(BitStream h)
         h, nitems, entries, t.nbits_delta_page_length, &HPageOffsetEntry::delta_page_length);
     load_vector_int(
         h, nitems, entries, t.nbits_nshared_objects, &HPageOffsetEntry::nshared_objects);
+    // A zero-bit field consumes nothing from the bit stream, so the stream's size doesn't limit
+    // these counts. Each shared identifier names a shared object group, and the groups are disjoint
+    // sets of objects.
+    auto nobjects = m->xref_table.size();
+    for (size_t i = 0; i < entries.size(); ++i) {
+        if (std::cmp_greater(entries[i].nshared_objects, nobjects)) {
+            throw damagedPDF(
+                "linearization hint table",
+                "page " + std::to_string(i) +
+                    ": number of shared objects exceeds number of objects in file");
+        }
+    }
     load_vector_vector(
         h,
         nitems,
@@ -751,6 +763,14 @@ Lin::readHSharedObject(BitStream h)
         "qpdf",
         "QPDF lin nshared_total > nshared_first_page",
         (t.nshared_total > t.nshared_first_page) ? 1 : 0);
+
+    // A zero-bit field consumes nothing from the bit stream, so the stream's size doesn't limit
+    // nshared_total. Each group contains at least one object, and the groups are disjoint.
+    if (std::cmp_greater(t.nshared_total, m->xref_table.size())) {
+        throw damagedPDF(
+            "linearization hint table",
+            "number of shared object groups exceeds number of objects in file");
+    }
 
     std::vector<HSharedObjectEntry>& entries = t.entries;
     entries.clear();

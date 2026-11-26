@@ -15,9 +15,18 @@ more detail.
 .. x.y.z: not yet released
 
 12.4.3: not yet released
+  - Enhancements
+
+    - Honor the ``SOURCE_DATE_EPOCH`` environment variable. When it is set, qpdf uses it in place
+      of the current time and generates a deterministic ID for unencrypted output. See
+      :ref:`source-date-epoch`.
+
   - Bug fixes
 
     - Read 32-bit linearization hint offsets as unsigned
+
+    - Bound shared object counts in linearization hint tables by the number of objects in the
+      file, preventing memory exhaustion when checking or showing linearization of a crafted file
 
     - ``fix-qdf``: Don't lose object streams that were not written by qpdf in QDF style
 

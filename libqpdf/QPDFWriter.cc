@@ -2353,6 +2353,13 @@ impl::Writer::doWriteSetup()
         }
     }
 
+    // SOURCE_DATE_EPOCH requests reproducible output, so use a deterministic ID when possible. If
+    // the ID has already been generated, such as when encryption parameters were copied before
+    // encryption was disabled for an older PDF version, it was generated from the fixed time.
+    if (util::source_date_epoch() && !encryption && id2.empty() && !cfg.static_id()) {
+        cfg.deterministic_id(true);
+    }
+
     if (cfg.qdf() || cfg.normalize_content()) {
         initializeSpecialStreams();
     }

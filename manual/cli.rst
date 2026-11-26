@@ -490,6 +490,10 @@ Related Options
    fixes that cause slightly different PDF code to be generated. Such
    changes are noted in the release notes.
 
+   If the ``SOURCE_DATE_EPOCH`` environment variable is set, qpdf
+   behaves as if this option were given whenever the output is not
+   encrypted. See :ref:`source-date-epoch`.
+
 .. qpdf:option:: --allow-weak-crypto
 
    .. help: allow insecure cryptographic algorithms
@@ -3187,7 +3191,8 @@ These options are valid between :qpdf:ref:`--add-attachment` and ``--``.
 
    Specify the attachment's creation date in PDF format; defaults to
    the current time. See :ref:`pdf-dates` for information about the
-   date format.
+   date format. If the ``SOURCE_DATE_EPOCH`` environment variable is
+   set, the default is that time in UTC. See :ref:`source-date-epoch`.
 
 .. qpdf:option:: --moddate=date
 
@@ -3199,7 +3204,8 @@ These options are valid between :qpdf:ref:`--add-attachment` and ``--``.
 
    Specify the attachment's modification date in PDF format; defaults
    to the current time. See :ref:`pdf-dates` for information about the
-   date format.
+   date format. If the ``SOURCE_DATE_EPOCH`` environment variable is
+   set, the default is that time in UTC. See :ref:`source-date-epoch`.
 
 .. qpdf:option:: --mimetype=type/subtype
 
@@ -3966,6 +3972,25 @@ the files :file:`2.pdf` and :file:`3.pdf` should be *byte-for-byte*
 identical. The qpdf test suite relies on this behavior. See also
 :qpdf:ref:`--static-aes-iv`, which should also be used only for
 testing.
+
+.. _source-date-epoch:
+
+SOURCE_DATE_EPOCH
+~~~~~~~~~~~~~~~~~
+
+qpdf honors the ``SOURCE_DATE_EPOCH`` environment variable as defined
+at https://reproducible-builds.org/specs/source-date-epoch/. When it
+is set to a non-empty value, qpdf uses that value in place of the
+current time, and it generates a deterministic ID, as with
+:qpdf:ref:`--deterministic-id`, when the output is not encrypted. The
+value must be a non-negative decimal integer, the number of seconds
+since 1970-01-01 00:00:00 UTC; any other non-empty value is an error.
+Times derived from it, such as default attachment dates, are in UTC.
+
+``SOURCE_DATE_EPOCH`` does not make encrypted output reproducible in
+general since encryption uses random data. For encrypted output, the
+ID is generated from the fixed time, the output file name, and the
+document information dictionary.
 
 Related Options
 ~~~~~~~~~~~~~~~
