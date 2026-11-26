@@ -15,7 +15,7 @@ cleanup();
 
 my $td = new TestDriver('deterministic-id');
 
-my $n_tests = 19;
+my $n_tests = 40;
 
 # Do not use qpdf-test-compare in this test suite since it ignores
 # /ID[1].
@@ -68,6 +68,82 @@ $td->runtest("deterministic ID (C API)",
 $td->runtest("compare files",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "c.pdf"});
+
+# SOURCE_DATE_EPOCH implies --deterministic-id for unencrypted output.
+foreach my $linearize ('', ' --linearize')
+{
+    {
+        delete local $ENV{'SOURCE_DATE_EPOCH'};
+        $td->runtest("deterministic ID without SOURCE_DATE_EPOCH$linearize",
+                     {$td->COMMAND =>
+                          "qpdf --deterministic-id$linearize deterministic-id-in.pdf d.pdf"},
+                     {$td->STRING => "", $td->EXIT_STATUS => 0});
+    }
+    local $ENV{'SOURCE_DATE_EPOCH'} = '1612969439';
+    foreach my $out ('a.pdf', 'b.pdf')
+    {
+        $td->runtest("SOURCE_DATE_EPOCH$linearize",
+                     {$td->COMMAND => "qpdf$linearize deterministic-id-in.pdf $out"},
+                     {$td->STRING => "", $td->EXIT_STATUS => 0});
+    }
+    $td->runtest("compare files",
+                 {$td->FILE => "a.pdf"},
+                 {$td->FILE => "b.pdf"});
+    $td->runtest("compare with deterministic ID",
+                 {$td->FILE => "a.pdf"},
+                 {$td->FILE => "d.pdf"});
+}
+
+{
+    # With encryption, there is no deterministic ID, but the ID is computed with the fixed time.
+    # 128-bit RC4 has no other random data.
+    local $ENV{'SOURCE_DATE_EPOCH'} = '1612969439';
+    foreach my $out ('a.pdf', 'b.pdf')
+    {
+        $td->runtest("SOURCE_DATE_EPOCH with encryption",
+                     {$td->COMMAND =>
+                          "qpdf --allow-weak-crypto --encrypt --bits=128 --use-aes=n --" .
+                          " deterministic-id-in.pdf e.pdf"},
+                     {$td->STRING => "", $td->EXIT_STATUS => 0});
+        rename("e.pdf", $out);
+    }
+    $td->runtest("compare files",
+                 {$td->FILE => "a.pdf"},
+                 {$td->FILE => "b.pdf"});
+}
+
+{
+    # Forcing an old version drops AES encryption after the ID was generated from the encryption
+    # parameters, so there is no deterministic ID, but the output is still reproducible.
+    local $ENV{'SOURCE_DATE_EPOCH'} = '1612969439';
+    foreach my $out ('a.pdf', 'b.pdf')
+    {
+        $td->runtest("SOURCE_DATE_EPOCH with encryption removed",
+                     {$td->COMMAND => "qpdf --force-version=1.4 V4-aes.pdf e.pdf"},
+                     {$td->STRING => "", $td->EXIT_STATUS => 0});
+        rename("e.pdf", $out);
+    }
+    $td->runtest("compare files",
+                 {$td->FILE => "a.pdf"},
+                 {$td->FILE => "b.pdf"});
+}
+
+foreach my $v ('potato', '-1', '12a', '99999999999999999999')
+{
+    local $ENV{'SOURCE_DATE_EPOCH'} = $v;
+    $td->runtest("invalid SOURCE_DATE_EPOCH $v",
+                 {$td->COMMAND => "qpdf deterministic-id-in.pdf a.pdf"},
+                 {$td->STRING => "qpdf: invalid value for SOURCE_DATE_EPOCH: $v\n",
+                      $td->EXIT_STATUS => 2},
+                 $td->NORMALIZE_NEWLINES);
+}
+
+{
+    local $ENV{'SOURCE_DATE_EPOCH'} = '';
+    $td->runtest("empty SOURCE_DATE_EPOCH",
+                 {$td->COMMAND => "qpdf deterministic-id-in.pdf a.pdf"},
+                 {$td->STRING => "", $td->EXIT_STATUS => 0});
+}
 
 cleanup();
 $td->report($n_tests);

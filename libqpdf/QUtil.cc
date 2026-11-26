@@ -11,7 +11,9 @@
 #include <qpdf/QTC.hh>
 #include <qpdf/Util.hh>
 
+#include <algorithm>
 #include <cerrno>
+#include <charconv>
 #include <chrono>
 #include <cstdlib>
 #include <cstring>
@@ -859,12 +861,49 @@ QUtil::get_env(std::string const& var, std::string* value)
 time_t
 QUtil::get_current_time()
 {
+    if (auto sde = util::source_date_epoch()) {
+        return *sde;
+    }
     return std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+}
+
+std::optional<time_t>
+util::source_date_epoch()
+{
+    std::string value;
+    // The spec is silent about an empty value, and implementations vary. Treat empty as unset.
+    if (!QUtil::get_env("SOURCE_DATE_EPOCH", &value) || value.empty()) {
+        return std::nullopt;
+    }
+    time_t result = 0;
+    auto end = value.data() + value.size();
+    if (std::all_of(value.begin(), value.end(), util::is_digit)) {
+        auto [ptr, ec] = std::from_chars(value.data(), end, result);
+        if (ec == std::errc() && ptr == end) {
+            return result;
+        }
+    }
+    throw std::runtime_error("invalid value for SOURCE_DATE_EPOCH: " + value);
 }
 
 QUtil::QPDFTime
 QUtil::get_current_qpdf_time()
 {
+    if (auto sde = util::source_date_epoch()) {
+        using namespace std::chrono;
+        auto t = sys_seconds(seconds(*sde));
+        auto d = floor<days>(t);
+        year_month_day ymd(d);
+        hh_mm_ss hms(t - d);
+        return {
+            static_cast<int>(ymd.year()),
+            static_cast<int>(static_cast<unsigned>(ymd.month())),
+            static_cast<int>(static_cast<unsigned>(ymd.day())),
+            static_cast<int>(hms.hours().count()),
+            static_cast<int>(hms.minutes().count()),
+            static_cast<int>(hms.seconds().count()),
+            0};
+    }
 #ifdef _WIN32
     SYSTEMTIME ltime;
     GetLocalTime(&ltime);

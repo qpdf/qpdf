@@ -197,6 +197,7 @@ jobs:
           - test-alt-zlib
           - test-unsigned-char
           - test-c++-next
+          - test-source-date-epoch
           - build-android-ndk
     steps:
       - uses: actions/checkout@v7

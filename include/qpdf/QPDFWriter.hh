@@ -274,7 +274,8 @@ class QPDFWriter
     // on the same inputs being written to the same outputs with the same parameters to generate
     // exactly the same results. This feature is incompatible with encrypted files because, for
     // encrypted files, the /ID is generated before any part of the file is written since it is an
-    // input to the encryption process.
+    // input to the encryption process. If the SOURCE_DATE_EPOCH environment variable is set, a
+    // deterministic /ID is generated for unencrypted files even if this is not called.
     QPDF_DLL
     void setDeterministicID(bool);
 
