@@ -1522,7 +1522,7 @@ QUtil::get_next_utf8_codepoint(std::string const& utf8_val, size_t& pos, bool& e
         lower_bound = 1 << 16;
         break;
     case 5:
-        lower_bound = 1 << 12;
+        lower_bound = 1 << 21;
         break;
     case 6:
         lower_bound = 1 << 26;
