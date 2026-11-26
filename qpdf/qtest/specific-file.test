@@ -14,7 +14,7 @@ cleanup();
 
 my $td = new TestDriver('specific-file');
 
-my $n_tests = 15;
+my $n_tests = 17;
 
 # Special PDF files that caused problems at some point
 
@@ -80,6 +80,13 @@ $td->runtest("Shared unnamed fields",
              {$td->COMMAND => "qpdf --check shared-unnamed-field.pdf"},
              {$td->FILE => "shared-unnamed-field.out", $td->EXIT_STATUS => 3},
              $td->NORMALIZE_NEWLINES);
+$td->runtest("Duplicated dictionary keys", # bug 1787
+             {$td->COMMAND => "qpdf --static-id dupkeys.pdf a.pdf"},
+             {$td->FILE => "dupkeys.out", $td->EXIT_STATUS => 3},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("check output",
+             {$td->COMMAND => "qpdf-test-compare a.pdf dupkeys-out.pdf"},
+             {$td->FILE => "dupkeys-out.pdf", $td->EXIT_STATUS => 0});
 
 cleanup();
 $td->report($n_tests);
