@@ -119,7 +119,10 @@ more detail.
     - Avoid generating JSON with leading zeroes when converting real numbers.
 
     - Detect and warn in check linearization when the xref stream reports the object containing a
-      compressed object to itself be a compressed object.
+      compressed object to itself be a compressed object. This fixes a security vulnerability
+      (GHSA-32m2-2vwh-qvhw) that could cause infinite recursion or an infinite loop. Packagers
+      can backport the fix to earlier versions by applying commit
+      30284e6cbd9e7ae5d893c7e2cdac36741eded715, which contains only this fix.
 
   - Enhancements
 
