@@ -28,6 +28,9 @@ more detail.
     - Bound shared object counts in linearization hint tables by the number of objects in the
       file, preventing memory exhaustion when checking or showing linearization of a crafted file
 
+    - Reject PNG predictor parameters whose row size is the maximum 32-bit value, preventing a heap
+      buffer overflow when decoding a crafted stream. This bug was introduced in 12.4.0.
+
     - ``fix-qdf``: Don't lose object streams that were not written by qpdf in QDF style
 
     - Fix regression: counting duplicated dictionary keys as token errors could cause complete loss

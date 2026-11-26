@@ -47,7 +47,7 @@ Pl_PNGFilter::Pl_PNGFilter(
     bytes_per_pixel = static_cast<uint32_t>((bits_per_pixel + 7) / 8);
     auto bpr = ((columns * bits_per_pixel) + 7) / 8;
     util::no_ci_rt_error_if(
-        bpr == 0 || !util::fits<uint32_t>(bpr), "PNGFilter created with invalid columns value");
+        bpr == 0 || !util::fits<uint32_t>(bpr + 1), "PNGFilter created with invalid columns value");
     util::no_ci_rt_error_if(
         memory_limit > 0 && bpr > (memory_limit / 2U), "PNGFilter memory limit exceeded");
     bytes_per_row = static_cast<uint32_t>(bpr);
