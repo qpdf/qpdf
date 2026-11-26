@@ -37,7 +37,7 @@ my @image_opt = (
      '--oi-min-width=0 --oi-min-height=0 --oi-min-area=0']
     );
 
-my $n_tests = 2 * scalar(@image_opt) + 5;
+my $n_tests = 2 * scalar(@image_opt) + 6;
 
 foreach my $d (@image_opt)
 {
@@ -85,6 +85,17 @@ $result = $size50b < $size100 ? "ok\n" : "failed\n";
 $td->runtest("quality 50 from DCT < quality 100",
              {$td->STRING => $result},
              {$td->STRING => "ok\n"},
+             $td->NORMALIZE_NEWLINES);
+
+$td->runtest("real /Width out of range",
+             {$td->COMMAND =>
+                  "qpdf --static-id --optimize-images --verbose" .
+                  " image-real-width.pdf a.pdf"},
+             {$td->STRING =>
+                  "qpdf: image /Im1 on page 1: not optimizing because image" .
+                  " is smaller than requested minimum dimensions\n" .
+                  "qpdf: wrote file a.pdf\n",
+                  $td->EXIT_STATUS => 0},
              $td->NORMALIZE_NEWLINES);
 
 cleanup();

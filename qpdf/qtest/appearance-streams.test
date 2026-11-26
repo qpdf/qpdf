@@ -14,7 +14,7 @@ cleanup();
 
 my $td = new TestDriver('appearance-streams');
 
-my $n_tests = 12;
+my $n_tests = 14;
 
 foreach my $f ('need-appearances2',
                'need-appearances-more',
@@ -84,6 +84,17 @@ $td->runtest("Update resources from /DR",
 $td->runtest("compare files",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "resource-from-dr-out.pdf"});
+
+$td->runtest("choice list with huge /BBox",
+             {$td->COMMAND =>
+                      "qpdf --qdf --no-original-object-ids --static-id" .
+                      " --generate-appearances" .
+                      " choice-huge-bbox.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
+$td->runtest("compare files",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "choice-huge-bbox-out.pdf"});
 
 cleanup();
 $td->report($n_tests);
