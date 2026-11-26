@@ -32,7 +32,9 @@ more detail.
     - Normalize leading plus signs and signed leading zeros in PDF real numbers when writing JSON,
       preserving decimal precision and producing valid JSON numeric syntax.
 
-    - Include many small, contributed fixes for various edge cases
+    - Fix parsing of reals in locales that use `,` as the decimal separator.
+
+    - Include many small, contributed fixes for various edge cases.
 
 12.4.2: September 26, 2026
   - Enhancements
