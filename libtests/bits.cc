@@ -168,6 +168,12 @@ test()
     print_buffer(bp);
 
     delete bp;
+
+    // A 32-bit field holding a value >= 2^31, which is what the linearization hint tables carry
+    // for file offsets in PDFs larger than 2 GiB. getBits must not sign-extend it.
+    static unsigned char const big_offset[] = {0xC1, 0xEA, 0xEE, 0x49};
+    BitStream big(big_offset, sizeof(big_offset));
+    std::cout << "unsigned 32-bit offset: " << big.getBits(32) << '\n';
 }
 
 int
