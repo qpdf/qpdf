@@ -12,11 +12,7 @@ Prior to version 12, file :file:`ChangeLog` contained more detail.
 From version 12 onward, please consult version control history for
 more detail.
 
-x.y.z: not yet released
-  - Bug fixes
-
-    - Normalize leading plus signs and signed leading zeros in PDF real numbers when writing JSON,
-      preserving decimal precision and producing valid JSON numeric syntax.
+.. x.y.z: not yet released
 
 12.4.3: not yet released
   - Bug fixes
@@ -25,6 +21,9 @@ x.y.z: not yet released
       when it is a name.
 
     - Speed up page selection with :qpdf:ref:`--pages` when the primary input has many pages.
+
+    - Normalize leading plus signs and signed leading zeros in PDF real numbers when writing JSON,
+      preserving decimal precision and producing valid JSON numeric syntax.
 
 12.4.2: September 26, 2026
   - Enhancements
