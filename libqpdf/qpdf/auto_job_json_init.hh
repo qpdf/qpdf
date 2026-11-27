@@ -464,6 +464,24 @@ beginArray(bindJSON(&Handlers::beginSetPageLabelsArray), bindBare(&Handlers::end
 setupSetPageLabels();
 popHandler(); // array: .setPageLabels[]
 popHandler(); // key: setPageLabels
+pushKey("author");
+addParameter([this](std::string const& p) { c_main->author(p); });
+popHandler(); // key: author
+pushKey("creator");
+addParameter([this](std::string const& p) { c_main->creator(p); });
+popHandler(); // key: creator
+pushKey("keywords");
+addParameter([this](std::string const& p) { c_main->keywords(p); });
+popHandler(); // key: keywords
+pushKey("producer");
+addParameter([this](std::string const& p) { c_main->producer(p); });
+popHandler(); // key: producer
+pushKey("subject");
+addParameter([this](std::string const& p) { c_main->subject(p); });
+popHandler(); // key: subject
+pushKey("title");
+addParameter([this](std::string const& p) { c_main->title(p); });
+popHandler(); // key: title
 pushKey("overlay");
 beginArray(bindJSON(&Handlers::beginOverlayArray), bindBare(&Handlers::endOverlayArray)); // .overlay[]
 beginDict(bindJSON(&Handlers::beginOverlay), bindBare(&Handlers::endOverlay)); // .overlay
