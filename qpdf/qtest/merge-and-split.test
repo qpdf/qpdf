@@ -14,7 +14,7 @@ cleanup();
 
 my $td = new TestDriver('merge-and-split');
 
-my $n_tests = 36;
+my $n_tests = 38;
 
 # Select pages from the same file multiple times including selecting
 # twice from an encrypted file and specifying the password only the
@@ -124,6 +124,17 @@ $td->runtest("remove info (with moddate)",
 $td->runtest("check output",
              {$td->FILE => "a.pdf"},
              {$td->FILE => "remove-info.pdf"});
+
+$td->runtest("remove info without removing metadata",
+             {$td->COMMAND =>
+                  "qpdf metadata-crypt-filter.pdf a.pdf" .
+                  " --remove-info" .
+                  " --decrypt" .
+                  " --static-id"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check metadata retained",
+             {$td->COMMAND => "qpdf --show-object=1 a.pdf"},
+             {$td->REGEXP => ".* /Metadata [0-9]+ 0 R .*", $td->EXIT_STATUS => 0});
 
 $td->runtest("remove info (without moddate)",
              {$td->COMMAND =>

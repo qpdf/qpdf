@@ -137,6 +137,9 @@ more detail.
 
     - Avoid generating JSON with leading zeroes when converting real numbers.
 
+    - Preserve document-level XMP metadata when using :qpdf:ref:`--remove-info`. Metadata is
+      removed only when :qpdf:ref:`--remove-metadata` is specified.
+
     - Detect and warn in check linearization when the xref stream reports the object containing a
       compressed object to itself be a compressed object. This fixes a security vulnerability
       (GHSA-32m2-2vwh-qvhw) that could cause infinite recursion or an infinite loop. Packagers
