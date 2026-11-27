@@ -546,6 +546,25 @@ BaseHandle::unparse() const
     return {}; // unreachable
 }
 
+namespace
+{
+    void
+    write_json_name(int json_version, JSON::Writer& p, std::string const& name)
+    {
+        if (json_version == 1) {
+            p << "\"" << JSON::Writer::encode_string(Name::normalize(name)) << "\"";
+        } else if (auto res = Name::analyzeJSONEncoding(name); res.first) {
+            if (res.second) {
+                p << "\"" << name << "\"";
+            } else {
+                p << "\"" << JSON::Writer::encode_string(name) << "\"";
+            }
+        } else {
+            p << "\"n:" << JSON::Writer::encode_string(Name::normalize(name)) << "\"";
+        }
+    }
+} // namespace
+
 void
 BaseHandle::write_json(int json_version, JSON::Writer& p) const
 {
@@ -600,24 +619,7 @@ BaseHandle::write_json(int json_version, JSON::Writer& p) const
         std::get<QPDF_String>(obj->value).writeJSON(json_version, p);
         break;
     case ::ot_name:
-        {
-            auto const& n = std::get<QPDF_Name>(obj->value);
-            // For performance reasons this code is duplicated in QPDF_Dictionary::writeJSON. When
-            // updating this method make sure QPDF_Dictionary is also update.
-            if (json_version == 1) {
-                p << "\"" << JSON::Writer::encode_string(Name::normalize(n.name)) << "\"";
-            } else {
-                if (auto res = Name::analyzeJSONEncoding(n.name); res.first) {
-                    if (res.second) {
-                        p << "\"" << n.name << "\"";
-                    } else {
-                        p << "\"" << JSON::Writer::encode_string(n.name) << "\"";
-                    }
-                } else {
-                    p << "\"n:" << JSON::Writer::encode_string(Name::normalize(n.name)) << "\"";
-                }
-            }
-        }
+        write_json_name(json_version, p, std::get<QPDF_Name>(obj->value).name);
         break;
     case ::ot_array:
         {
@@ -662,19 +664,8 @@ BaseHandle::write_json(int json_version, JSON::Writer& p) const
             for (auto& iter: d.items) {
                 if (!iter.second.null()) {
                     p.writeNext();
-                    if (json_version == 1) {
-                        p << "\"" << JSON::Writer::encode_string(Name::normalize(iter.first))
-                          << "\": ";
-                    } else if (auto res = Name::analyzeJSONEncoding(iter.first); res.first) {
-                        if (res.second) {
-                            p << "\"" << iter.first << "\": ";
-                        } else {
-                            p << "\"" << JSON::Writer::encode_string(iter.first) << "\": ";
-                        }
-                    } else {
-                        p << "\"n:" << JSON::Writer::encode_string(Name::normalize(iter.first))
-                          << "\": ";
-                    }
+                    write_json_name(json_version, p, iter.first);
+                    p << ": ";
                     iter.second.writeJSON(json_version, p);
                 }
             }
