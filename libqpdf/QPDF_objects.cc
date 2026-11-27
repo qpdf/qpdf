@@ -398,7 +398,6 @@ Objects::reconstruct_xref(QPDFExc& e, bool found_startxref)
                 if (qpdf.getRoot().getKey("/Pages").isDictionary()) {
                     warn(damagedPDF(
                         "", -1, "startxref was more than 1024 bytes before end of file"));
-                    m->encp->initialize(qpdf);
                     m->parsed = true;
                     m->reconstructed_xref = false;
                     return;

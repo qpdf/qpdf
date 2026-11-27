@@ -2,6 +2,7 @@
 require 5.008;
 use warnings;
 use strict;
+use File::Copy;
 
 unshift(@INC, '.');
 require qpdf_test_helpers;
@@ -20,7 +21,7 @@ my @check_encryption_password = (
     ["20-pages.pdf", "", 0, 0],
     ["20-pages.pdf", "user", 0, 3],
     );
-my $n_tests = 3 * scalar(@check_encryption_password);
+my $n_tests = 3 * scalar(@check_encryption_password) + 1;
 foreach my $d (@check_encryption_password)
 {
     my ($file, $pass, $is_encrypted, $requires_password) = @$d;
@@ -32,6 +33,22 @@ foreach my $d (@check_encryption_password)
                       " --password=$pass $file"},
                  {$td->STRING => "", $td->EXIT_STATUS => $requires_password});
 }
+
+# Password errors from recovered cross-reference tables must not be swallowed.
+copy("20-pages.pdf", "a.pdf") or die;
+open(F, ">>a.pdf") or die;
+print F "\n" . (" " x 2048) . "\n";
+close(F);
+my $trailing_warnings = <<'EOF';
+WARNING: a.pdf: file is damaged
+WARNING: a.pdf: can't find startxref
+WARNING: a.pdf: Attempting to reconstruct cross-reference table
+WARNING: a.pdf: startxref was more than 1024 bytes before end of file
+EOF
+$td->runtest("requires password after trailing data",
+             {$td->COMMAND => "qpdf --requires-password a.pdf"},
+             {$td->STRING => $trailing_warnings, $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 
 # Exercise reading password from file
 open(F, ">args") or die;
