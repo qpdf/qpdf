@@ -17,6 +17,13 @@
     /OVERLONG+#f0#81#82#83
     /OVERLONG+#f0#8f#ff#ff
     /Ok+#f0#90#80#80
+    /AWBSDL+#c3#97#ed#aa#a7#ed#99#95
+    /SURROGATE+#ed#a0#80
+    /SURROGATE+#ed#bf#bf
+    /Ok+#ed#9f#bf
+    /TOOBIG+#f4#90#80#80
+    /TOOBIG+#f5#80#80#80
+    /Ok+#f4#8f#bf#bf
     /range+#01
     /low+#18
     /ABCEDEF+#cf#80
@@ -31,6 +38,8 @@
     (Very small/large reals)
     0.00001
     1000000000000
+    (Explicit UTF-8 string that is not valid UTF-8)
+    <efbbbfeda080>
   ]
   /Nested <<
     /1 <<
@@ -220,16 +229,16 @@ xref
 0 7
 0000000000 65535 f 
 0000000025 00000 n 
-0000008642 00000 n 
-0000008724 00000 n 
-0000008920 00000 n 
-0000009019 00000 n 
-0000009038 00000 n 
+0000008889 00000 n 
+0000008971 00000 n 
+0000009167 00000 n 
+0000009266 00000 n 
+0000009285 00000 n 
 trailer <<
   /Root 1 0 R
   /Size 7
   /ID [<42841c13bbf709d79a200fa1691836f8><31415926535897932384626433832795>]
 >>
 startxref
-9144
+9391
 %%EOF

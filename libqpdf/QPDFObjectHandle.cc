@@ -177,44 +177,49 @@ QPDFObjectHandle::ParserCallbacks::terminateParsing()
 }
 
 std::pair<bool, bool>
-Name::analyzeJSONEncoding(const std::string& name)
+Name::analyzeJSONEncoding(std::string_view name)
 {
-    int tail = 0;       // Number of continuation characters expected.
-    bool tail2 = false; // Potential overlong 3 octet utf-8.
-    bool tail3 = false; // potential overlong 4 octet
+    // Accept exactly the well-formed byte sequences of Table 3-7 in chapter 3 of the Unicode
+    // Standard. This excludes overlong encodings, surrogates (U+D800 through U+DFFF), and values
+    // above U+10FFFF. This is also used by QPDF_String::writeJSON to validate explicit UTF-8
+    // strings.
+    int tail = 0; // Number of continuation bytes expected.
+    // Allowed range of the next continuation byte. Only the first continuation byte after some
+    // lead bytes is narrower than the full range.
+    unsigned char lo = 0x80;
+    unsigned char hi = 0xbf;
     bool needs_escaping = false;
     for (auto const& it: name) {
         auto c = static_cast<unsigned char>(it);
         if (tail) {
-            if ((c & 0xc0) != 0x80) {
+            if (c < lo || c > hi) {
                 return {false, false};
             }
-            if (tail2) {
-                if ((c & 0xe0) == 0x80) {
-                    return {false, false};
-                }
-                tail2 = false;
-            } else if (tail3) {
-                if ((c & 0xf0) == 0x80) {
-                    return {false, false};
-                }
-                tail3 = false;
-            }
-            tail--;
+            lo = 0x80;
+            hi = 0xbf;
+            --tail;
         } else if (c < 0x80) {
             if (!needs_escaping) {
                 needs_escaping = !((c > 34 && c != '\\') || c == ' ' || c == 33);
             }
-        } else if ((c & 0xe0) == 0xc0) {
-            if ((c & 0xfe) == 0xc0) {
-                return {false, false};
-            }
+        } else if (c < 0xc2) {
+            // Continuation byte without a lead byte, or overlong 2-byte sequence.
+            return {false, false};
+        } else if (c < 0xe0) {
             tail = 1;
-        } else if ((c & 0xf0) == 0xe0) {
-            tail2 = (c == 0xe0);
+        } else if (c < 0xf0) {
+            if (c == 0xe0) {
+                lo = 0xa0; // overlong
+            } else if (c == 0xed) {
+                hi = 0x9f; // surrogate
+            }
             tail = 2;
-        } else if ((c & 0xf8) == 0xf0) {
-            tail3 = (c == 0xf0);
+        } else if (c < 0xf5) {
+            if (c == 0xf0) {
+                lo = 0x90; // overlong
+            } else if (c == 0xf4) {
+                hi = 0x8f; // above U+10FFFF
+            }
             tail = 3;
         } else {
             return {false, false};
