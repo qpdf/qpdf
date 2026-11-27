@@ -50,6 +50,11 @@ more detail.
     - Normalize leading plus signs and signed leading zeros in PDF real numbers when writing JSON,
       preserving decimal precision and producing valid JSON numeric syntax.
 
+    - Produce valid UTF-8 in JSON output for names containing byte sequences that encode UTF-16
+      surrogates or values above U+10FFFF, and for strings with an explicit UTF-8 marker whose
+      remaining bytes are not valid UTF-8. Such names are written in ``n:/pdf-syntax`` form, and
+      such strings are treated like other binary strings.
+
     - Fix parsing of reals in locales that use `,` as the decimal separator.
 
     - Include many small, contributed fixes for various edge cases.
