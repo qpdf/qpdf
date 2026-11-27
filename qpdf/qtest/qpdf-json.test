@@ -207,6 +207,19 @@ foreach my $f (@update_files) {
                  {$td->FILE => "$f-updated.pdf"});
 }
 
+# Object 6 is replaced before its object stream (7) is read. Writing needs
+# object 5, from the same object stream, which reads the object stream. The
+# replacement of object 6 must survive (#1814).
+$n_tests += 2;
+$td->runtest("update object in unresolved object stream",
+             {$td->COMMAND =>
+                  "qpdf update-in-unresolved-objstm.pdf a.pdf --qdf --static-id" .
+                  " --update-from-json=update-in-unresolved-objstm.json"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("check update in unresolved object stream",
+             {$td->FILE => "a.pdf"},
+             {$td->FILE => "update-in-unresolved-objstm-updated.pdf"});
+
 # Exercise object description
 $n_tests += 2;
 $td->runtest("json-input object description",

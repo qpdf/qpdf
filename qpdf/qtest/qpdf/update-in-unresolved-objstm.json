@@ -1,0 +1,19 @@
+{
+  "qpdf": [
+    {
+      "jsonversion": 2,
+      "pushedinheritedpageresources": false,
+      "calledgetallpages": false,
+      "maxobjectid": 8
+    },
+    {
+      "obj:6 0 R": {
+        "value": {
+          "/Type": "/Font",
+          "/Subtype": "/Type1",
+          "/BaseFont": "/Courier"
+        }
+      }
+    }
+  ]
+}

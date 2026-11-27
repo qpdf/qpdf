@@ -1843,12 +1843,19 @@ Objects::resolveObjectsInStream(int obj_stream_number)
     // To avoid having to read the object stream multiple times, store all objects that would be
     // found here in the cache.  Remember that some objects stored here might have been overridden
     // by new objects appended to the file, so it is necessary to recheck the xref table and only
-    // cache what would actually be resolved here.
+    // cache what would actually be resolved here. Also leave alone objects that were replaced
+    // (with replaceObject, e.g. by --update-from-json) before this object stream was read, or the
+    // replacement would be silently lost. Objects being resolved are still filled: resolve may
+    // have set them to null after detecting a loop.
     for (auto const& [obj_id, obj_offset, obj_size]: offsets) {
         QPDFObjGen og(obj_id, 0);
         auto entry = m->xref_table.find(og);
         if (entry != m->xref_table.end() && entry->second.getType() == 2 &&
             entry->second.getObjStreamNumber() == obj_stream_number) {
+            if (!isUnresolved(og) && !m->resolving.contains(og)) {
+                QTC::TC("qpdf", "QPDF not caching replaced objstm object");
+                continue;
+            }
             is::OffsetBuffer in("", {b_start + obj_offset, obj_size}, obj_offset);
             if (auto oh = Parser::parse(in, obj_stream_number, obj_id, m->tokenizer, qpdf)) {
                 updateCache(og, oh.obj_sp(), end_before_space, end_after_space);

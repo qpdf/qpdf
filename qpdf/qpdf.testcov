@@ -129,6 +129,7 @@ qpdf-c called qpdf_set_r6_encryption_parameters 0
 QPDFObjectHandle EOF in inline image 0
 QPDFObjectHandle inline image token 0
 QPDF not caching overridden objstm object 0
+QPDF not caching replaced objstm object 0
 QPDF xref space 2
 QPDFJob pages range omitted in middle 0
 QPDFWriter standard deterministic ID 1

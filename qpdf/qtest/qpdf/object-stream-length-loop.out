@@ -1,0 +1,6 @@
+WARNING: object-stream-length-loop.pdf (offset 366): loop detected resolving object 5 0
+WARNING: object-stream-length-loop.pdf (object 7 0, offset 311): stream dictionary lacks /Length key
+WARNING: object-stream-length-loop.pdf (object 7 0, offset 367): attempting to recover stream length
+WARNING: object-stream-length-loop.pdf (object 7 0, offset 367): recovered stream length: 93
+<< /Font << /F1 6 0 R >> >>
+qpdf: operation succeeded with warnings
