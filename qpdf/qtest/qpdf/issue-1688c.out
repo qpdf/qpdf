@@ -1,0 +1,3 @@
+WARNING: issue-1688c.pdf, stream object 4 0: error while getting stream data: PNGFilter created with invalid columns value
+WARNING: issue-1688c.pdf, stream object 4 0: qpdf will attempt to write the damaged stream unchanged
+qpdf: operation succeeded with warnings; resulting file may have some problems

@@ -11,7 +11,10 @@
 #include <qpdf/QTC.hh>
 #include <qpdf/Util.hh>
 
+#include <algorithm>
 #include <cerrno>
+#include <charconv>
+#include <chrono>
 #include <cstdlib>
 #include <cstring>
 #include <fcntl.h>
@@ -372,6 +375,18 @@ QUtil::double_to_string(double num, int decimal_places, bool trim_trailing_zeroe
         }
     }
     return result;
+}
+
+std::optional<double>
+util::string_to_double(std::string const& str)
+{
+    std::istringstream buf(str);
+    buf.imbue(std::locale::classic());
+    double result;
+    if (buf >> result) {
+        return result;
+    }
+    return std::nullopt;
 }
 
 long long
@@ -846,32 +861,49 @@ QUtil::get_env(std::string const& var, std::string* value)
 time_t
 QUtil::get_current_time()
 {
-#ifdef _WIN32
-    // The procedure to get local time at this resolution comes from
-    // the Microsoft documentation.  It says to convert a SYSTEMTIME
-    // to a FILETIME, and to copy the FILETIME to a ULARGE_INTEGER.
-    // The resulting number is the number of 100-nanosecond intervals
-    // between January 1, 1601 and now.  POSIX threads wants a time
-    // based on January 1, 1970, so we adjust by subtracting the
-    // number of seconds in that time period from the result we get
-    // here.
-    SYSTEMTIME sysnow;
-    GetSystemTime(&sysnow);
-    FILETIME filenow;
-    SystemTimeToFileTime(&sysnow, &filenow);
-    ULARGE_INTEGER uinow;
-    uinow.LowPart = filenow.dwLowDateTime;
-    uinow.HighPart = filenow.dwHighDateTime;
-    ULONGLONG now = uinow.QuadPart;
-    return static_cast<time_t>((now / 10000000ULL) - 11644473600ULL);
-#else
-    return time(nullptr);
-#endif
+    if (auto sde = util::source_date_epoch()) {
+        return *sde;
+    }
+    return std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+}
+
+std::optional<time_t>
+util::source_date_epoch()
+{
+    std::string value;
+    // The spec is silent about an empty value, and implementations vary. Treat empty as unset.
+    if (!QUtil::get_env("SOURCE_DATE_EPOCH", &value) || value.empty()) {
+        return std::nullopt;
+    }
+    time_t result = 0;
+    auto end = value.data() + value.size();
+    if (std::all_of(value.begin(), value.end(), util::is_digit)) {
+        auto [ptr, ec] = std::from_chars(value.data(), end, result);
+        if (ec == std::errc() && ptr == end) {
+            return result;
+        }
+    }
+    throw std::runtime_error("invalid value for SOURCE_DATE_EPOCH: " + value);
 }
 
 QUtil::QPDFTime
 QUtil::get_current_qpdf_time()
 {
+    if (auto sde = util::source_date_epoch()) {
+        using namespace std::chrono;
+        auto t = sys_seconds(seconds(*sde));
+        auto d = floor<days>(t);
+        year_month_day ymd(d);
+        hh_mm_ss hms(t - d);
+        return {
+            static_cast<int>(ymd.year()),
+            static_cast<int>(static_cast<unsigned>(ymd.month())),
+            static_cast<int>(static_cast<unsigned>(ymd.day())),
+            static_cast<int>(hms.hours().count()),
+            static_cast<int>(hms.minutes().count()),
+            static_cast<int>(hms.seconds().count()),
+            0};
+    }
 #ifdef _WIN32
     SYSTEMTIME ltime;
     GetLocalTime(&ltime);
@@ -1522,7 +1554,7 @@ QUtil::get_next_utf8_codepoint(std::string const& utf8_val, size_t& pos, bool& e
         lower_bound = 1 << 16;
         break;
     case 5:
-        lower_bound = 1 << 12;
+        lower_bound = 1 << 21;
         break;
     case 6:
         lower_bound = 1 << 26;

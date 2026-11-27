@@ -35,9 +35,10 @@ my @goodfiles = ("implicit null",                       # 1
                  "xref with prev",                      # 19
                  "lots of compressible objects",        # 20
                  "array with indirect nulls",           # 21
+                 "stream with filter as array",         # 22
                  );
 
-my $n_tests = (3 * @goodfiles) + 6;
+my $n_tests = (3 * @goodfiles) + 12;
 
 my %goodtest_overrides = ('14' => 3);
 my %goodtest_flags =
@@ -72,6 +73,25 @@ check_pdf($td, "no recompression",
           "qpdf --static-id --stream-data=preserve good17.pdf",
           "good17-not-recompressed.pdf",
           0);
+
+check_pdf($td, "no recompression with filter as array",
+          "qpdf --static-id --stream-data=preserve good22.pdf",
+          "good22-not-recompressed.pdf",
+          0);
+
+$td->runtest("no recompression with filter as array",
+             {$td->COMMAND => "qpdf --compression-level=9 good22.pdf a.pdf"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("get original stream data",
+             {$td->COMMAND => "qpdf --show-object=7 --raw-stream-data good22.pdf > auto-1"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+$td->runtest("get new stream data",
+             {$td->COMMAND => "qpdf --show-object=2 --raw-stream-data a.pdf > auto-2"},
+             {$td->STRING => "", $td->EXIT_STATUS => 0});
+# This would fail if we didn't recognize [/FlateDecode] as the same as /FlateDecode
+$td->runtest("compare",
+             {$td->FILE => "auto-1"},
+             {$td->FILE => "auto-2"});
 
 cleanup();
 $td->report($n_tests);

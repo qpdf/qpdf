@@ -66,6 +66,13 @@
         "/OVERLONG+#f0#81#82#83",
         "/OVERLONG+#f0#8f#ff#ff",
         "/Ok+#f0#90#80#80",
+        "/AWBSDL+#c3#97#ed#aa#a7#ed#99#95",
+        "/SURROGATE+#ed#a0#80",
+        "/SURROGATE+#ed#bf#bf",
+        "/Ok+#ed#9f#bf",
+        "/TOOBIG+#f4#90#80#80",
+        "/TOOBIG+#f5#80#80#80",
+        "/Ok+#f4#8f#bf#bf",
         "/range+#01",
         "/low+#18",
         "/ABCEDEF+#cf#80",
@@ -79,7 +86,9 @@
         "/Except!",
         "Very small/large reals",
         0.00001,
-        1000000000000
+        1000000000000,
+        "Explicit UTF-8 string that is not valid UTF-8",
+        "ï»¿í€•"
       ],
       "/Nested": {
         "/1": {

@@ -1560,9 +1560,10 @@ impl::Writer::will_filter_stream(QPDFObjectHandle stream, std::string* stream_da
             // make it worse if the original file used a better Flate algorithm, and we don't spend
             // time and CPU cycles uncompressing and recompressing stuff. This can be overridden
             // with setRecompressFlate(true).
-            Name Filter = stream_dict["/Filter"];
-            if (Filter && !cfg.recompress_flate() && !stream.isDataModified() &&
-                (Filter == "/FlateDecode" || Filter == "/Fl")) {
+            auto Filter = stream_dict["/Filter"];
+            Name filter_name = Filter.size() == 1 ? Filter[0] : QPDFObjectHandle();
+            if (filter_name && !cfg.recompress_flate() && !stream.isDataModified() &&
+                (filter_name == "/FlateDecode" || filter_name == "/Fl")) {
                 filter = false;
             }
         }
@@ -2350,6 +2351,13 @@ impl::Writer::doWriteSetup()
         if (compareVersions(major, minor, 1, 5) < 0) {
             cfg.object_streams(qpdf_o_disable);
         }
+    }
+
+    // SOURCE_DATE_EPOCH requests reproducible output, so use a deterministic ID when possible. If
+    // the ID has already been generated, such as when encryption parameters were copied before
+    // encryption was disabled for an older PDF version, it was generated from the fixed time.
+    if (util::source_date_epoch() && !encryption && id2.empty() && !cfg.static_id()) {
+        cfg.deterministic_id(true);
     }
 
     if (cfg.qdf() || cfg.normalize_content()) {

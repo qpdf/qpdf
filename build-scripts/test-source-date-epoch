@@ -1,0 +1,17 @@
+#!/bin/bash
+set -e
+sudo apt-get update
+sudo apt-get -y install \
+   build-essential cmake \
+   zlib1g-dev libjpeg-dev libgnutls28-dev libssl-dev
+cmake -S . -B build \
+    -DCI_MODE=1 -DBUILD_STATIC_LIBS=0 -DCMAKE_BUILD_TYPE=Release \
+    -DREQUIRE_CRYPTO_OPENSSL=1 -DREQUIRE_CRYPTO_GNUTLS=1 \
+    -DENABLE_QTC=1
+cmake --build build --verbose -j$(nproc) -- -k
+cd build
+# Packagers often set SOURCE_DATE_EPOCH while running the test suite.
+# It makes qpdf use deterministic IDs for unencrypted output, so make
+# sure the test suite passes with it set.
+export SOURCE_DATE_EPOCH=1612969439
+ctest --verbose

@@ -1,0 +1,16 @@
+auto-1 -> 6,0
+  preferred name: auto-1
+  all names:
+    /F -> auto-1
+    /UF -> auto-1
+  all data streams:
+    /F -> 6,0
+      creation date: D:20210210150359Z
+      modification date: D:20210210150359Z
+      mime type: 
+      checksum: a857d18d3fc23ad412122ef040733331
+    /UF -> 6,0
+      creation date: D:20210210150359Z
+      modification date: D:20210210150359Z
+      mime type: 
+      checksum: a857d18d3fc23ad412122ef040733331

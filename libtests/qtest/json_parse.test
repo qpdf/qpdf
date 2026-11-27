@@ -129,6 +129,7 @@ my @bad = (
     "cr char in string",        # 46
     "lf char in string",        # 47
     "bs char in string",        # 48
+    "stray low surrogate at 6", # 49
     );
 
 my $i = 0;

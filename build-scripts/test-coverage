@@ -10,6 +10,13 @@ cmake -S . -B build \
     -DENABLE_QTC=1 -DENABLE_COVERAGE=ON
 cmake --build build --verbose -j$(nproc) -- -k
 (cd build; ctest --verbose)
-lcov --capture --directory . --output-file coverage.info
-lcov --remove coverage.info '/usr/*' --output-file coverage.info
-lcov --list coverage.info
+# lcov reports "inconsistent" when a function was never called but its
+# first line was executed. This happens whenever a lambda that is never
+# called is defined on the same line as code that runs, which is
+# common in qpdf. The coverage data is correct in that case. Each lcov
+# command repeats the check, so each one needs the flag.
+lcov --capture --directory . --output-file coverage.info \
+     --ignore-errors inconsistent
+lcov --remove coverage.info '/usr/*' --output-file coverage.info \
+     --ignore-errors inconsistent
+lcov --list coverage.info --ignore-errors inconsistent

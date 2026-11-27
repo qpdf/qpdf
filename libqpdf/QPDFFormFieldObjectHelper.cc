@@ -11,8 +11,9 @@
 #include <qpdf/QPDF_private.hh>
 #include <qpdf/QTC.hh>
 #include <qpdf/QUtil.hh>
-#include <cstdlib>
 
+#include <algorithm>
+#include <cstdlib>
 #include <memory>
 
 using namespace qpdf;
@@ -712,7 +713,13 @@ ValueSetter::writeAppearance()
 
     // Write one or more lines, centered vertically, possibly with one row highlighted.
 
-    auto max_rows = static_cast<size_t>((bbox.ury - bbox.lly) / tfh);
+    // The bounding box comes from the file and may be arbitrarily large. Converting an out-of-range
+    // double to size_t is undefined, so clamp first. Rows beyond the number of options are unused.
+    double rows = (bbox.ury - bbox.lly) / tfh;
+    size_t max_rows = 0;
+    if (rows >= 1.0) {
+        max_rows = static_cast<size_t>(std::min(rows, static_cast<double>(opt.size() + 1)));
+    }
     bool highlight = false;
     size_t highlight_idx = 0;
 
@@ -809,7 +816,7 @@ namespace
             switch (ttype) {
             case QPDFTokenizer::tt_integer:
             case QPDFTokenizer::tt_real:
-                last_num = strtod(value.c_str(), nullptr);
+                last_num = util::string_to_double(value).value_or(0.0);
                 last_num_idx = QIntC::to_int(DA.size() - 1);
                 break;
 
@@ -852,7 +859,7 @@ namespace
             int i = -1;
             for (auto const& cur: DA) {
                 if (++i == tf_idx) {
-                    double delta = strtod(cur.c_str(), nullptr) - tf;
+                    double delta = util::string_to_double(cur).value_or(0.0) - tf;
                     if (delta > 0.001 || delta < -0.001) {
                         // tf doesn't match the font size passed to Tf, so substitute.
                         QTC::TC("qpdf", "QPDFFormFieldObjectHelper fallback Tf");

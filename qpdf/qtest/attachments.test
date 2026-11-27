@@ -14,7 +14,7 @@ cleanup();
 
 my $td = new TestDriver('attachments');
 
-my $n_tests = 37;
+my $n_tests = 39;
 
 open(F, ">auto-txt") or die;
 print F "from file";
@@ -100,6 +100,19 @@ foreach my $i (qw(1 2 3))
     print F "attachment $i";
     close(F);
 }
+{
+    # Default attachment dates come from SOURCE_DATE_EPOCH in UTC regardless of TZ.
+    local $ENV{'SOURCE_DATE_EPOCH'} = '1612969439';
+    local $ENV{'TZ'} = 'Asia/Kolkata';
+    $td->runtest("add attachment with SOURCE_DATE_EPOCH",
+                 {$td->COMMAND =>
+                      "qpdf minimal.pdf a.pdf --add-attachment ./auto-1 --"},
+                 {$td->STRING => "", $td->EXIT_STATUS => 0});
+}
+$td->runtest("list attachments with SOURCE_DATE_EPOCH",
+             {$td->COMMAND => "qpdf --list-attachments --verbose a.pdf"},
+             {$td->FILE => "list-attachments-sde.out", $td->EXIT_STATUS => 0},
+             $td->NORMALIZE_NEWLINES);
 my @dates = ("--creationdate=D:20210210091359-05'00'",
              "--moddate=D:20210210141359Z");
 $td->runtest("add attachments",

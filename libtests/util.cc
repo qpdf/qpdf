@@ -5,9 +5,11 @@
 #include <qpdf/Util.hh>
 
 #include <qpdf/QIntC.hh>
+#include <qpdf/QPDFObjectHandle.hh>
 #include <qpdf/QUtil.hh>
 #include <qpdf/global.hh>
 
+#include <clocale>
 #include <limits>
 
 using namespace qpdf::util;
@@ -91,6 +93,27 @@ test_1(QPDF&, char const*)
     }));
 }
 
+// Test util::string_to_double
+static void
+test_2(QPDF&, char const*)
+{
+    // Use a locale with ',' as the decimal separator if one is available. The results must not
+    // depend on it.
+    for (auto name: {"de_DE.UTF-8", "de_DE.utf8", "fr_FR.UTF-8", "fr_FR.utf8", "de-DE"}) {
+        if (std::setlocale(LC_ALL, name)) {
+            break;
+        }
+    }
+
+    assert(string_to_double("612.5") == 612.5);
+    assert(string_to_double("-.25") == -0.25);
+    assert(string_to_double("1.25e3") == 1250.0);
+    assert(!string_to_double("abc"));
+    assert(QPDFObjectHandle::parse("792.25").getNumericValue() == 792.25);
+
+    std::setlocale(LC_ALL, "C");
+}
+
 void
 runtest(int n, char const* filename1, char const* arg2)
 {
@@ -98,7 +121,7 @@ runtest(int n, char const* filename1, char const* arg2)
     // the test suite to see how the test is invoked to find the file
     // that the test is supposed to operate on.
 
-    std::set<int> ignore_filename = {0, 1};
+    std::set<int> ignore_filename = {0, 1, 2};
 
     QPDF pdf;
     std::shared_ptr<char> file_buf;
@@ -111,7 +134,8 @@ runtest(int n, char const* filename1, char const* arg2)
         pdf.processMemoryFile(filename1, file_buf.get(), size);
     }
 
-    std::map<int, void (*)(QPDF&, char const*)> test_functions = {{0, test_0}, {1, test_1}};
+    std::map<int, void (*)(QPDF&, char const*)> test_functions = {
+        {0, test_0}, {1, test_1}, {2, test_2}};
 
     auto fn = test_functions.find(n);
     if (fn == test_functions.end()) {

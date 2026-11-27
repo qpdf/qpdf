@@ -88,7 +88,8 @@ set(CORPUS_FROM_TEST
   issue-202.pdf
   issue-263.pdf
   issue-335a.pdf
-  issue-335b.pdf)
+  issue-335b.pdf
+  issue-1688c.pdf)
 
 # Any file that qpdf_fuzzer should be tested with can be named
 # something.fuzz and dropped into qpdf_extra. Update count for qpdf in

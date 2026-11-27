@@ -432,8 +432,9 @@ namespace qpdf
 
         // Check whether name is valid utf-8 and whether it contains characters that require
         // escaping. Return {false, false} if the name is not valid utf-8, otherwise return {true,
-        // true} if no characters require or {true, false} if escaping is required.
-        static std::pair<bool, bool> analyzeJSONEncoding(std::string const& name);
+        // true} if no characters require or {true, false} if escaping is required. This is also
+        // used by QPDF_String::writeJSON to validate explicit UTF-8 strings.
+        static std::pair<bool, bool> analyzeJSONEncoding(std::string_view name);
 
         Name() = default;
         Name(Name const&) = default;

@@ -7,6 +7,16 @@
 // DO NOT USE ctype -- it is locale dependent for some things, and it's not worth the risk of
 // including it in case it may accidentally be used.
 
+// PDF 2.0 allows UTF-8 strings when explicitly prefixed with the three-byte representation of
+// U+FEFF. A string with that prefix whose remainder is not valid UTF-8 is treated like any other
+// string.
+static bool
+is_valid_explicit_utf8(std::string const& val)
+{
+    return util::is_explicit_utf8(val) &&
+        qpdf::Name::analyzeJSONEncoding(std::string_view(val).substr(3)).first;
+}
+
 static bool
 is_iso_latin1_printable(char ch)
 {
@@ -21,9 +31,7 @@ QPDF_String::writeJSON(int json_version, JSON::Writer& p)
             p << "\"" << JSON::Writer::encode_string(QUtil::utf16_to_utf8(val)) << "\"";
             return;
         }
-        if (util::is_explicit_utf8(val)) {
-            // PDF 2.0 allows UTF-8 strings when explicitly prefixed with the three-byte
-            // representation of U+FEFF.
+        if (is_valid_explicit_utf8(val)) {
             p << "\"" << JSON::Writer::encode_string(val.substr(3)) << "\"";
             return;
         }
@@ -36,7 +44,7 @@ QPDF_String::writeJSON(int json_version, JSON::Writer& p)
         return;
     }
     // See if we can unambiguously represent as Unicode.
-    if (util::is_explicit_utf8(val)) {
+    if (is_valid_explicit_utf8(val)) {
         p << "\"u:" << JSON::Writer::encode_string(val.substr(3)) << "\"";
         return;
     }

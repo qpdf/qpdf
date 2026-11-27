@@ -1,7 +1,7 @@
 #include <qpdf/InsecureRandomDataProvider.hh>
 
-#include <qpdf/QUtil.hh>
 #include <qpdf/qpdf-config.h>
+#include <chrono>
 #include <cstdlib>
 
 void
@@ -16,9 +16,13 @@ long
 InsecureRandomDataProvider::random()
 {
     if (!this->seeded_random) {
-        // Seed the random number generator with something simple, but just to be interesting, don't
-        // use the unmodified current time.  It would be better if this were a more secure seed.
-        auto seed = static_cast<unsigned int>(QUtil::get_current_time() ^ 0xcccc);
+        // Use the time to seed the insecure random number generator. In this case, the important
+        // part is that the value is reasonably unique, not that it's a time. Read a high-resolution
+        // clock directly rather than using QUtil::get_current_time since QUtil::get_current_time
+        // obeys SOURCE_DATE_EPOCH, which breaks the uniqueness of random values. Note that this
+        // random provider is disabled in favor of a secure random source by default.
+        auto seed =
+            static_cast<unsigned int>(std::chrono::steady_clock::now().time_since_epoch().count());
 #ifdef HAVE_RANDOM
         ::srandom(seed);
 #else
